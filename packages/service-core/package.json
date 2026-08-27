@@ -1,0 +1,10 @@
+{
+  "name": "@ccx/service-core",
+  "version": "0.1.0",
+  "private": true,
+  "description": "JSON-RPC 2.0 服务核心（services-spec §1/ADR-006）：协议/daemon/客户端",
+  "type": "module",
+  "bin": {
+    "ccx-service-daemon": "bin/daemon.mjs"
+  }
+}

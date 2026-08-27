@@ -7,10 +7,11 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { CommandBus } from '../../scene-service/src/commands.mjs';
 import { renderPlan } from '../../scene-service/src/render_plan.mjs';
+import { RpcClient } from '../../service-core/src/client.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 
-function main() {
+async function main() {
   const args = process.argv.slice(2);
   const jsonMode = args.includes('--json');
   const positional = args.filter((a) => !a.startsWith('--'));
@@ -133,6 +134,27 @@ function main() {
     });
   }
 
+  // —— service demo：spawn stdio daemon -> RPC 调用 -> 退出 ——
+  if (sub === 'service' && positional[1] === 'demo') {
+    const daemonEntry = resolve(join(here, '..', '..', 'service-core', 'bin', 'daemon.mjs'));
+    const client = new RpcClient(process.execPath, [daemonEntry]);
+    try {
+      await new Promise((resolve, reject) => {
+        const off = client.onEvent((m) => {
+          if (m.method === 'system.ready') {
+            off();
+            resolve();
+          }
+        });
+        setTimeout(() => reject(new Error('daemon 未就绪')), 2000);
+      });
+      const list = await client.request('asset.list');
+      return emit({ ok: true, daemon: 'stdio', assets: list.assets.length });
+    } finally {
+      client.close();
+    }
+  }
+
   // —— doctor / version ——
   if (sub === 'version') return emit({ ok: true, name: '@ccx/cli', version: '0.1.0', milestone: 'M1' });
   if (sub === 'doctor') {
@@ -161,4 +183,7 @@ function main() {
   });
 }
 
-main();
+main().catch((e) => {
+  console.error(e);
+  process.exit(1);
+});

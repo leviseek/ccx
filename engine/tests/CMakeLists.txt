@@ -83,3 +83,8 @@ add_test(NAME animation.state_machine COMMAND ccx_state_machine_test)
 add_executable(ccx_metrics_test metrics_test.cpp)
 target_link_libraries(ccx_metrics_test PRIVATE ccx_foundation)
 add_test(NAME foundation.metrics COMMAND ccx_metrics_test)
+
+# M1：shader 资产 + material 联动校验
+add_executable(ccx_shader_material_test shader_material_test.cpp)
+target_link_libraries(ccx_shader_material_test PRIVATE ccx_render)
+add_test(NAME render.shader_material COMMAND ccx_shader_material_test)

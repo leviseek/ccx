@@ -6,6 +6,7 @@ add_library(ccx_render STATIC
   src/pipeline.cpp
   src/batcher.cpp
   src/material.cpp
+  src/shader.cpp
 )
 
 target_include_directories(ccx_render PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

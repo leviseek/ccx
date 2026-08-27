@@ -131,6 +131,7 @@
 
 ## 变更记录
 
+- **v0.2.8（2026-08-27）**：M1 渲染链路 CPU 面——Pipeline 资产解析→RenderGraph 编译（启用剔除/minFeatures 降级门槛/同 target 隐式链，修正写-写与读写顺序规则）、gfx RHI CPU 面（纹理/缓冲描述校验 + HandlePool 防悬垂句柄）、SceneService/CommandBus（命令应用 + undo/redo + ADR-003 读写）；ctest 9/9 + node 14/14。
 - **v0.2.7（2026-08-27）**：M1 深度推进——scene 模块（树/2D 排序/world 变换/Prefab override，engine/scene）、RenderGraph 编译器（engine/render，6 组校验用例）、CLI create/scene-new（项目模板 + ADR-003 空场景）、AssetService 骨架（importer 注册表/PNG 头解析/图集 shelf 打包）；ctest 7/7 + node 8/8。
 - **v0.2.6（2026-08-27）**：M1 首轮四件套完成——① GITHUB-SETUP.md 推送说明；② bindgen v0.2 扩展（数组/默认值/回调，7/7+tsc）；③ ECS M1 化（Query 缓存 + Stage 调度器 + job::TaskGraph，ctest 5/5）；④ vendor 落地（pal/audio/storage/main 369 文件，tools/vendor/sync.mjs 可复现）。
 - **v0.2.5（2026-08-27）**：**M0 gate 会签通过，M0 正式关闭，M1 开工**（裁定 A；出口③④ 待 push 后真 CI 复核）。M1 首轮：bindgen 扩展 / ECS M1 化 / vendor 落地 / GitHub push 说明。

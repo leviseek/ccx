@@ -1,7 +1,7 @@
 {
   "name": "@ccx/scene-service",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
-  "description": "SceneService 占位（services-spec §2/§4；M2 实现）",
+  "description": "SceneService 骨架（services-spec §2/§4）：命令应用 + undo/redo + ADR-003 读写",
   "type": "module"
 }

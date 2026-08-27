@@ -36,38 +36,40 @@ CompileResult RenderGraph::compile() const {
         }
     }
 
-    // 2) transient 生命周期：任何资源不得在其 first-write 之前被读取
+    // 2) transient 生命周期：读取不得发生在首次写入（按添加序）之前；
+    //    显式 after 可覆盖（pipeline 资产内声明的顺序优先）
     {
-        std::unordered_map<std::string, std::string> firstWriter;
-        for (const Pass& p : passes_) {
-            for (const std::string& r : p.writes) {
-                if (!firstWriter.count(r)) firstWriter[r] = p.name;
+        std::unordered_map<std::string, size_t> firstWriterIdx;
+        for (size_t i = 0; i < passes_.size(); ++i) {
+            for (const std::string& r : passes_[i].writes) {
+                if (!firstWriterIdx.count(r)) firstWriterIdx[r] = i;
             }
         }
-        for (const Pass& p : passes_) {
+        for (size_t i = 0; i < passes_.size(); ++i) {
+            const Pass& p = passes_[i];
             for (const std::string& r : p.reads) {
-                const auto it = firstWriter.find(r);
-                if (it != firstWriter.end()) {
-                    // 读出现在写之前（按添加序）——保守规则：必须显式 after
-                    std::string w = it->second;
-                    if (w != p.name) {
-                        bool ordered = false;
-                        for (const std::string& a : p.after) {
-                            if (a == w) { ordered = true; break; }
-                        }
-                        if (!ordered) {
-                            out.error = "transient 资源在写入前被读取: " + r +
-                                        "（pass " + p.name + " 读取，首次写入在 " + w +
-                                        "；请用 after 显式排序）";
-                            return out;
-                        }
-                    }
-                } else if (true) {
-                    // 外部资源（External）允许任何顺序
+                const auto it = firstWriterIdx.find(r);
+                if (it == firstWriterIdx.end()) {
+                    // 从未被写入：External 允许，Transient 拒绝
                     const int ri = resourceIndex(r, p.name.c_str());
                     if (ri >= 0 && resources_[static_cast<size_t>(ri)].kind ==
                                       ResourceKind::Transient) {
                         out.error = "transient 资源从未被写入却被读取: " + r;
+                        return out;
+                    }
+                    continue;
+                }
+                if (it->second > i) {
+                    // 读取 pass 在首次写入 pass 之前声明：需显式 after 覆盖
+                    bool ordered = false;
+                    const std::string w = passes_[it->second].name;
+                    for (const std::string& a : p.after) {
+                        if (a == w) { ordered = true; break; }
+                    }
+                    if (!ordered) {
+                        out.error = "transient 资源在写入前被读取: " + r +
+                                    "（pass " + p.name + " 读取，首次写入在 " + w +
+                                    "；请用 after 显式排序）";
                         return out;
                     }
                 }

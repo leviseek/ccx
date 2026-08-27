@@ -48,22 +48,29 @@ int main() {
         check(r.error.find("未声明资源") != std::string::npos, "错误信息明确");
     }
     {
-        // 3) transient 写前读（未显式排序）
+        // 3) transient 读写顺序：按添加序判定（写者在前合法；读者在前需显式 after）
         RenderGraph g2;
         g2.declareResource("hdr", ResourceKind::Transient);
         g2.addPass({"writer", {}, {"hdr"}, {}});
         g2.addPass({"reader", {"hdr"}, {}, {}});
         const auto r2 = g2.compile();
-        check(!r2.ok, "写前读（transient）被拒");
-        check(r2.error.find("after") != std::string::npos, "提示用 after 显式排序");
-        // 显式 after 后通过
+        check(r2.ok, "写者在前（添加序）合法");
+        // 读者在前 -> 拒绝
         RenderGraph g3;
         g3.declareResource("hdr", ResourceKind::Transient);
-        g3.addPass({"reader", {"hdr"}, {}, {"writer"}});
+        g3.addPass({"reader", {"hdr"}, {}, {}});
         g3.addPass({"writer", {}, {"hdr"}, {}});
         const auto r3 = g3.compile();
-        check(r3.ok, "显式 after 后合法");
-        check(r3.executionOrder[0] == "writer" && r3.executionOrder[1] == "reader",
+        check(!r3.ok, "读者在写者前被拒");
+        check(r3.error.find("after") != std::string::npos, "提示用 after 显式排序");
+        // 读者在前 + 显式 after -> 合法（after 覆盖添加序）
+        RenderGraph g4;
+        g4.declareResource("hdr", ResourceKind::Transient);
+        g4.addPass({"reader", {"hdr"}, {}, {"writer"}});
+        g4.addPass({"writer", {}, {"hdr"}, {}});
+        const auto r4 = g4.compile();
+        check(r4.ok, "显式 after 后合法");
+        check(r4.executionOrder[0] == "writer" && r4.executionOrder[1] == "reader",
               "after 约束生效");
     }
     {

@@ -35,3 +35,13 @@ add_test(NAME scene.module COMMAND ccx_scene_test)
 add_executable(ccx_render_graph_test render_graph_test.cpp)
 target_link_libraries(ccx_render_graph_test PRIVATE ccx_render)
 add_test(NAME render.graph COMMAND ccx_render_graph_test)
+
+# M1：Pipeline 资产解析 -> RenderGraph 编译（renderer-spec §4）
+add_executable(ccx_pipeline_test pipeline_test.cpp)
+target_link_libraries(ccx_pipeline_test PRIVATE ccx_render)
+add_test(NAME render.pipeline COMMAND ccx_pipeline_test)
+
+# M1：gfx CPU 面（描述校验 + 句柄池）
+add_executable(ccx_gfx_test gfx_test.cpp)
+target_link_libraries(ccx_gfx_test PRIVATE ccx_gfx)
+add_test(NAME gfx.cpu COMMAND ccx_gfx_test)

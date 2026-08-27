@@ -15,8 +15,11 @@ if(CCX_BUILD_RENDER)
   add_subdirectory(render)
 endif()
 
+if(CCX_BUILD_GFX)
+  add_subdirectory(gfx)
+endif()
+
 # 占位模块：README 已建，CMake 随 milestone 打开（roadmap M1/M2）
-# add_subdirectory(gfx)
 # add_subdirectory(render)
 # add_subdirectory(animation)
 # add_subdirectory(physics)

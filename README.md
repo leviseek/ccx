@@ -122,7 +122,7 @@
 | 工具链 | ✅ mise 管理 | .mise.toml（cmake/ninja）；本地编译器 w64devkit（CI 用系统编译器，见 engine/README） |
 | CLI 壳 | ✅ doctor/version + --json | packages/cli/bin/ccx.mjs |
 | ADR 会签 | ✅ 用户已认可（2026-08-27） | 6 份 ADR 全部采纳；后续变更走 ADR 流程 |
-| M0 gate 评审 | ✅ 材料就绪，待会签（需人） | docs/working/m0-gate-review.md（出口对照/证据/议程/签字栏） |
+| M0 gate 评审 | ✅ **已会签关闭 M0（2026-08-27）** | docs/working/m0-gate-review.md §5（裁定 A + 签字）；M1 已开工 |
 | ECS 最小实现（M0 工作包） | ✅ **实现并测试全绿** | engine/ecs：World/Entity(版本)/Archetype(SoA+自动扩容)/Query/CommandBuffer；ctest 3/3（含 1000 实体跨 chunk 扩容用例） |
 | M0 出口①（场景 JSON+diff） | ✅ **补齐** | examples/scenes/sample.scene.json + scene_sample_test（golden/反读/幂等）；git diff 演示见评审材料 §3 |
 | M0 出口④（bindgen napi） | 🟡 **基础设施补齐，待真 CI** | napi/binding.gyp + smoke + CI 任务 lighthouse-c-bindgen；本机 5/5+tsc 通过 |
@@ -131,6 +131,7 @@
 
 ## 变更记录
 
+- **v0.2.5（2026-08-27）**：**M0 gate 会签通过，M0 正式关闭，M1 开工**（裁定 A；出口③④ 待 push 后真 CI 复核）。M1 首轮：bindgen 扩展 / ECS M1 化 / vendor 落地 / GitHub push 说明。
 - **v0.2.4（2026-08-27）**：M0 gate 会前材料就绪（docs/working/m0-gate-review.md）；补齐出口①（场景样例+golden 测试+diff 演示）与出口④（bindgen napi 编译冒烟 CI 任务）；ctest 升至 4/4。
 - **v0.2.3（2026-08-27）**：ADR 会签通过（用户认可）；ECS 最小实现完成并测试全绿（engine/ecs，ctest 3/3；修复 chunk 越界与 CommandBuffer 占位实体 op 残留两个真 bug）
 - **v0.2.2（2026-08-27）**：灯塔任务 B/C/D 全部完成——vendor 裁剪清单（实测数据）、bindgen 原型（5/5 测试 + tsc 通过）、SpriteBatch 合批原型（ctest 2/2）。

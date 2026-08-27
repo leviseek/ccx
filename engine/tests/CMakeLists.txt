@@ -8,3 +8,8 @@ add_test(NAME foundation.roundtrip COMMAND ccx_foundation_tests)
 # 灯塔任务 D：SpriteBatch 合批模型原型（renderer-spec §5，纯 CPU 数据模型）
 add_executable(ccx_batch_prototype_test batch_prototype_test.cpp)
 add_test(NAME render.batch_prototype COMMAND ccx_batch_prototype_test)
+
+# ECS 最小实现（engine-spec §3、ADR-002）
+add_executable(ccx_ecs_minimal_test ecs_minimal_test.cpp)
+target_link_libraries(ccx_ecs_minimal_test PRIVATE ccx_ecs)
+add_test(NAME ecs.minimal COMMAND ccx_ecs_minimal_test)

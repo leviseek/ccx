@@ -3,8 +3,11 @@
 
 add_subdirectory(foundation)
 
+if(CCX_BUILD_ECS)
+  add_subdirectory(ecs)
+endif()
+
 # 占位模块：README 已建，CMake 随 milestone 打开（roadmap M1/M2）
-# add_subdirectory(ecs)
 # add_subdirectory(scene)
 # add_subdirectory(gfx)
 # add_subdirectory(render)

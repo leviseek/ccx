@@ -73,3 +73,13 @@ target_link_libraries(ccx_e2e_render_plan_test PRIVATE ccx_render ccx_scene)
 add_test(NAME e2e.render_plan
          COMMAND ccx_e2e_render_plan_test
          WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+
+# M1：动画状态机（时间/触发器条件）
+add_executable(ccx_state_machine_test state_machine_test.cpp)
+target_link_libraries(ccx_state_machine_test PRIVATE ccx_animation)
+add_test(NAME animation.state_machine COMMAND ccx_state_machine_test)
+
+# M1：metrics（帧统计环形缓冲 + JSON 快照）
+add_executable(ccx_metrics_test metrics_test.cpp)
+target_link_libraries(ccx_metrics_test PRIVATE ccx_foundation)
+add_test(NAME foundation.metrics COMMAND ccx_metrics_test)

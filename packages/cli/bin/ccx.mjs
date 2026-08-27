@@ -6,6 +6,7 @@ import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { CommandBus } from '../../scene-service/src/commands.mjs';
+import { renderPlan } from '../../scene-service/src/render_plan.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 
@@ -106,6 +107,29 @@ function main() {
       applied,
       entityCount: out.entities.length,
       note: 'undo/redo 属会话内能力（SceneService），CLI 一次性提交',
+    });
+  }
+
+  // —— render plan <file>：渲染计划（场景 -> 稳定排序 -> 合批）——
+  if (sub === 'render' && positional[1] === 'plan') {
+    const file = positional[2] ? resolve(positional[2]) : null;
+    if (!file || !existsSync(file)) {
+      return emit({ ok: false, error: '用法: ccx render plan <scene.json>' });
+    }
+    let json;
+    try {
+      json = JSON.parse(readFileSync(file, 'utf8'));
+    } catch (e) {
+      return emit({ ok: false, error: '场景文件解析失败: ' + e.message });
+    }
+    const plan = renderPlan(json);
+    if (jsonMode) return emit({ ok: true, file, ...plan });
+    return emit({
+      ok: true,
+      summary:
+        plan.sprites + ' sprites -> ' + plan.batches.length + ' batches',
+      batches: plan.batches.map((b) =>
+        'atlas=' + b.atlas + ' mat=' + b.material + ' x' + b.count + '@' + b.first).join(' | '),
     });
   }
 

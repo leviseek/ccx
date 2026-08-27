@@ -4,6 +4,7 @@
 add_library(ccx_animation STATIC
   src/clip.cpp
   src/sprite_anim.cpp
+  src/state_machine.cpp
 )
 
 target_include_directories(ccx_animation PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

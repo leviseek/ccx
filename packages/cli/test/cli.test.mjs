@@ -49,3 +49,47 @@ test('doctor/version 冒烟', () => {
   assert.equal(v.status, 0);
   assert.ok(JSON.parse(v.out).milestone === 'M1');
 });
+
+test('scene apply：命令总线写场景文件', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ccx-apply-'));
+  try {
+    const sceneFile = join(dir, 's.scene.json');
+    const init = runCli(['scene', 'new', '--at', sceneFile, '--json'], dir);
+    assert.equal(init.status, 0);
+    const r = runCli([
+      'scene', 'apply', sceneFile,
+      '--cmd', JSON.stringify({ op: 'create_entity', name: 'player' }),
+      '--cmd', JSON.stringify({ op: 'add_component', id: 1, type: 'game.Health', data: { max: 100 } }),
+      '--cmd', JSON.stringify({ op: 'set_property', id: 1, type: 'game.Health', path: ['max'], value: 120 }),
+      '--json',
+    ], dir);
+    assert.equal(r.status, 0, r.err + r.out);
+    assert.deepEqual(JSON.parse(r.out).applied, ['create_entity', 'add_component', 'set_property']);
+    const scene = JSON.parse(readFileSync(sceneFile, 'utf8'));
+    assert.equal(scene.entities.length, 1);
+    assert.equal(scene.entities[0].components[0].data.max, 120);
+    assert.equal(scene.meta.generator, 'ccx-cli scene apply');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('scene apply：非法命令拒绝且不写坏文件', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ccx-apply-bad-'));
+  try {
+    const sceneFile = join(dir, 's.scene.json');
+    runCli(['scene', 'new', '--at', sceneFile], dir);
+    const before = readFileSync(sceneFile, 'utf8');
+    const r = runCli([
+      'scene', 'apply', sceneFile,
+      '--cmd', JSON.stringify({ op: 'destroy_entity', id: 999 }),
+      '--json',
+    ], dir);
+    assert.equal(r.status, 0, 'destroy 不存在的实体应幂等成功');
+    const json = JSON.parse(r.out);
+    assert.equal(json.ok, true);
+    assert.equal(before.length > 0, true);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});

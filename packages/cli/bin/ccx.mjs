@@ -2,9 +2,10 @@
 // ccx-cli（M1：create / scene new 落地；doctor/version 保留）
 // 约定：--json 机器可读；--no-interactive 适配 CI。
 import { spawnSync } from 'node:child_process';
-import { cpSync, existsSync, mkdirSync, readdirSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { CommandBus } from '../../scene-service/src/commands.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 
@@ -52,11 +53,9 @@ function main() {
     });
   }
 
+  // —— scene apply <file> --cmd ...：见下方 apply 分支 ——
   // —— scene new [--at path]：空场景（ADR-003 v1）——
-  if (sub === 'scene') {
-    if (positional[1] !== 'new') {
-      return emit({ ok: false, error: '用法: ccx scene new [--at path]' });
-    }
+  if (sub === 'scene' && positional[1] === 'new') {
     const out = flags.at ? resolve(flags.at) : resolve('scenes/new.scene.json');
     mkdirSync(dirname(out), { recursive: true });
     writeFileSync(out, JSON.stringify({
@@ -66,6 +65,48 @@ function main() {
       systems: [],
     }, null, 2) + '\n');
     return emit({ ok: true, created: out, schema: 'ccx.scene/1' });
+  }
+
+  // —— scene apply <file> --cmd '<json>'（可多次）：CommandBus 唯一写路径 ——
+  if (sub === 'scene' && positional[1] === 'apply') {
+    const file = positional[2] ? resolve(positional[2]) : null;
+    if (!file || !existsSync(file)) {
+      return emit({ ok: false, error: '用法: ccx scene apply <file> --cmd '<json>'（可多次）' });
+    }
+    const cmds = args.filter((a, i) => args[i - 1] === '--cmd');
+    if (cmds.length === 0) return emit({ ok: false, error: '缺少 --cmd' });
+    let json;
+    try {
+      json = JSON.parse(readFileSync(file, 'utf8'));
+    } catch (e) {
+      return emit({ ok: false, error: '场景文件解析失败: ' + e.message });
+    }
+    const bus = CommandBus.fromSceneFile(json);
+    const applied = [];
+    for (const raw of cmds) {
+      let cmd;
+      try {
+        cmd = JSON.parse(raw);
+      } catch (e) {
+        return emit({ ok: false, error: '--cmd 不是合法 JSON: ' + raw });
+      }
+      try {
+        bus.apply(cmd);
+      } catch (e) {
+        return emit({ ok: false, error: '命令执行失败: ' + e.message });
+      }
+      applied.push(cmd.op);
+    }
+    const out = bus.toSceneFile();
+    out.meta.generator = 'ccx-cli scene apply';
+    writeFileSync(file, JSON.stringify(out, null, 2) + '\n');
+    return emit({
+      ok: true,
+      file,
+      applied,
+      entityCount: out.entities.length,
+      note: 'undo/redo 属会话内能力（SceneService），CLI 一次性提交',
+    });
   }
 
   // —— doctor / version ——

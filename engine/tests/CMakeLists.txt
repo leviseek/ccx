@@ -5,8 +5,9 @@ add_executable(ccx_foundation_tests roundtrip_test.cpp)
 target_link_libraries(ccx_foundation_tests PRIVATE ccx_foundation)
 add_test(NAME foundation.roundtrip COMMAND ccx_foundation_tests)
 
-# 灯塔任务 D：SpriteBatch 合批模型原型（renderer-spec §5，纯 CPU 数据模型）
+# 灯塔任务 D：SpriteBatch 合批模型（renderer-spec §5，逻辑在 render::batcher）
 add_executable(ccx_batch_prototype_test batch_prototype_test.cpp)
+target_link_libraries(ccx_batch_prototype_test PRIVATE ccx_render)
 add_test(NAME render.batch_prototype COMMAND ccx_batch_prototype_test)
 
 # ECS 最小实现（engine-spec §3、ADR-002）
@@ -45,3 +46,18 @@ add_test(NAME render.pipeline COMMAND ccx_pipeline_test)
 add_executable(ccx_gfx_test gfx_test.cpp)
 target_link_libraries(ccx_gfx_test PRIVATE ccx_gfx)
 add_test(NAME gfx.cpu COMMAND ccx_gfx_test)
+
+# M1：animation（曲线采样/循环/驱动场景变换）
+add_executable(ccx_animation_test animation_test.cpp)
+target_link_libraries(ccx_animation_test PRIVATE ccx_animation)
+add_test(NAME animation.module COMMAND ccx_animation_test)
+
+# M1：场景 -> 渲染提交（renderOrder -> 合批）
+add_executable(ccx_scene_to_batch_test scene_to_batch_test.cpp)
+target_link_libraries(ccx_scene_to_batch_test PRIVATE ccx_render ccx_scene)
+add_test(NAME render.scene_to_batch COMMAND ccx_scene_to_batch_test)
+
+# M1：材质资产解析
+add_executable(ccx_material_test material_test.cpp)
+target_link_libraries(ccx_material_test PRIVATE ccx_render)
+add_test(NAME render.material COMMAND ccx_material_test)

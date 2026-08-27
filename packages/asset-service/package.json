@@ -1,0 +1,7 @@
+{
+  "name": "@ccx/asset-service",
+  "version": "0.0.0",
+  "private": true,
+  "description": "AssetService 占位（asset-spec §3；M1 实现）",
+  "type": "module"
+}

@@ -1,0 +1,7 @@
+{
+  "name": "@ccx/build-service",
+  "version": "0.0.0",
+  "private": true,
+  "description": "BuildService 占位（contributes.builder 兼容，ADR-006；M2 实现）",
+  "type": "module"
+}

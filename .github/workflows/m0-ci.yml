@@ -1,0 +1,46 @@
+name: CCX M0 CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  gates:
+    name: 架构门禁（依赖方向 / vendor / schema）
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: 门禁 1 依赖方向（铁律 1/6）
+        run: node ci/gates/layered_imports.mjs .
+      - name: 门禁 2 vendor 纪律（ADR-005）
+        run: node ci/gates/vendor_check.mjs .
+      - name: 门禁 3 schema round-trip（ADR-003，构建任务强制执行）
+        run: node ci/gates/schema_roundtrip.mjs .
+
+  build:
+    name: 构建 + ctest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: 配置（CI preset）
+        run: cmake --preset ci-${{ runner.os == 'Windows' && 'windows' || 'linux' }}
+      - name: 构建
+        run: cmake --build --preset ci-${{ runner.os == 'Windows' && 'windows' || 'linux' }}
+      - name: 测试（Linux）
+        if: runner.os != 'Windows'
+        working-directory: build/ci-linux
+        run: ctest --output-on-failure
+      - name: 测试（Windows）
+        if: runner.os == 'Windows'
+        working-directory: build/ci-windows
+        run: ctest -C Release --output-on-failure

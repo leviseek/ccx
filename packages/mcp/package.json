@@ -1,0 +1,7 @@
+{
+  "name": "@ccx/mcp",
+  "version": "0.0.0",
+  "private": true,
+  "description": "MCP Server 薄适配层占位（services-spec §7；M2 实现）",
+  "type": "module"
+}

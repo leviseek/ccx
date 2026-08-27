@@ -1,0 +1,7 @@
+{
+  "name": "@ccx/project-service",
+  "version": "0.0.0",
+  "private": true,
+  "description": "ProjectService 占位（services-spec §2；M1 实现）",
+  "type": "module"
+}

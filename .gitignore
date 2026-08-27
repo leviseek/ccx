@@ -1,0 +1,25 @@
+# builds
+/build/
+/build-*/
+*.exe
+*.obj
+*.o
+*.a
+*.lib
+
+# node
+node_modules/
+packages/*/dist/
+packages/*/node_modules/
+
+# ccx artifacts
+library/
+build-artifacts/
+.ccx/
+*.log
+
+# ide / os
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

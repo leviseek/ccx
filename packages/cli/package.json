@@ -1,0 +1,10 @@
+{
+  "name": "@ccx/cli",
+  "version": "0.0.0",
+  "private": true,
+  "description": "ccx 命令行壳（--json / --no-interactive 约定；完整命令面见 services-spec §6）",
+  "type": "module",
+  "bin": {
+    "ccx": "bin/ccx.mjs"
+  }
+}

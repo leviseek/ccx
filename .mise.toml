@@ -1,0 +1,9 @@
+# 项目工具链（mise 管理）：cmake + ninja 由 mise 提供；
+# 编译器按平台自备（Windows: w64devkit/Visual Studio；Linux/macOS: 系统 gcc/clang）
+[tools]
+cmake = "latest"
+ninja = "latest"
+
+[env]
+# Windows 本地编译器（w64devkit）；CI 使用系统编译器，不需要此覆盖
+# CCX_CXX = "D:/engine/w64devkit/bin/g++.exe"

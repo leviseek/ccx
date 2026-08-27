@@ -1,0 +1,13 @@
+{
+  "name": "@ccx/bindgen",
+  "version": "0.0.1",
+  "private": true,
+  "description": "IDL -> napi/.d.ts/JSON Schema 绑定生成器（灯塔任务 C，ADR-004）",
+  "type": "module",
+  "bin": {
+    "ccx-bindgen": "bin/bindgen.mjs"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0"
+  }
+}

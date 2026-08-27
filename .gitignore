@@ -18,6 +18,9 @@ build-artifacts/
 .ccx/
 *.log
 
+# bindgen 生成物
+tools/bindgen/out/
+
 # ide / os
 .vscode/
 .idea/

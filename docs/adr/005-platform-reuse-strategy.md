@@ -28,11 +28,11 @@
 
 | vendor 来源（cocos4） | CCX 去向 | 用途 |
 | --- | --- | --- |
-| native/cocos/platform（desktop/mobile 各平台窗口、输入、文件系统、线程、生命周期） | platform/vendor/pal | 平台底座 |
+| native/cocos/platform（Base/FileUtils/Image/SAXParser + android/win32/apple/ios/mac/linux/interfaces/empty 等真实子目录，实测 350 文件 3.1MB） | platform/vendor/pal | 平台底座（详细清单见 docs/working/vendor-candidates.md） |
 | native/cocos/platform/audio（AAudio/OpenAL/Web 音频后端） | platform/vendor/audio | 音频后端 |
 | native/cocos/editor-support/… 与 web 适配（web 端 window/input/fs） | platform/vendor/web | Web 适配 |
 | 小游戏适配（wechat/tt/bytedance 等，存在于 exports/templates 与 native 侧） | platform/vendor/minigame | 小游戏运行时适配 |
-| cocos-cli packages/platforms/*（builder 插件） | build-service 直接兼容（协议采纳，代码不 vendor） | 构建插件 |
+| cocos-cli builder 插件协议（contributes.builder；第三方插件位于项目内 packages/platforms/*，文档约定，实测 cli 仓库 packages/ 无此目录） | build-service 直接兼容（协议采纳，代码不 vendor） | 构建插件 |
 | native 的 Vulkan/Metal/WebGPU/GLES 设备初始化与 swapchain | renderer 后端启动基座（参考实现，逐步替换） | 渲染后端基座 |
 
 - 每个 vendor 目录带 `UPSTREAM.md`（来源 commit、同步日期、本地改动清单）；同步策略：**每季度跟随上游 tag**，若有本地修改则打 patch 文件（`patches/`）。

@@ -116,15 +116,18 @@
 | 仓库骨架（monorepo） | ✅ 已建 | CMakeLists + CMakePresets（ci-linux/ci-windows）+ engine/foundation + 13 个模块占位 + packages/（cli + 5 服务占位） |
 | 三条 CI 门禁 | ✅ 已建并本地验证 | ci/gates/layered_imports.mjs（9 文件通过）/ vendor_check.mjs（空通过）/ schema_roundtrip.mjs；.github/workflows/m0-ci.yml 双平台矩阵 |
 | 灯塔任务 A（反射+序列化） | ✅ **本地编译并测试全绿** | w64devkit g++ 16.2 + mise cmake 4.4.3/ninja 1.13.2；ctest 1/1 Passed（详见 engine/tests/roundtrip_test.cpp 输出） |
+| 灯塔任务 B（vendor 清单） | ✅ **评审完成** | docs/working/vendor-candidates.md（GitHub API 实测目录与大小；V1–V9 取 ≈5.5–6MB；修正 ADR-005 两处假设） |
+| 灯塔任务 C（bindgen） | ✅ **原型完成并验证** | tools/bindgen：IDL → napi/.d.ts/schema；node --test 5/5 + tsc 类型检查通过 |
+| 灯塔任务 D（SpriteBatch） | ✅ **原型完成并验证** | engine/tests/batch_prototype_test.cpp：100 同键精灵=1 批；ctest 2/2 Passed |
 | 工具链 | ✅ mise 管理 | .mise.toml（cmake/ninja）；本地编译器 w64devkit（CI 用系统编译器，见 engine/README） |
 | CLI 壳 | ✅ doctor/version + --json | packages/cli/bin/ccx.mjs |
-| ADR 会签 | ⏳ 需人 | roadmap §7.1 |
-| 灯塔任务 B/C/D | ⏳ 待做 | vendor 清单评审 / bindgen 原型 / SpriteBatch 原型 |
+| ADR 会签 / M0 gate 会议 | ⏳ 需人签字 | roadmap §7.1 / §7.7 |
 
 构建复现（本地）：`mise install` 后 `cmake -S . -B build/local -G Ninja -DCMAKE_CXX_COMPILER=<g++>` → `cmake --build build/local` → `ctest --test-dir build/local`。
 
 ## 变更记录
 
+- **v0.2.2（2026-08-27）**：灯塔任务 B/C/D 全部完成——vendor 裁剪清单（实测数据）、bindgen 原型（5/5 测试 + tsc 通过）、SpriteBatch 合批原型（ctest 2/2）。
 - **v0.2.1（2026-08-27）**：T+0 开工——仓库骨架 + 三条 CI 门禁 + 灯塔任务 A（反射/序列化 round-trip）本地编译测试全绿；工具链转入 mise（cmake/ninja）。
 - **v0.2（2026-08-27）**：范围收敛 **2D-first**（用户裁切：不需要 3D 能力）——renderer/engine/asset/roadmap 重写，ADR-005 后端矩阵改 2D 视角（GLES3 移动主后端、D3D12 不做），ADR-003 示例组件改 2D 集；修复全部 Markdown 代码块转义。
 - **v0.1（2026-08-27）**：首版可开工基线（决策与规格全量）。

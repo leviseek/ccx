@@ -1,0 +1,9 @@
+// ccx bindgen IDL v0.1（灯塔任务 C 最小原型）
+module ccx.hello;
+
+class Greeter {
+  // 向 name 打招呼
+  greet(name: string): string;
+  add(a: float, b: float): float;
+  readonly version: string = "0.0.1";
+}

@@ -4,10 +4,11 @@
 add_library(ccx_scene STATIC
   src/scene.cpp
   src/schema.cpp
+  src/bridge.cpp
 )
 
 target_include_directories(ccx_scene PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(ccx_scene PUBLIC ccx_foundation)
+target_link_libraries(ccx_scene PUBLIC ccx_foundation ccx_ecs)
 target_compile_features(ccx_scene PUBLIC cxx_std_20)
 
 if(MSVC)

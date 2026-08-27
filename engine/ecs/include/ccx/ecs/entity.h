@@ -15,5 +15,6 @@ inline bool operator==(Entity a, Entity b) {
     return a.index == b.index && a.version == b.version;
 }
 inline bool operator!=(Entity a, Entity b) { return !(a == b); }
+inline bool operator<(Entity a, Entity b) { return a.index < b.index; }  // map 键/排序
 
 }  // namespace ccx::ecs

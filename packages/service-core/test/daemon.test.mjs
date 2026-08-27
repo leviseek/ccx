@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
@@ -27,8 +27,10 @@ test('daemon: RPC roundtrip + ready event (real process)', async () => {
 
     const list = await client.request('asset.list', { filter: 'texture' });
     assert.equal(list.assets.length, 2);
+    // 真实实现：文件不存在 -> 明确错误（存根已被真实服务替代）
     const open = await client.request('scene.open', { path: 'scenes/x.scene.json' });
-    assert.equal(open.path, 'scenes/x.scene.json');
+    assert.equal(open.ok, false);
+    assert.ok(open.error.includes('open 失败'), '错误信息明确');
     await assert.rejects(client.request('asset.nope'), /Method not found/);
     const pong = await client.request('__system.ping');
     assert.ok(pong.pong > 0);
@@ -69,6 +71,56 @@ test('createDaemon: in-process handle unit (protocol error codes)', () => {
   assert.equal(parse.error.code, -32700);
   const notify = d.handle(JSON.stringify({ jsonrpc: '2.0', method: 'asset.list' }));
   assert.equal(notify, null, 'notification no response');
+});
+
+
+test('daemon: scene open/query/apply/save (real scene write path)', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ccx-daemon-scene-'));
+  const client = new RpcClient(process.execPath, [daemonEntry]);
+  try {
+    const sceneFile = join(dir, 's.scene.json');
+    writeFileSync(sceneFile, JSON.stringify({
+      schema: 'ccx.scene/1',
+      meta: {},
+      entities: [{ id: 1, name: 'root', parent: null, components: [] }],
+      systems: [],
+    }));
+    const open = await client.request('scene.open', { path: sceneFile });
+    assert.equal(open.ok, true);
+    assert.equal(open.entities, 1);
+    await client.request('scene.apply', {
+      command: { op: 'create_entity', name: 'hero', parent: 1 },
+    });
+    await client.request('scene.apply', {
+      command: { op: 'add_component', id: 2, type: 'game.Health', data: { max: 100 } },
+    });
+    const q = await client.request('scene.query');
+    assert.equal(q.entities.length, 2);
+    assert.equal(q.entities[1].components.includes('game.Health'), true);
+    const saved = await client.request('scene.save', { path: sceneFile });
+    assert.equal(saved.ok, true);
+    const reload = JSON.parse(readFileSync(sceneFile, 'utf8'));
+    assert.equal(reload.entities.length, 2, '文件已持久化');
+  } finally {
+    client.close();
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('daemon: asset.scan real directory', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ccx-daemon-assets-'));
+  const client = new RpcClient(process.execPath, [daemonEntry]);
+  try {
+    writeFileSync(join(dir, 'a.png'), 'x');
+    writeFileSync(join(dir, 'b.png'), 'y');
+    const r = await client.request('asset.scan', { root: dir });
+    assert.equal(r.assets.length, 2);
+    assert.ok(r.assets[0].uuid.length === 36, '确定性 uuid');
+    assert.equal(r.assets[0].uuid, r.assets[0].uuid);
+  } finally {
+    client.close();
+    rmSync(dir, { recursive: true, force: true });
+  }
 });
 
 test('daemon: asset.subscribe -> assetChanged push (real fs change)', async () => {

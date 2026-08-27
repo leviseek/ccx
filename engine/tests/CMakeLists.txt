@@ -93,3 +93,8 @@ add_test(NAME render.shader_material COMMAND ccx_shader_material_test)
 add_executable(ccx_anim_to_plan_test anim_to_plan_test.cpp)
 target_link_libraries(ccx_anim_to_plan_test PRIVATE ccx_animation ccx_render)
 add_test(NAME e2e.anim_to_plan COMMAND ccx_anim_to_plan_test)
+
+# M1：场景 <-> ECS 桥（映射 + Transform 数值镜像）
+add_executable(ccx_bridge_test bridge_test.cpp)
+target_link_libraries(ccx_bridge_test PRIVATE ccx_scene)
+add_test(NAME scene.bridge COMMAND ccx_bridge_test)

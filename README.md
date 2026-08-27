@@ -131,6 +131,7 @@
 
 ## 变更记录
 
+- **v0.3.4（2026-08-27）**：M1 服务与桥面——**daemon 真实服务**（scene.open/query/apply/save 接 CommandBus 真写路径 + asset.scan 真目录扫描，真进程 RPC 编排持久化测试）、**BuildService 骨架**（Builder 注册表对齐 contributes.builder + bundle 清单确定性哈希 + hooks 状态机错误中断）、**场景↔ECS 桥**（SceneBridge：节点↔实体双向映射 + Transform 数值镜像 + 全量重建；反射特化移入头文件解决跨 TU 可见性）；ctest 19/19 + node 42/42。
 - **v0.3.3（2026-08-27）**：M1 组装面——**动画→渲染 E2E**（状态机驱动变换→场景→批结构稳定）、**daemon 事件推送实装**（asset.subscribe：真实 fs 变更→assetChanged 推送，真进程测试）、**编辑器 Shell 最小集**（editor-shell：命令注册表/快捷键归一化/选择集/面板布局模型，与 CommandBus 绑定驱动写路径）；ctest 18/18 + node 37/37。
 - **v0.3.2（2026-08-27）**：M1 服务与资产面——**JSON-RPC 2.0 daemon**（service-core：协议/dispatcher/stdio daemon/客户端，真进程测试 4 组 + `ccx service demo` 端到端）、Cook 管线骨架（2D 平台矩阵：png/webp/astc4/etc2/bc7 + 音频目标 + 产物记录）、shader 资产与 material 联动校验（参数 ⊆ uniforms、类型匹配、缺参默认值）；ctest 17/17 + node 31/31。
 - **v0.3.1（2026-08-27）**：M1 交互与分析面——动画状态机（时间/触发器条件、计时重置、非法过渡容错）、`ccx render plan`（服务侧渲染计划：树序→稳定排序→合批，fixture 与服务/引擎双侧同断言）、foundation metrics（帧统计环形缓冲 128 + JSON 快照，Profiler 骨架）、AssetService 导入队列（确定性 uuid + 优先级 + 幂等去重 + 状态机）；ctest 16/16 + node 24/24。

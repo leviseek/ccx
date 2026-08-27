@@ -32,7 +32,27 @@
 
 用 `sample.scene.json` 的一次典型编辑（把 enemy 血量上限 50 → 80）展示结构化解读：
 
-<!-- DIFF_DEMO_SLOT -->
+以下是真实产生的 `git diff` 输出（enemy 血量上限 50 → 80）：
+
+```text
+diff --git a/examples/scenes/sample.scene.json b/examples/scenes/sample.scene.json
+index 9519b28..d91ccd2 100644
+--- a/examples/scenes/sample.scene.json
++++ b/examples/scenes/sample.scene.json
+@@ -21,9 +21,10 @@
+       "parent": null,
+       "components": [
+         { "type": "ccx.Position", "data": { "x": 20, "y": 0 } },
+-        { "type": "game.Health",  "data": { "max": 50, "current": 50 } }
++        { "type": "game.Health",  "data": { "max": 80, "current": 80 } }
+       ]
+     }
+   ],
+   "systems": []
+ }
+```
+
+> 结构化说明：场景文件是普通 JSON，diff 只显示被修改的那一个字段，而不是整段 blob —— 这正是 ADR-003 的目的（Git 友好、AI 可读、可脚本化处理）。
 
 ## 4. 后置项清单（M0 关闭后仍盯）
 

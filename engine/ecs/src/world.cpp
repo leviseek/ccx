@@ -90,6 +90,7 @@ uint32_t World::getOrCreateArchetype(const std::vector<TypeId>& sortedIds) {
     archetypes_.push_back(std::move(a));
     const uint32_t idx = static_cast<uint32_t>(archetypes_.size() - 1);
     archetypeByKey_.emplace(sortedIds, idx);
+    queryCache_.clear();  // M1：新 archetype 使所有查询缓存失效
     return idx;
 }
 

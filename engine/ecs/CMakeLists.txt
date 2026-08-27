@@ -4,6 +4,7 @@
 add_library(ccx_ecs STATIC
   src/world.cpp
   src/command_buffer.cpp
+  src/scheduler.cpp
 )
 
 target_include_directories(ccx_ecs PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

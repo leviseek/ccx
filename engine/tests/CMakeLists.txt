@@ -20,3 +20,8 @@ target_link_libraries(ccx_scene_sample_test PRIVATE ccx_foundation)
 add_test(NAME foundation.scene_sample
          COMMAND ccx_scene_sample_test
          WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+
+# M1：系统调度（Stage + 拓扑序）与 job::TaskGraph 骨架
+add_executable(ccx_schedule_test schedule_test.cpp)
+target_link_libraries(ccx_schedule_test PRIVATE ccx_ecs)
+add_test(NAME ecs.schedule COMMAND ccx_schedule_test)

@@ -1,4 +1,5 @@
 #pragma once
+#include <algorithm>
 #include <array>
 #include <cstddef>
 #include <cstdint>
@@ -110,12 +111,29 @@ public:
     }
 
     // 查询：组件签名任意顺序；fn(Entity, Cs&...)；满足全部 Cs 才命中
+    // M1：签名(排序) -> archetype 列表缓存于 queryCache_，新 archetype 创建时失效
     template <class... Cs, class Fn>
     void query(Fn&& fn) {
         (ensureComponent<Cs>(), ...);
-        for (Archetype& a : archetypes_) {
+        constexpr size_t N = sizeof...(Cs);
+        std::array<TypeId, N> sig{componentTypeId<Cs>()...};
+        std::sort(sig.begin(), sig.end());
+        std::vector<TypeId> key(sig.begin(), sig.end());
+        auto it = queryCache_.find(key);
+        if (it == queryCache_.end()) {
+            std::vector<uint32_t> hits;
+            for (uint32_t ai = 0; ai < archetypes_.size(); ++ai) {
+                bool ok = true;
+                for (const TypeId id : key) {
+                    if (columnIndex(archetypes_[ai], id) < 0) { ok = false; break; }
+                }
+                if (ok) hits.push_back(ai);
+            }
+            it = queryCache_.emplace(std::move(key), std::move(hits)).first;
+        }
+        for (const uint32_t ai : it->second) {
+            Archetype& a = archetypes_[ai];
             if (a.count == 0) continue;
-            constexpr size_t N = sizeof...(Cs);
             std::array<int, N> cols{};
             size_t i = 0;
             bool ok = true;
@@ -189,6 +207,9 @@ private:
     std::map<TypeId, Column> columnByType_;
     std::vector<uint32_t> freeIndices_;
     uint32_t defaultArchetype_ = 0;
+
+    // M1：Query 缓存 —— 签名(排序后) -> 匹配的 archetype 下标；新 archetype 创建时失效
+    std::map<std::vector<TypeId>, std::vector<uint32_t>> queryCache_;
 };
 
 }  // namespace ccx::ecs

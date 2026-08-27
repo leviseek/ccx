@@ -38,8 +38,8 @@ function walk(dir, out = []) {
   }
   for (const e of entries) {
     if (e.name === '.git' || e.name === 'node_modules' || e.name === 'build' ||
-        e.name.startsWith('CMakeFiles')) {
-      continue;
+        e.name.startsWith('CMakeFiles') || e.name === 'vendor') {
+      continue;  // vendor（ADR-005）不受依赖方向门禁约束
     }
     const p = path.join(dir, e.name);
     if (e.isDirectory()) {

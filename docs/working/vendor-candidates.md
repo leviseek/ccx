@@ -51,11 +51,13 @@ platform/vendor/
 - **禁止直接改 vendor 源码**：本地修改必须落 `patches/*.patch` + UPSTREAM.md 登记（ADR-005 §7 / vendor_check.mjs）。
 - 季度同步窗口：只允许编译兼容性改动（platform-spec §5）。
 
-## 4. M1 落地动作清单
+## 4. M1 落地动作清单（✅ 1-2 已完成，2026-08-27）
 
-1. 按 V1–V9 + V11 清单拷贝进 `engine/platform/vendor/*`。
-2. 每个包写 UPSTREAM.md（来源 tag、同步日期、localChanges: 0）。
-3. 编译矩阵先行验证：win32 + linux + android 三平台 hello（platform-spec §5 冒烟）。
-4. 平台宏隔离：vendor 内允许 `#ifdef`；`platform/api/` 起禁止（platform-spec §2）。
+1. ✅ 按 V1–V9 清单拷贝进 `engine/platform/vendor/*`（pal/audio/storage/main，369 文件 2.6MB；工具：tools/vendor/sync.mjs）。
+2. ✅ 每个包写 UPSTREAM.md（来源 commit f5eaf97、同步日期 2026-08-27、localChanges: 0）+ LICENSE/AUTHORS。
+3. ⏳ 编译矩阵先行验证：win32 + linux + android 三平台 hello（platform-spec §5 冒烟；platform 模块 CMake 挂载后执行）。
+4. ⏳ 平台宏隔离：vendor 内允许 `#ifdef`；`platform/api/` 起禁止（platform-spec §2）。
+
+> V11（renderer 后端启动基座）未随本轮落地，M1 后半段按需取 3 处（gfx 后端 device/swapchain）。
 
 > 本清单为**评审结论**；M1 落地时若实际编译暴露依赖缺口，按"封装层兜底"原则补（ADR-005 §7），不回流改造 vendor。

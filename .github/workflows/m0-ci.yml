@@ -44,3 +44,30 @@ jobs:
         if: runner.os == 'Windows'
         working-directory: build/ci-windows
         run: ctest -C Release --output-on-failure
+
+  lighthouse-c-bindgen:
+    name: 灯塔C bindgen napi 编译冒烟（出口④）
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: bindgen 生成 + 单元测试 + 类型检查
+        working-directory: tools/bindgen
+        run: |
+          npm install --no-audit --no-fund
+          node --test
+          node bin/bindgen.mjs examples/hello.idl --out out
+          npx tsc --noEmit --strict out/ccx_hello.d.ts
+      - name: napi 编译（node-gyp，生成源码拷贝到 gen/）
+        working-directory: tools/bindgen/napi
+        run: |
+          mkdir -p gen
+          cp ../out/ccx_hello_bindings.cpp gen/
+          npm install --no-audit --no-fund
+          npx node-gyp rebuild
+      - name: smoke（JS 调 C++，出口④）
+        working-directory: tools/bindgen/napi
+        run: node --test smoke.test.mjs

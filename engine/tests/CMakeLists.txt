@@ -13,3 +13,10 @@ add_test(NAME render.batch_prototype COMMAND ccx_batch_prototype_test)
 add_executable(ccx_ecs_minimal_test ecs_minimal_test.cpp)
 target_link_libraries(ccx_ecs_minimal_test PRIVATE ccx_ecs)
 add_test(NAME ecs.minimal COMMAND ccx_ecs_minimal_test)
+
+# M0 出口①：场景 JSON 读写 + golden 校验（ADR-003；需仓库根 cwd）
+add_executable(ccx_scene_sample_test scene_sample_test.cpp)
+target_link_libraries(ccx_scene_sample_test PRIVATE ccx_foundation)
+add_test(NAME foundation.scene_sample
+         COMMAND ccx_scene_sample_test
+         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})

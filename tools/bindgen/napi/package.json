@@ -1,0 +1,8 @@
+{
+  "name": "@ccx/bindgen-napi-smoke",
+  "version": "0.0.1",
+  "private": true,
+  "description": "灯塔 C 出口④：bindgen 生成 napi 源码的 node-gyp 编译冒烟（CI 执行）",
+  "gypfile": true,
+  "type": "module"
+}

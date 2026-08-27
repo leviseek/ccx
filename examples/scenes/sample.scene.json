@@ -1,0 +1,29 @@
+{
+  "schema": "ccx.scene/1",
+  "meta": {
+    "name": "Sample",
+    "generator": "ccx-editor 0.0.0",
+    "guid": "6f1e9b31-3c79-4f5a-9b9e-1f2a3b4c5d6e"
+  },
+  "entities": [
+    {
+      "id": 1,
+      "name": "player",
+      "parent": null,
+      "components": [
+        { "type": "ccx.Position", "data": { "x": 10.5, "y": -3.25 } },
+        { "type": "game.Health",  "data": { "max": 100, "current": 77 } }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "enemy",
+      "parent": null,
+      "components": [
+        { "type": "ccx.Position", "data": { "x": 20, "y": 0 } },
+        { "type": "game.Health",  "data": { "max": 50, "current": 50 } }
+      ]
+    }
+  ],
+  "systems": []
+}

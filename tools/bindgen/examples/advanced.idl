@@ -1,0 +1,10 @@
+// ccx bindgen IDL v0.2（灯塔 C 扩展：数组/默认值/回调）
+module ccx.audio;
+
+class Playback {
+  play(url: string, loop: bool = false): void;
+  setVolume(v: float = 1.0): void;
+  sum(values: float[]): float;
+  onTick(cb: () => void): void;
+  onDamage(cb: (amount: float) => void): void;
+}

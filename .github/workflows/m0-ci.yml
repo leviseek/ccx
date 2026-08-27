@@ -70,4 +70,4 @@ jobs:
           npx node-gyp rebuild
       - name: smoke（JS 调 C++，出口④）
         working-directory: tools/bindgen/napi
-        run: node --test smoke.test.mjs
+        run: node napi_smoke.mjs

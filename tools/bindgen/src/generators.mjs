@@ -1,4 +1,5 @@
-// 三个生成器：napi 绑定源码 / .d.ts / JSON Schema（ADR-004 §4.3）
+// 三个生成器：napi 绑定源码 / .d.ts / JSON Schema（ADR-004 §4.3；灯塔 C v0.2）
+import { analyzeType } from './idl.mjs';
 
 function cppType(t) {
   switch (t) {
@@ -8,6 +9,25 @@ function cppType(t) {
     case 'bool': return 'bool';
     default: return t;
   }
+}
+
+function mapType(t) {
+  switch (t) {
+    case 'float': return 'number';
+    case 'int': return 'number';
+    case 'bool': return 'boolean';
+    case 'void': return 'void';
+    case 'string': return 'string';
+    default: return t;
+  }
+}
+
+function defaultLit(p) {
+  if (p.def === null) return null;
+  if (p.def === true) return 'true';
+  if (p.def === false) return 'false';
+  if (typeof p.def === 'number') return String(p.def);
+  return '"' + p.def + '"';
 }
 
 export function generateNapi(ir) {
@@ -23,10 +43,8 @@ export function generateNapi(ir) {
   for (const cls of ir.classes) {
     for (const m of cls.methods) {
       const plist = m.params.map((p) => cppType(p.type) + ' ' + p.name).join(', ');
-      const ret =
-        m.ret === 'string' ? 'const char*' : m.ret === 'void' ? 'void' : cppType(m.ret);
-      const body =
-        m.ret === 'string' ? 'return "TODO";' : m.ret === 'void' ? '' : 'return 0;';
+      const ret = m.ret === 'string' ? 'const char*' : m.ret === 'void' ? 'void' : cppType(m.ret);
+      const body = m.ret === 'string' ? 'return "TODO";' : m.ret === 'void' ? '' : 'return 0;';
       L.push('  ' + ret + ' ' + m.name + '(' + plist + ') { ' + body + ' }');
     }
     for (const p of cls.props) {
@@ -37,6 +55,22 @@ export function generateNapi(ir) {
   L.push('}  // namespace ' + mod);
   L.push('');
 
+  // 回调参数存储（每个方法每个回调一个 napi_ref）
+  for (const cls of ir.classes) {
+    for (const m of cls.methods) {
+      for (const p of m.params) {
+        const a = analyzeType(p.type);
+        if (a.kind === 'callback') {
+          L.push('static napi_ref g_ref_' + m.name + '_' + p.name + ' = nullptr;');
+        }
+      }
+    }
+  }
+  if (ir.classes.some((c) => c.methods.some((m) => m.params.some((p) =>
+      analyzeType(p.type).kind === 'callback')))) {
+    L.push('');
+  }
+
   for (const cls of ir.classes) {
     for (const m of cls.methods) {
       L.push('static napi_value ' + m.name + '_wrapper(napi_env env, napi_callback_info info) {');
@@ -45,15 +79,45 @@ export function generateNapi(ir) {
       L.push('  napi_get_cb_info(env, info, &argc, args, nullptr, nullptr);');
       const callArgs = [];
       m.params.forEach((p, i) => {
-        if (p.type === 'string') {
-          L.push('  size_t len' + i + ' = 0; napi_get_value_string_utf8(env, args[' + i + '], nullptr, 0, &len' + i + ');');
-          L.push('  std::vector<char> buf' + i + '(len' + i + ' + 1);');
-          L.push('  napi_get_value_string_utf8(env, args[' + i + '], buf' + i + '.data(), buf' + i + '.size(), &len' + i + ');');
-          L.push('  const std::string s' + i + '(buf' + i + '.data(), len' + i + ');');
+        const a = analyzeType(p.type);
+        const lit = defaultLit(p);
+        if (a.kind === 'callback') {
+          // 存储回调引用；实现体经 g_ref_<m>_<p> 调用（骨架只做生命周期保存）
+          L.push('  if (argc > ' + i + ' && args[' + i + '] != nullptr) {');
+          L.push('    napi_create_reference(env, args[' + i + '], 1, &g_ref_' + m.name + '_' + p.name + ');');
+          L.push('  }');
+        } else if (a.kind === 'array') {
+          const cppEl = a.base === 'string' ? 'std::string' : 'float';
+          L.push('  std::vector<' + cppEl + '> v' + i + ';');
+          L.push('  if (argc > ' + i + ') {');
+          L.push('    uint32_t n' + i + ' = 0; napi_get_array_length(env, args[' + i + '], &n' + i + ');');
+          L.push('    for (uint32_t k = 0; k < n' + i + '; ++k) {');
+          L.push('      napi_value el' + i + '; napi_get_element(env, args[' + i + '], k, &el' + i + ');');
+          if (a.base === 'string') {
+            L.push('      size_t ln = 0; napi_get_value_string_utf8(env, el' + i + ', nullptr, 0, &ln);');
+            L.push('      std::vector<char> bf(ln + 1);');
+            L.push('      napi_get_value_string_utf8(env, el' + i + ', bf.data(), bf.size(), &ln);');
+            L.push('      v' + i + '.emplace_back(bf.data(), ln);');
+          } else {
+            L.push('      double dv = 0; napi_get_value_double(env, el' + i + ', &dv);');
+            L.push('      v' + i + '.push_back(static_cast<float>(dv));');
+          }
+          L.push('    }');
+          L.push('  }');
+          callArgs.push('v' + i);
+        } else if (a.base === 'string') {
+          L.push('  std::string s' + i + (lit !== null ? ' = ' + lit : '') + ';');
+          L.push('  if (argc > ' + i + ') {');
+          L.push('    size_t len' + i + ' = 0; napi_get_value_string_utf8(env, args[' + i + '], nullptr, 0, &len' + i + ');');
+          L.push('    std::vector<char> buf' + i + '(len' + i + ' + 1);');
+          L.push('    napi_get_value_string_utf8(env, args[' + i + '], buf' + i + '.data(), buf' + i + '.size(), &len' + i + ');');
+          L.push('    s' + i + '.assign(buf' + i + '.data(), len' + i + ');');
+          L.push('  }');
           callArgs.push('s' + i);
         } else {
-          L.push('  double d' + i + ' = 0; napi_get_value_double(env, args[' + i + '], &d' + i + ');');
-          L.push('  ' + cppType(p.type) + ' v' + i + ' = (' + cppType(p.type) + ')d' + i + ';');
+          L.push('  double d' + i + ' = ' + (lit !== null ? lit : '0') + ';');
+          L.push('  if (argc > ' + i + ') napi_get_value_double(env, args[' + i + '], &d' + i + ');');
+          L.push('  ' + cppType(a.base) + ' v' + i + ' = (' + cppType(a.base) + ')d' + i + ';');
           callArgs.push('v' + i);
         }
       });
@@ -105,6 +169,16 @@ export function generateNapi(ir) {
   return L.join('\n');
 }
 
+function dtsType(p) {
+  const a = analyzeType(p.type);
+  if (a.kind === 'callback') {
+    const ps = a.callbackParams.map((q) => q.name + ': ' + mapType(q.type)).join(', ');
+    return '(' + ps + ') => ' + mapType(a.ret);
+  }
+  if (a.kind === 'array') return mapType(a.base) + '[]';
+  return mapType(a.base);
+}
+
 export function generateDts(ir) {
   const out = [];
   out.push('// Auto-generated by ccx-bindgen (灯塔任务 C 原型). DO NOT EDIT.');
@@ -114,13 +188,13 @@ export function generateDts(ir) {
     if (cls.doc) out.push('  /** ' + cls.doc + ' */');
     out.push('  class ' + cls.name + ' {');
     for (const p of cls.props) {
-      // ambient 上下文禁止初始化器；默认值只记录在 schema（生成器保留信息）
       out.push('    /** 默认值: ' + (p.default ?? '-') + ' */');
       out.push('    readonly ' + p.name + ': ' + mapType(p.type) + ';');
     }
     for (const m of cls.methods) {
       if (m.doc) out.push('    /** ' + m.doc + ' */');
-      const ps = m.params.map((p) => p.name + ': ' + mapType(p.type)).join(', ');
+      const ps = m.params.map((p) =>
+        p.name + (p.def !== null ? '?' : '') + ': ' + dtsType(p)).join(', ');
       out.push('    ' + m.name + '(' + ps + '): ' + mapType(m.ret) + ';');
     }
     out.push('  }');
@@ -129,15 +203,15 @@ export function generateDts(ir) {
   return out.join('\n');
 }
 
-function mapType(t) {
-  switch (t) {
-    case 'float': return 'number';
-    case 'int': return 'number';
-    case 'bool': return 'boolean';
-    case 'void': return 'void';
-    case 'string': return 'string';
-    default: return t;
+function schemaTypeForType(type) {
+  const a = analyzeType(type);
+  if (a.kind === 'callback') {
+    return { type: 'function', binding: 'callback' };
   }
+  if (a.kind === 'array') {
+    return { type: 'array', items: { type: mapType(a.base) } };
+  }
+  return { type: mapType(a.base) };
 }
 
 export function generateSchema(ir) {
@@ -146,7 +220,11 @@ export function generateSchema(ir) {
     const methods = {};
     for (const m of cls.methods) {
       const params = {};
-      for (const p of m.params) params[p.name] = { type: mapType(p.type) };
+      for (const p of m.params) {
+        const s = schemaTypeForType(p.type);
+        if (p.def !== null) s.default = p.def;
+        params[p.name] = s;
+      }
       methods[m.name] = { doc: m.doc ?? undefined, params, returns: mapType(m.ret) };
     }
     const properties = {};

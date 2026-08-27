@@ -25,3 +25,13 @@ add_test(NAME foundation.scene_sample
 add_executable(ccx_schedule_test schedule_test.cpp)
 target_link_libraries(ccx_schedule_test PRIVATE ccx_ecs)
 add_test(NAME ecs.schedule COMMAND ccx_schedule_test)
+
+# M1：scene 模块（树/排序/world 变换/Prefab override）
+add_executable(ccx_scene_test scene_test.cpp)
+target_link_libraries(ccx_scene_test PRIVATE ccx_scene)
+add_test(NAME scene.module COMMAND ccx_scene_test)
+
+# M1：RenderGraph 编译器（renderer-spec §3）
+add_executable(ccx_render_graph_test render_graph_test.cpp)
+target_link_libraries(ccx_render_graph_test PRIVATE ccx_render)
+add_test(NAME render.graph COMMAND ccx_render_graph_test)

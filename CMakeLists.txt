@@ -10,9 +10,10 @@ option(CCX_BUILD_FOUNDATION "Build foundation module" ON)
 option(CCX_BUILD_TESTS "Build engine tests" ON)
 
 option(CCX_BUILD_ECS "Build ecs module" ON)
+option(CCX_BUILD_SCENE "Build scene module" ON)
+option(CCX_BUILD_RENDER "Build render module" ON)
 
 # 后续模块占位（M1+ 按 roadmap 打开）
-# option(CCX_BUILD_SCENE "Build scene module" OFF)
 # option(CCX_BUILD_GFX "Build gfx (RHI) module" OFF)
 # option(CCX_BUILD_RENDER "Build render module" OFF)
 # option(CCX_BUILD_PHYSICS "Build physics module" OFF)

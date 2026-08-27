@@ -36,6 +36,9 @@ public:
     const ObjectEntries& asObject() const;
     const Value* find(std::string_view key) const;
 
+    // 对象写入（Prefab override 字段链用）：将节点视为对象，返回（或创建）该键子节点
+    Value& setField(std::string_view key);
+
     bool operator==(const Value&) const = default;
 
 private:

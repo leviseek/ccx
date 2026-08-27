@@ -30,6 +30,16 @@ const Value* Value::find(std::string_view key) const {
     return nullptr;
 }
 
+Value& Value::setField(std::string_view key) {
+    if (kind() != Kind::Object) storage_ = ObjectEntries{};
+    auto& entries = std::get<ObjectEntries>(storage_);
+    for (auto& [k, v] : entries) {
+        if (k == key) return v;
+    }
+    entries.emplace_back(std::string(key), Value{});
+    return entries.back().second;
+}
+
 namespace {
 
 struct Parser {

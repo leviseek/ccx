@@ -7,8 +7,15 @@ if(CCX_BUILD_ECS)
   add_subdirectory(ecs)
 endif()
 
+if(CCX_BUILD_SCENE)
+  add_subdirectory(scene)
+endif()
+
+if(CCX_BUILD_RENDER)
+  add_subdirectory(render)
+endif()
+
 # 占位模块：README 已建，CMake 随 milestone 打开（roadmap M1/M2）
-# add_subdirectory(scene)
 # add_subdirectory(gfx)
 # add_subdirectory(render)
 # add_subdirectory(animation)

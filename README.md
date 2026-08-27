@@ -131,6 +131,7 @@
 
 ## 变更记录
 
+- **v0.3.0（2026-08-27）**：M1 运行面——精灵帧动画（帧网格/循环/UV）、**场景文件装载/导出**（C++ 引擎读 ADR-003，Transform/Sorting 属性与组件互转，Scene::setParent）、**E2E 渲染计划演示**（fixture 场景 → 装载 → 渲染序 → 合批 → 导出往返）、AssetService watch 事件流（合并/pump/close）；ctest 14/14 + node 19/19。
 - **v0.2.9（2026-08-27）**：M1“场景→渲染提交”数据链路——animation 模块（关键帧曲线/缓动/Sampler 循环/驱动 Transform）、render::batcher 正式化（灯塔 D 逻辑入住 render，场景 renderOrder→合批集成测试）、CLI `ccx scene apply`（命令总线接入 CLI）、材质资产解析（shader/blend/params 校验）；ctest 12/12 + node 16/16。
 - **v0.2.8（2026-08-27）**：M1 渲染链路 CPU 面——Pipeline 资产解析→RenderGraph 编译（启用剔除/minFeatures 降级门槛/同 target 隐式链，修正写-写与读写顺序规则）、gfx RHI CPU 面（纹理/缓冲描述校验 + HandlePool 防悬垂句柄）、SceneService/CommandBus（命令应用 + undo/redo + ADR-003 读写）；ctest 9/9 + node 14/14。
 - **v0.2.7（2026-08-27）**：M1 深度推进——scene 模块（树/2D 排序/world 变换/Prefab override，engine/scene）、RenderGraph 编译器（engine/render，6 组校验用例）、CLI create/scene-new（项目模板 + ADR-003 空场景）、AssetService 骨架（importer 注册表/PNG 头解析/图集 shelf 打包）；ctest 7/7 + node 8/8。

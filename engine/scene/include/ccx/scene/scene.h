@@ -13,6 +13,7 @@ struct EntityId {
     uint32_t index = 0;
     bool operator==(const EntityId&) const = default;
 };
+inline bool operator<(EntityId a, EntityId b) { return a.index < b.index; }
 inline constexpr EntityId kNullId{0xFFFFFFFFu};
 
 // 组件数据 = JSON（ADR-003：编辑器/AI/CLI 同一数据视图）
@@ -57,6 +58,7 @@ struct Override {
 class Scene {
 public:
     EntityId createNode(std::string name, EntityId parent = kNullId);
+    void setParent(EntityId id, EntityId parent);  // 重挂（父子树移除 + 新父追加）
     void destroyNode(EntityId id);  // 递归销毁子树
     std::optional<Node> node(EntityId id) const;
     EntityId parentOf(EntityId id) const;

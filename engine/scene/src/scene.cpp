@@ -41,6 +41,17 @@ EntityId Scene::createNode(std::string name, EntityId parent) {
     return n.id;
 }
 
+void Scene::setParent(EntityId id, EntityId parent) {
+    if (slotEmpty(id)) return;
+    Node& n = at(id);
+    if (n.parent != kNullId) {
+        auto& sib = nodes_[n.parent.index].children;
+        sib.erase(std::remove(sib.begin(), sib.end(), id), sib.end());
+    }
+    n.parent = parent;
+    if (parent != kNullId) nodes_[parent.index].children.push_back(id);
+}
+
 void Scene::destroyRecursive(EntityId id) {
     if (slotEmpty(id)) return;
     Node& n = at(id);

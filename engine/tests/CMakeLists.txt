@@ -61,3 +61,15 @@ add_test(NAME render.scene_to_batch COMMAND ccx_scene_to_batch_test)
 add_executable(ccx_material_test material_test.cpp)
 target_link_libraries(ccx_material_test PRIVATE ccx_render)
 add_test(NAME render.material COMMAND ccx_material_test)
+
+# M1：精灵帧动画（帧推进/循环/UV）
+add_executable(ccx_sprite_anim_test sprite_anim_test.cpp)
+target_link_libraries(ccx_sprite_anim_test PRIVATE ccx_animation)
+add_test(NAME animation.sprite COMMAND ccx_sprite_anim_test)
+
+# M1 E2E：场景文件 -> 渲染计划（装载/渲染序/合批/导出往返；仓库根 cwd）
+add_executable(ccx_e2e_render_plan_test e2e_render_plan_test.cpp)
+target_link_libraries(ccx_e2e_render_plan_test PRIVATE ccx_render ccx_scene)
+add_test(NAME e2e.render_plan
+         COMMAND ccx_e2e_render_plan_test
+         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})

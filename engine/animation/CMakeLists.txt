@@ -1,7 +1,10 @@
 # animation — 2D 动画（曲线/精灵帧，engine-spec §1；状态机 M2）
 # 依赖：scene（输出到 LocalTransform）、foundation
 
-add_library(ccx_animation STATIC src/clip.cpp)
+add_library(ccx_animation STATIC
+  src/clip.cpp
+  src/sprite_anim.cpp
+)
 
 target_include_directories(ccx_animation PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(ccx_animation PUBLIC ccx_scene)

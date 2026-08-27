@@ -1,7 +1,7 @@
 {
   "name": "@ccx/asset-service",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
-  "description": "AssetService 占位（asset-spec §3；M1 实现）",
+  "description": "AssetService 骨架（asset-spec §3）：importer registry / PNG 头解析 / 图集打包",
   "type": "module"
 }

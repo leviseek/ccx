@@ -1,0 +1,7 @@
+{
+  "name": "MyGame",
+  "type": "2d",
+  "entry": "scenes/main.scene.json",
+  "scripts": ["scripts/main.ts"],
+  "platforms": ["web-desktop", "web-mobile", "android", "ios", "minigame-wechat"]
+}

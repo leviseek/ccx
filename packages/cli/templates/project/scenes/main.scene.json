@@ -1,0 +1,9 @@
+{
+  "schema": "ccx.scene/1",
+  "meta": {
+    "name": "Main",
+    "generator": "ccx-cli"
+  },
+  "entities": [],
+  "systems": []
+}

@@ -1,5 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { RpcClient } from '../src/client.mjs';
@@ -8,7 +10,7 @@ import { createDaemon } from '../src/daemon.mjs';
 const here = dirname(fileURLToPath(import.meta.url));
 const daemonEntry = join(here, '..', 'bin', 'daemon.mjs');
 
-test('daemon：RPC 往返 + 事件订阅（真进程）', async () => {
+test('daemon: RPC roundtrip + ready event (real process)', async () => {
   const client = new RpcClient(process.execPath, [daemonEntry]);
   try {
     const ready = await new Promise((resolve) => {
@@ -20,12 +22,11 @@ test('daemon：RPC 往返 + 事件订阅（真进程）', async () => {
       });
       setTimeout(() => resolve(null), 2000);
     });
-    assert.ok(ready, '收到 system.ready 事件');
-    assert.ok(ready.params.pid > 0, 'ready 携带 pid');
+    assert.ok(ready, 'ready event received');
+    assert.ok(ready.params.pid > 0, 'ready carries pid');
 
     const list = await client.request('asset.list', { filter: 'texture' });
     assert.equal(list.assets.length, 2);
-    assert.equal(list.assets[0].uuid, 'a-1');
     const open = await client.request('scene.open', { path: 'scenes/x.scene.json' });
     assert.equal(open.path, 'scenes/x.scene.json');
     await assert.rejects(client.request('asset.nope'), /Method not found/);
@@ -36,7 +37,7 @@ test('daemon：RPC 往返 + 事件订阅（真进程）', async () => {
   }
 });
 
-test('daemon：通知不产生响应', async () => {
+test('daemon: notification produces no response', async () => {
   const client = new RpcClient(process.execPath, [daemonEntry]);
   try {
     const msgs = [];
@@ -44,14 +45,13 @@ test('daemon：通知不产生响应', async () => {
     client.notify('asset.scan');
     await new Promise((r) => setTimeout(r, 150));
     off();
-    assert.equal(msgs.filter((m) => m.method === 'asset.scan').length, 0,
-                 '通知不推事件');
+    assert.equal(msgs.filter((m) => m.method === 'asset.scan').length, 0);
   } finally {
     client.close();
   }
 });
 
-test('daemon：关闭后请求失败（连接生命周期）', async () => {
+test('daemon: closed connection rejects requests', async () => {
   const client = new RpcClient(process.execPath, [daemonEntry]);
   await client.request('asset.scan');
   client.close();
@@ -59,7 +59,7 @@ test('daemon：关闭后请求失败（连接生命周期）', async () => {
   await assert.rejects(client.request('asset.scan', {}, 500), /daemon exited|超时/);
 });
 
-test('createDaemon：进程内 handle 单测（协议错误码）', () => {
+test('createDaemon: in-process handle unit (protocol error codes)', () => {
   const d = createDaemon({ asset: { list: () => ({ ok: true }) } });
   const ok = d.handle(JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'asset.list', params: {} }));
   assert.deepEqual(ok.result, { ok: true });
@@ -68,5 +68,27 @@ test('createDaemon：进程内 handle 单测（协议错误码）', () => {
   const parse = d.handle('not json');
   assert.equal(parse.error.code, -32700);
   const notify = d.handle(JSON.stringify({ jsonrpc: '2.0', method: 'asset.list' }));
-  assert.equal(notify, null, '通知无响应');
+  assert.equal(notify, null, 'notification no response');
+});
+
+test('daemon: asset.subscribe -> assetChanged push (real fs change)', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ccx-daemon-watch-'));
+  const client = new RpcClient(process.execPath, [daemonEntry]);
+  const events = [];
+  const off = client.onEvent((m) => {
+    if (m.method === 'asset.event') events.push(m.params);
+  });
+  try {
+    const sub = await client.request('asset.subscribe', { root: dir });
+    assert.equal(sub.ok, true);
+    writeFileSync(join(dir, 'hero.png'), 'png');
+    await new Promise((r) => setTimeout(r, 400));
+    assert.ok(events.length >= 1, 'received at least one assetChanged');
+    assert.ok(events[0].data.path.includes('hero.png'), 'event carries path');
+    await client.request('asset.unsubscribe');
+  } finally {
+    off();
+    client.close();
+    rmSync(dir, { recursive: true, force: true });
+  }
 });

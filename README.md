@@ -131,6 +131,7 @@
 
 ## 变更记录
 
+- **v0.3.3（2026-08-27）**：M1 组装面——**动画→渲染 E2E**（状态机驱动变换→场景→批结构稳定）、**daemon 事件推送实装**（asset.subscribe：真实 fs 变更→assetChanged 推送，真进程测试）、**编辑器 Shell 最小集**（editor-shell：命令注册表/快捷键归一化/选择集/面板布局模型，与 CommandBus 绑定驱动写路径）；ctest 18/18 + node 37/37。
 - **v0.3.2（2026-08-27）**：M1 服务与资产面——**JSON-RPC 2.0 daemon**（service-core：协议/dispatcher/stdio daemon/客户端，真进程测试 4 组 + `ccx service demo` 端到端）、Cook 管线骨架（2D 平台矩阵：png/webp/astc4/etc2/bc7 + 音频目标 + 产物记录）、shader 资产与 material 联动校验（参数 ⊆ uniforms、类型匹配、缺参默认值）；ctest 17/17 + node 31/31。
 - **v0.3.1（2026-08-27）**：M1 交互与分析面——动画状态机（时间/触发器条件、计时重置、非法过渡容错）、`ccx render plan`（服务侧渲染计划：树序→稳定排序→合批，fixture 与服务/引擎双侧同断言）、foundation metrics（帧统计环形缓冲 128 + JSON 快照，Profiler 骨架）、AssetService 导入队列（确定性 uuid + 优先级 + 幂等去重 + 状态机）；ctest 16/16 + node 24/24。
 - **v0.3.0（2026-08-27）**：M1 运行面——精灵帧动画（帧网格/循环/UV）、**场景文件装载/导出**（C++ 引擎读 ADR-003，Transform/Sorting 属性与组件互转，Scene::setParent）、**E2E 渲染计划演示**（fixture 场景 → 装载 → 渲染序 → 合批 → 导出往返）、AssetService watch 事件流（合并/pump/close）；ctest 14/14 + node 19/19。

@@ -88,3 +88,8 @@ add_test(NAME foundation.metrics COMMAND ccx_metrics_test)
 add_executable(ccx_shader_material_test shader_material_test.cpp)
 target_link_libraries(ccx_shader_material_test PRIVATE ccx_render)
 add_test(NAME render.shader_material COMMAND ccx_shader_material_test)
+
+# M1 E2E：动画状态机 -> 场景变换 -> 渲染计划
+add_executable(ccx_anim_to_plan_test anim_to_plan_test.cpp)
+target_link_libraries(ccx_anim_to_plan_test PRIVATE ccx_animation ccx_render)
+add_test(NAME e2e.anim_to_plan COMMAND ccx_anim_to_plan_test)

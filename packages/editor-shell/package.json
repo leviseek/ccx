@@ -1,0 +1,7 @@
+{
+  "name": "@ccx/editor-shell",
+  "version": "0.1.0",
+  "private": true,
+  "description": "编辑器 Shell 最小集（services-spec §8）：命令/快捷键/选择/面板模型，无 UI 依赖",
+  "type": "module"
+}

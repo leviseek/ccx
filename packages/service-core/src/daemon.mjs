@@ -44,6 +44,8 @@ export function createDaemon(services) {
 
 export function runStdioDaemon(services) {
   const daemon = createDaemon(services);
+  // 事件推送通道：subscribe 后 daemon 侧可主动推送（services-spec §3 事件契约）
+  daemon.onPush((payload) => process.stdout.write(payload + '\n'));
   const rl = createInterface({ input: process.stdin, crlfDelay: Infinity });
   rl.on('line', (line) => {
     if (!line.trim()) return;

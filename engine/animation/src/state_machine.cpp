@@ -36,7 +36,7 @@ void AnimStateMachine::addTransition(AnimTransition t) {
 bool AnimStateMachine::evaluate(const AnimTransition& t) const {
     if (t.condition == "immediate") return true;
     if (startsWith(t.condition, "time_gt:")) {
-        const float limit = std::atof(t.condition.c_str() + 8);
+        const float limit = static_cast<float>(std::atof(t.condition.c_str() + 8));
         return stateTime_ >= limit;
     }
     if (startsWith(t.condition, "trigger:")) {

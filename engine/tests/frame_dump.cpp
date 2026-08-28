@@ -71,7 +71,7 @@ int main(int argc, char** argv) {
     if (W <= 0 || H <= 0) return 2;
 
     // 可选时间参数：ccx.CurveAnim 组件（线性轨 pos.x：{t0,v0,t1,v1}）驱动位置
-    const float animTime = argc >= 6 ? std::atof(argv[5]) : 0.0f;
+    const float animTime = argc >= 6 ? static_cast<float>(std::atof(argv[5])) : 0.0f;
 
     // --contacts 模式：先应用曲线到节点变换，再跑正式碰撞获得接触对（自动高亮）
     std::set<uint32_t> contactSet;

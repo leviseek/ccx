@@ -62,3 +62,9 @@
 
 - **场景数据面驱动帧**：壳编译 scene.cpp/schema.cpp/json.cpp（NDK）→ Scene 实体（hero/npc/coin + Sprite）→ 光栅上屏（帧循环）——真机帧与引擎场景渲染同源。
 
+
+
+## 设备上脚本驱动（2026-08-28）
+
+- 共享场景 + ccxSceneCommand 桥（script::applySceneCommand）注册进 nativeEval——脚本可驱动设备场景；帧循环渲染共享场景（hero 每帧移动）——设备上脚本驱动游戏的最小闭环。
+

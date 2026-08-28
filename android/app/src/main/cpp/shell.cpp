@@ -8,6 +8,15 @@
 #include "ccx/render/raster.h"
 #include "ccx/scene/scene.h"
 #include "ccx/script/host.h"
+#include "ccx/script/scene_bridge.h"
+
+// 设备上共享场景：脚本经桥修改 -> 帧循环渲染（脚本驱动的游戏）
+ccx::scene::Scene gScene;
+std::string gBridgeOut;
+const char* ccxSceneCommandBridge(const char* jsonIn) {
+    gBridgeOut = ccx::script::applySceneCommand(gScene, jsonIn ? jsonIn : "{}");
+    return gBridgeOut.c_str();
+}
 
 extern "C" JNIEXPORT jstring JNICALL
 Java_ccx_android_MainActivity_nativeVersion(JNIEnv* env, jobject) {
@@ -51,7 +60,9 @@ Java_ccx_android_MainActivity_nativeFrameAt(JNIEnv* env, jobject, jfloat t) {
         px[i] = 0x10; px[i + 1] = 0x10; px[i + 2] = 0x20; px[i + 3] = 0xFF;
     }
     // 引擎场景数据面：Scene + Sprite 实体 -> 光栅帧（帧循环）
-    ccx::scene::Scene scene;
+    // 脚本已建实体时优先渲染脚本场景（设备上脚本驱动）
+    ccx::scene::Scene& scene = gScene.renderOrder().empty() ? gScene : gScene;
+    if (gScene.renderOrder().empty()) {
     ccx::scene::EntityId hero = scene.createNode("hero");
     ccx::json::Value::ObjectEntries spr;
     spr.emplace_back("atlas", ccx::json::Value::number(1));
@@ -64,15 +75,18 @@ Java_ccx_android_MainActivity_nativeFrameAt(JNIEnv* env, jobject, jfloat t) {
     ccx::json::Value::ObjectEntries spr3;
     spr3.emplace_back("atlas", ccx::json::Value::number(3));
     scene.setComponent(coin, "ccx.Sprite", ccx::json::Value::object(std::move(spr3)));
-    {
-        constexpr float PI = 3.14159265f;
-        const double ang = static_cast<double>(t) * 2.0 * PI;
-        const float cx = 32.0f + 20.0f * static_cast<float>(std::cos(ang));
-        const float cy = 24.0f + 16.0f * static_cast<float>(std::sin(ang));
-        scene.setLocalTransform(hero, { { cx, cy }, 0.0f, { 1.0f, 1.0f } });
-    }
+    scene.setLocalTransform(hero, { { 32.0f, 24.0f }, 0.0f, { 1.0f, 1.0f } });
     scene.setLocalTransform(npc, { { 40.0f, 20.0f }, 0.0f, { 1.0f, 1.0f } });
     scene.setLocalTransform(coin, { { 20.0f, 44.0f }, 0.0f, { 1.0f, 1.0f } });
+    }
+    // hero 每帧移动（脚本/本地场景共用）
+    if (const auto hn = scene.node(ccx::scene::EntityId{0})) {
+        constexpr float PI2 = 3.14159265f;
+        const double ang2 = static_cast<double>(t) * 2.0 * PI2;
+        const float hx = 32.0f + 20.0f * static_cast<float>(std::cos(ang2));
+        const float hy = 24.0f + 16.0f * static_cast<float>(std::sin(ang2));
+        scene.setLocalTransform(ccx::scene::EntityId{0}, { { hx, hy }, 0.0f, { 1.0f, 1.0f } });
+    }
 
     // 引擎光栅：按场景实体绘制（hero 红 / npc 绿 / coin 蓝）
     ccx::render::RasterTarget target(64, 64);
@@ -104,13 +118,14 @@ Java_ccx_android_MainActivity_nativeFrameAt(JNIEnv* env, jobject, jfloat t) {
     return out;
 }
 
-// QuickJS 脚本面（设备上）：eval 表达式 -> JSON 字符串结果
+// QuickJS 脚本面（设备上）：eval -> JSON 结果；脚本可经 ccxSceneCommand 驱动场景
 extern "C" JNIEXPORT jstring JNICALL
 Java_ccx_android_MainActivity_nativeEval(JNIEnv* env, jobject, jstring code) {
     const char* utf = env->GetStringUTFChars(code, nullptr);
     std::string result = "{}";
     if (utf) {
         ccx::script::ScriptHost host;
+        host.setJsonFunction("ccxSceneCommand", &ccxSceneCommandBridge);
         result = "script-eval " + ccx::json::dump(host.eval(utf));
         env->ReleaseStringUTFChars(code, utf);
     }

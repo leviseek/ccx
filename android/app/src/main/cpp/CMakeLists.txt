@@ -13,6 +13,7 @@ add_library(ccx_shell SHARED
   D:/engine/ai-ccc/engine/scene/src/schema.cpp
   D:/engine/ai-ccc/engine/foundation/src/serialization/json.cpp
   D:/engine/ai-ccc/engine/script/src/host.cpp
+  D:/engine/ai-ccc/engine/script/src/scene_bridge.cpp
   ${QUICKJS_DIR}/quickjs.c
   ${QUICKJS_DIR}/cutils.c
   ${QUICKJS_DIR}/libregexp.c

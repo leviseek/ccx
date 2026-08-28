@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.163（2026-08-28）**：W6 脚本驱动——**设备上脚本可驱动场景**（共享 Scene + ccxSceneCommand 桥入 nativeEval；帧循环渲染共享场景（hero 每帧移动）——设备上脚本驱动游戏最小闭环）；ctest 62/62 + node 120/120。
 - **v0.3.162（2026-08-28）★ W6 脚本面 ★**——**QuickJS 在 Android 设备上运行**（壳编译 vendor quickjs 全套 + script host；nativeEval(1+2*3)=7 屏幕 OCR 实证）——设备上脚本引擎可用；途中第五次规避 read+write 截断（git 恢复+纯 edit）；ctest 62/62 + node 120/120。
 - **v0.3.161（2026-08-28）**：M2 彩排 3——**全链重演含设备**（自检 19s + demo 2.6s + W1 2.7s + 设备 0.3s ≈24.6s；评审随时可举行，仅 Actions 待 push）；ctest 62/62 + node 120/120。
 - **v0.3.160（2026-08-28）**：M1 收口 5——**W6 设备面入快照**（status/screenshot/push-frame + 壳运行/帧循环/场景数据面）；ctest 62/62 + node 120/120。

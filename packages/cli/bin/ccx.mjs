@@ -1187,8 +1187,12 @@ async function main() {
   if (sub === 'doctor' && flags.all) {
     if (flags.verify) {
       const runVerify = (script) => {
+        // ctest 自动探测（测试/评审环境可能无 PATH）：默认 w64devkit
+        const defaultCtest = 'D:/engine/w64devkit/bin/ctest.exe';
+        const env = { ...process.env };
+        if (!env.CC_CTEST && existsSync(defaultCtest)) env.CC_CTEST = defaultCtest;
         const r = spawnSync(process.execPath, [script, '--json'],
-                            { encoding: 'utf8', timeout: 180000 });
+                            { encoding: 'utf8', timeout: 180000, env });
         let data = null;
         try {
           data = JSON.parse(r.stdout);

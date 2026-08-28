@@ -1,9 +1,10 @@
 # M2 立项评审包（索引页）
 
 > 评审人照着走：材料 → 要点 → 复核命令 → 签名。
-> 全部材料在 docs/working/ 与仓库中；复核命令均可本机执行（≈2 分钟）。
+> 全部材料在 docs/working/ 与仓库中；复核命令均可本机执行（实测 ≈45 秒机器段 + 人工阅读 ≈15 分钟）。
+> 预检：`node ci/verify_review_package.mjs`（材料 10 + 命令 3，READY 判定）。
 
-## 材料清单（按评审顺序）
+## 材料清单（按评审顺序，10 件）
 
 | # | 材料 | 要点 | 复核命令 |
 | --- | --- | --- | --- |
@@ -15,6 +16,8 @@
 | 6 | script-engine-decision.md | QuickJS 主选决策 | ccx script run --engine |
 | 7 | gpu-backend-plan.md | W1 映射表 + 五级验收（附录 B） | ccx doctor --w1 |
 | 8 | ci-push-checklist.md | push 终审清单 | — |
+| 9 | m2-review-ready.md | 评审就绪实录（当天状态页） | node ci/verify_review_package.mjs |
+| 10 | m2-rehearsal-run.md | 彩排演练实录（机器段 45s/20 分钟可完成） | — |
 
 ## 一键复核（评审现场）
 

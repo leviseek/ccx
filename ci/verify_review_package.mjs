@@ -16,6 +16,8 @@ const MATERIALS = [
   'm2-proposal.md', 'm2-gate-dress-rehearsal.md', 'm2-tickets.md',
   'script-engine-decision.md', 'gpu-backend-plan.md', 'ci-push-checklist.md',
   'm2-review-package.md',
+  'm2-review-ready.md',
+  'm2-rehearsal-run.md',
 ];
 
 const materials = MATERIALS.map((f) => ({ file: f, exists: existsSync(join(docs, f)) }));

@@ -35,3 +35,9 @@
 - 本文件为基线交接；后续里程碑增量见 m1-gate-review / m1-final-summary / m2-package-index。
 
 
+
+
+## 交接终检终版（2026-08-28，v0.3.134）
+
+- 三件一致：handoff/completion/launch 数字对齐（62 CTest / 116 node / 17 步 / 13 张 ✅）——以 m1-final-summary 为唯一事实源。
+

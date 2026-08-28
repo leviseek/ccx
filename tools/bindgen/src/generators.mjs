@@ -125,7 +125,8 @@ export function generateNapi(ir) {
     }
     for (const p of cls.props) {
       const lit = typeof p.default === 'string' ? '"' + p.default + '"' : String(p.default ?? 0);
-      L.push('  const ' + p.type + ' ' + p.name + '_value = ' + lit + ';');
+      const cpp = p.type === 'string' ? 'std::string' : p.type;
+      L.push('  const ' + cpp + ' ' + p.name + '_value = ' + lit + ';');
     }
   }
   L.push('}  // namespace ' + mod);

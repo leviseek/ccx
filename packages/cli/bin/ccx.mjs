@@ -399,7 +399,7 @@ async function main() {
         const cFrames = [];
         for (const t of ['0', '0.7', '1.4']) {
           const ppm = join(ppmDir2, 'contact-' + t.replace('.', '_') + '.ppm');
-          const fr = spawnSync(dumpExe2, [collideScene, ppm, '160', '90', t, '', '1'],
+          const fr = spawnSync(dumpExe2, [collideScene, ppm, '160', '90', t, '', '1', '1'],
                                { encoding: 'utf8' });
           if (fr.status !== 0) {
             push('contact.gif', { ok: false, error: '帧 t=' + t + ' 失败' });
@@ -591,11 +591,33 @@ async function main() {
         const errStep = run.trace?.find((t) => t.status === 'error');
         return emit({ ok: false, error: '构建失败: ' + (errStep?.error ?? 'hooks 出错') });
       }
+      // Web 构建目标骨架：--out <dir> 装配静态站点（index.html + assets 清单）
+      let outDir = null;
+      if (flags.out) {
+        outDir = resolve(flags.out);
+        mkdirSync(outDir, { recursive: true });
+        const assets = run.manifest?.entries?.assets ?? [];
+        writeFileSync(join(outDir, 'assets.json'),
+                      JSON.stringify({ schema: 'ccx.assets.index/1', platform, assets }, null, 2));
+        const scripts = run.manifest?.entries?.scripts ?? [];
+        writeFileSync(
+          join(outDir, 'index.html'),
+          '<!doctype html><html><head><meta charset="utf-8">' +
+          '<title>CCX ' + platform + '</title></head><body>' +
+          '<div id="game"></div><script src="game.js"></script></body></html>' +
+          '\n');
+        writeFileSync(
+          join(outDir, 'game.js'),
+          '// CCX web 目标骨架（M2 接运行时入口）\n' +
+          'window.__CCX = {' + platform + ': true, assets: ' + assets.length + '};\n');
+      }
       return emit({
         ok: true,
         platform,
         traceSteps: run.trace.filter((t) => t.status === 'ok').length,
         buildId: run.manifest?.buildId ?? null,
+        out: outDir,
+        assets: run.manifest?.entries?.assets?.length ?? 0,
       });
     } finally {
       client.close();
@@ -706,6 +728,7 @@ async function main() {
         tmpPpms.push(ppm);
         const args5 = [sceneFile, ppm, m[1], m[2], t];
         if (flags.highlight) args5.push(flags.highlight);  // 接触高亮透传
+        args5.push('', '', '1');  // argv[8] 设备路径（FakeDevice 上传/绘制/读回）
         const r = spawnSync(dumpExe, args5, { encoding: 'utf8' });
         if (r.status !== 0) return emit({ ok: false, error: ('帧 t=' + t + ' 失败: ' + r.stderr).trim() });
         const { w, h, data } = parsePpm(readFileSync(ppm));

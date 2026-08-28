@@ -90,6 +90,28 @@ test('ccx build：经 daemon 的 Builder RPC', async () => {
   assert.equal(out2.ok, false);
 });
 
+test('ccx build --out：Web 目标静态站点装配', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ccx-web-'));
+  try {
+    const r = runCli(['build', '--platform', 'web-desktop', '--out', join(dir, 'site'),
+                      '--json'], dir);
+    assert.equal(r.status, 0, r.err + r.out);
+    const out = JSON.parse(r.out);
+    assert.equal(out.ok, true);
+    assert.equal(out.platform, 'web-desktop');
+    assert.ok(out.out.length > 0, '输出目录');
+    assert.ok(existsSync(join(dir, 'site', 'index.html')), 'index.html 生成');
+    assert.ok(existsSync(join(dir, 'site', 'game.js')), 'game.js 生成');
+    const assets = JSON.parse(readFileSync(join(dir, 'site', 'assets.json'), 'utf8'));
+    assert.equal(assets.schema, 'ccx.assets.index/1');
+    assert.equal(assets.platform, 'web-desktop');
+    const html = readFileSync(join(dir, 'site', 'index.html'), 'utf8');
+    assert.ok(html.includes('CCX web-desktop'), '页面标题');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('ccx cook：扫描 -> Cook -> bundle 一步全链', () => {
   const dir = mkdtempSync(join(tmpdir(), 'ccx-cook-'));
   try {

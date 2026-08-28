@@ -11,6 +11,7 @@ import { assetUuid } from '../../asset-service/src/queue.mjs';
 import { CommandBus } from '../../scene-service/src/commands.mjs';
 import { createBundleManifest } from '../../build-service/src/bundle.mjs';
 import { getBuilder, listBuilders, registerBuilder } from '../../build-service/src/builder_registry.mjs';
+import { listPlugins, installPlugin, parsePluginManifest, getPlugin } from '../../plugin-market/src/plugin_registry.mjs';
 function listBuildersSafe() {
   try {
     return listBuilders();
@@ -149,6 +150,20 @@ const services = {
           config: params.options ?? {},
         }),
       });
+    },
+  },
+  plugin: {
+    list: () => ({ ok: true, plugins: listPlugins() }),
+    install: (params = {}) => {
+      const dir = params.dir ?? params.path;
+      if (!dir) return { ok: false, error: '需 dir（插件目录）' };
+      const m = parsePluginManifest(dir);
+      if (!m) return { ok: false, error: '清单无效（缺 ccx-plugin.json 或字段不合法）' };
+      return installPlugin(m, { entry: params.entry ?? null });
+    },
+    get: (params = {}) => {
+      const p = getPlugin(params.name ?? '');
+      return p ? { ok: true, plugin: p } : { ok: false, error: '未安装: ' + (params.name ?? '') };
     },
   },
   scene: {

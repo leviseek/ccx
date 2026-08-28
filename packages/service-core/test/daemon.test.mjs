@@ -388,3 +388,32 @@ test('daemon: M4 token 鉴权（env CCX_TOKEN 开启后拒绝/放行）', async 
   assert.deepEqual(open.result, { ok: true }, '未配置 token 开放');
 });
 
+
+
+test('daemon: plugin 市场 RPC（install/list/get，M4 插件市场上线）', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ccx-plugrpc-'));
+  const client = new RpcClient(process.execPath, [daemonEntry]);
+  try {
+    await new Promise((resolve) => {
+      const off = client.onEvent((m) => { if (m.method === 'system.ready') { off(); resolve(); } });
+      setTimeout(() => resolve(), 2000);
+    });
+    const empty = await client.request('plugin.list');
+    assert.equal(empty.ok, true);
+    // 无清单目录 -> 安装失败
+    const bad = await client.request('plugin.install', { dir });
+    assert.equal(bad.ok, false);
+    // 写清单 -> 安装成功
+    writeFileSync(join(dir, 'ccx-plugin.json'), JSON.stringify({ name: 'webgl-shadow', version: '1.2.0', type: 'builder', platform: 'web-desktop' }));
+    const inst = await client.request('plugin.install', { dir });
+    assert.equal(inst.ok, true);
+    const list = await client.request('plugin.list');
+    const names = list.plugins.map((p) => p.name);
+    assert.ok(names.includes('webgl-shadow'), 'list 含新插件');
+    const g = await client.request('plugin.get', { name: 'webgl-shadow' });
+    assert.equal(g.plugin.version, '1.2.0');
+  } finally {
+    client.close();
+    rmSync(dir, { recursive: true, force: true });
+  }
+});

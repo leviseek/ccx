@@ -7,8 +7,10 @@ import { spawnSync } from 'node:child_process';
 
 const cli = join(import.meta.dirname, '..', 'bin', 'ccx.mjs');
 
-function runCli(args, cwd) {
-  const r = spawnSync(process.execPath, [cli, ...args], { encoding: 'utf8', cwd });
+function runCli(args, cwd, env = null) {
+  const opts = { encoding: 'utf8', cwd };
+  if (env) opts.env = env;
+  const r = spawnSync(process.execPath, [cli, ...args], opts);
   return { status: r.status, out: r.stdout, err: r.stderr };
 }
 
@@ -521,6 +523,33 @@ test('ccx scene status/undo/redo：会话命令面', () => {
     out = JSON.parse(r.out);
     assert.equal(out.entityCount, 3, 'undo 移除 ghost（回到 3）');
     assert.equal(out.applied.at(-1), 'undo');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('ccx cook + CCX_EXTERNAL_COMPRESSOR：外部压缩器端到端', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ccx-extccli-'));
+  try {
+    writeFileSync(join(dir, 'hero.png'), 'PNG');
+    const fix = join(import.meta.dirname, '..', '..', 'asset-service', 'test', 'fixtures',
+                     'fake_compressor.mjs');
+    // runCli + env（第三方 env 经选项透传）
+    const r = runCli(['cook', '--root', dir, '--platform', 'web-desktop', '--json'],
+                     join(import.meta.dirname, '..'),
+                     { ...process.env,
+                       CCX_EXTERNAL_COMPRESSOR: 'png=' + process.execPath + '|' + fix + '|{src}' });
+    assert.equal(r.status, 0, r.err + r.out);
+    const out = JSON.parse(r.out);
+    assert.equal(out.ok, true);
+    assert.equal(out.okCount, 1, 'png 经外挂压缩器成功');
+    assert.equal(out.failCount, 0);
+    // 无外挂配置：png 无压缩器 -> fail（回归既有语义）
+    const r2 = runCli(['cook', '--root', dir, '--platform', 'web-desktop', '--json'],
+                      join(import.meta.dirname, '..'), process.env);
+    const out2 = JSON.parse(r2.out);
+    assert.equal(out2.okCount, 0);
+    assert.equal(out2.failCount, 1);
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

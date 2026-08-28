@@ -5,7 +5,19 @@ import { spawn, spawnSync } from 'node:child_process';
 import { createWriteStream } from 'node:fs';
 import { closeSync, cpSync, existsSync, mkdirSync, openSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { buildAtlasFromDir } from '../../asset-service/src/atlas_builder.mjs';
-import { cookWithCompression } from '../../asset-service/src/cook.mjs';
+import { cookWithCompression, externalCompressor, registerCompressor } from '../../asset-service/src/cook.mjs';
+
+// 外部压缩器配置（W4）：CCX_EXTERNAL_COMPRESSOR='png=D:\node.exe|scripts\ext.mjs|{src}'（分号|分隔）
+(function registerExternalFromEnv() {
+  const spec = process.env.CCX_EXTERNAL_COMPRESSOR;
+  if (!spec) return;
+  const eq = spec.indexOf('=');
+  if (eq <= 0) return;
+  const format = spec.slice(0, eq).trim();
+  const parts = spec.slice(eq + 1).split('|');
+  if (parts.length < 1 || !parts[0]) return;
+  registerCompressor(format, externalCompressor({ cmd: parts[0], args: parts.slice(1) }));
+})();
 import { createBundleManifest } from '../../build-service/src/bundle.mjs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -655,7 +667,7 @@ async function main() {
     const results = [];
     for (const a of assets) {
       const r = await cookWithCompression({ uuid: a.uuid, sourceFormat: a.sourceFormat,
-                                             sizeBytes: a.sizeBytes }, platform);
+                                             sizeBytes: a.sizeBytes, path: a.path }, platform);
       const ok = r.artifact.parts.every((p) => p.ok !== false);
       results.push({ uuid: a.uuid, ok, parts: r.artifact.parts.length });
       if (ok) okCount += 1;

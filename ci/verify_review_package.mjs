@@ -11,13 +11,19 @@ const docs = join(root, 'docs', 'working');
 const node = process.execPath;
 const cli = join(root, 'packages', 'cli', 'bin', 'ccx.mjs');
 
+// 总纲（m2-package-index.md）四组材料全量
 const MATERIALS = [
-  'm1-final-summary.md', 'm1-final-summary.json', 'm1-architecture.html',
-  'm2-proposal.md', 'm2-gate-dress-rehearsal.md', 'm2-tickets.md',
-  'script-engine-decision.md', 'gpu-backend-plan.md', 'ci-push-checklist.md',
-  'm2-review-package.md',
-  'm2-review-ready.md',
-  'm2-rehearsal-run.md',
+  // A 立项主体
+  'm2-kickoff.md', 'm2-proposal.md', 'm2-tickets.md', 'm2-gate-dress-rehearsal.md',
+  // B 评审支持
+  'm2-review-package.md', 'm2-review-ready.md', 'm2-rehearsal-run.md',
+  // C 技术决策与预备
+  'script-engine-decision.md', 'gpu-backend-plan.md',
+  // D 状态基线（M1 交接）
+  'm1-handoff.md', 'm1-gate-review.md', 'm1-final-summary.md', 'm1-final-summary.json',
+  'ci-push-checklist.md', 'm1-architecture.html',
+  // 索引
+  'm2-package-index.md',
 ];
 
 const materials = MATERIALS.map((f) => ({ file: f, exists: existsSync(join(docs, f)) }));

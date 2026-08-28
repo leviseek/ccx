@@ -49,3 +49,4 @@
 
 - 自检（ci/verify_review_package.mjs）16 件 md 材料 **覆盖总纲全部**（A-D 四组 + 索引）；4 个 .mjs 工具由命令段（3 条）覆盖。
 - 结论：**材料包闭环一致（16 md + 4 mjs + 3 命令）→ READY**。
+

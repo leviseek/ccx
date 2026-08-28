@@ -51,7 +51,7 @@ public class MainActivity extends Activity {
         protected void onDraw(Canvas canvas) {
             super.onDraw(canvas);
             int w = getWidth(), h = getHeight();
-            int side = Math.min(w, h) - 40;
+            int side = Math.min(w, h) - 120; // 预留文本行空间（CCX loop / script / stats）
             int l = (w - side) / 2, top = (h - side) / 2;
             canvas.drawBitmap(frame, null, new android.graphics.Rect(l, top, l + side, top + side), paint);
             paint.setTextSize(28);

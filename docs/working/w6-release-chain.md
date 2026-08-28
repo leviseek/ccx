@@ -86,3 +86,10 @@
 
 - 验证基准（2026-08-29）：ctest 62/62、node 125/125（32 文件）、双 gate OK。
 
+
+## W6-1 验收（2026-08-29）
+
+- 修复壳显示 bug：横屏下文本行越界（side 预留 120px 空间）。
+- release APK 五验证全部实证：壳运行✅ / 帧循环✅（frames 递增）/ 引擎光栅✅（三色精灵块）/ 脚本驱动✅（script-eval {ok:true,value:7}）/ 统计上报✅（stats: frames=203 + logcat CCX_STATS）。
+- T-W6-1 转✅；余下：W6-2 iOS、运行时官方签名。
+

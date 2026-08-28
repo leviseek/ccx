@@ -22,6 +22,7 @@ public class MainActivity extends Activity {
     private static native byte[] nativeFrameAt(float t);
     private static native String nativeFrameStats();
     private static native String nativeEval(String code);
+    private static native String nativeBench();
     static { System.loadLibrary("ccx_shell"); }
 
     static class FrameView extends View {
@@ -29,8 +30,14 @@ public class MainActivity extends Activity {
         private final Paint paint = new Paint();
         private final Handler handler = new Handler(Looper.getMainLooper());
         private float t = 0.0f;
+        private boolean benchDone = false;
         private final Runnable tick = new Runnable() {
             @Override public void run() {
+                if (!benchDone) {
+                    benchDone = true;
+                    // v1.0 基准1：设备端 ECS 性能（结果打 logcat CCX_BENCH）
+                    try { android.util.Log.i("CCX_BENCH", nativeBench()); } catch (Throwable ignored) {}
+                }
                 t += 0.03f;
                 byte[] px = nativeFrameAt(t);
                 frame.copyPixelsFromBuffer(java.nio.ByteBuffer.wrap(px));

@@ -6,6 +6,7 @@
 
 - CTest **65/65**（含 ecs.bench_gate + scene.big_roundtrip）；node --test **128/128**（34 文件，含 verify_mcp_loop + verify_three_platform，2026-08-29 实测复跑）；引擎构建模块 14；demo all **18 步**全 ok（含真后端帧/骨骼/帧性能汇总）
 - **M1 性能 gate（engine-spec §3.7，2026-08-29 实测）**：实体创建 8.7M/s（≥1M/s ✅）；10 万 Transform 查询 0.148ms（<2ms ✅）；空世界 tick ~0ms（<0.5ms ✅）；10 万精灵帧推进 0.038ms（桌面 <6ms ✅）；10 万同键精灵 = 1 批 0.028ms（renderer-spec §5 ✅）——RTX 4070 桌面
+- **v1.0 基准1 移动端（roadmap §8.2，2026-08-29 实测，Android 模拟器 ALN-AL00 x86_64）**：10 万实体创建 14.78ms（≈6.8M/s，≥1M/s ✅）；10 万查询 0.150ms（<6ms ✅）；10 万精灵帧推进 0.032ms（移动目标 1.5ms ✅）——logcat CCX_BENCH
 - **v1.0 基准4（roadmap §8.2，2026-08-29 实测）**：10 万实体场景 JSON round-trip 全等——build 17.6ms / save 142.6ms（23.5MB）/ load 120.5ms / save(load(save)) dump 全等 ✅
 - **v1.0 基准6（roadmap §8.2，2026-08-29 实测）**：MCP 自然语言闭环 9 步全过（open→create_entity→Sprite→Health→query→save→帧导出→build.run；verify_mcp_loop.mjs 单 daemon 会话）✅
 - **v1.0 基准3（roadmap §8.2，2026-08-29 实测）**：从零新建项目 → Web+Android 双端出包 **4.1s**（预算 3600s；verify_three_platform.mjs；iOS 待环境）✅

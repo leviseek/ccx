@@ -5,6 +5,7 @@ project(ccx_shell C CXX)
 set(QUICKJS_DIR D:/engine/ai-ccc/engine/platform/vendor/quickjs)
 set(ENGINE_INC D:/engine/ai-ccc/engine/render/include D:/engine/ai-ccc/engine/scene/include
               D:/engine/ai-ccc/engine/foundation/include D:/engine/ai-ccc/engine/script/include
+              D:/engine/ai-ccc/engine/ecs/include
               ${QUICKJS_DIR})
 add_library(ccx_shell SHARED
   shell.cpp
@@ -12,6 +13,8 @@ add_library(ccx_shell SHARED
   D:/engine/ai-ccc/engine/scene/src/scene.cpp
   D:/engine/ai-ccc/engine/scene/src/schema.cpp
   D:/engine/ai-ccc/engine/foundation/src/serialization/json.cpp
+  D:/engine/ai-ccc/engine/foundation/src/reflection/type_registry.cpp
+  D:/engine/ai-ccc/engine/ecs/src/world.cpp
   D:/engine/ai-ccc/engine/script/src/host.cpp
   D:/engine/ai-ccc/engine/script/src/scene_bridge.cpp
   ${QUICKJS_DIR}/quickjs.c

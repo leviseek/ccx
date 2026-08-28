@@ -16,6 +16,8 @@ static double gLastFrameMs = 0.0;
 #include "ccx/scene/scene.h"
 #include "ccx/script/host.h"
 #include "ccx/script/scene_bridge.h"
+#include "ccx/ecs/world.h"
+#include "ccx/foundation/reflection/ccx_type.h"
 
 // 设备上共享场景：脚本经桥修改 -> 帧循环渲染（脚本驱动的游戏）
 ccx::scene::Scene gScene;
@@ -153,4 +155,56 @@ Java_ccx_android_MainActivity_nativeEval(JNIEnv* env, jobject, jstring code) {
         env->ReleaseStringUTFChars(code, utf);
     }
     return env->NewStringUTF(result.c_str());
+}
+
+// v1.0 基准1（roadmap §8.2）：移动端 ECS 性能——实体创建 / 10 万查询 / 帧推进
+// 返回 JSON：{createRateMs, query100kMs, advance100kMs, entities}
+struct BenchPos { float x = 0.0f; float y = 0.0f; };
+struct BenchVel { float vx = 0.0f; float vy = 0.0f; };
+namespace ccx {
+// 显式特化（Android .so 下 CCX_TYPE 宏的 inline 特化可能被链接器丢弃）
+template <>
+inline const TypeInfo* type_info_of<BenchPos>() {
+    static const TypeInfo kInfo = detail::make_type_info<BenchPos>("BenchPos", {});
+    return &kInfo;
+}
+template <>
+inline const TypeInfo* type_info_of<BenchVel>() {
+    static const TypeInfo kInfo = detail::make_type_info<BenchVel>("BenchVel", {});
+    return &kInfo;
+}
+}  // namespace ccx
+extern "C" JNIEXPORT jstring JNICALL
+Java_ccx_android_MainActivity_nativeBench(JNIEnv* env, jobject) {
+    using namespace ccx::ecs;
+    using clock = std::chrono::steady_clock;
+    auto ms = [](clock::time_point t0) {
+        return std::chrono::duration<double, std::milli>(clock::now() - t0).count();
+    };
+    constexpr int kCreate = 100000;
+    World w;
+    const auto t0 = clock::now();
+    for (int i = 0; i < kCreate; ++i) {
+        const Entity e = w.create();
+        w.add<BenchPos>(e);
+        w.add<BenchVel>(e);
+    }
+    const double createMs = ms(t0);
+    volatile double sink = 0;
+    const auto t1 = clock::now();
+    w.query<BenchPos>([&](Entity, BenchPos& p) { sink += p.x + p.y; });
+    const double queryMs = ms(t1);
+    const auto t2 = clock::now();
+    for (int f = 0; f < 5; ++f) {
+        w.query<BenchPos, BenchVel>([](Entity, BenchPos& p, BenchVel& v) { p.x += v.vx; p.y += v.vy; });
+    }
+    const double advanceMs = ms(t2) / 5.0;
+    (void)sink;
+    const std::string out =
+        "{\"create100kMs\":" + std::to_string(createMs) +
+        ",\"query100kMs\":" + std::to_string(queryMs) +
+        ",\"advance100kMs\":" + std::to_string(advanceMs) +
+        ",\"entities\":100000}";
+    __android_log_print(ANDROID_LOG_INFO, "CCX_BENCH", "%s", out.c_str());
+    return env->NewStringUTF(out.c_str());
 }

@@ -3,7 +3,7 @@
 // 约定：--json 机器可读；--no-interactive 适配 CI。
 import { spawn, spawnSync } from 'node:child_process';
 import { createWriteStream } from 'node:fs';
-import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { buildAtlasFromDir } from '../../asset-service/src/atlas_builder.mjs';
 import { cookWithCompression } from '../../asset-service/src/cook.mjs';
 import { createBundleManifest } from '../../build-service/src/bundle.mjs';
@@ -11,7 +11,8 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildView } from '../../editor-shell/src/viewmodel.mjs';
 import { EditorShell } from '../../editor-shell/src/shell.mjs';
-import { ppmToBmp } from '../../editor-shell/src/ppm_to_bmp.mjs';
+import { buildGif } from '../../editor-shell/src/gif.mjs';
+import { parsePpm, ppmToBmp } from '../../editor-shell/src/ppm_to_bmp.mjs';
 import { renderPreviewPage } from '../../editor-shell/src/preview_page.mjs';
 import { CommandBus } from '../../scene-service/src/commands.mjs';
 import { diffScenes } from '../../scene-service/src/diff.mjs';
@@ -19,6 +20,10 @@ import { renderPlan } from '../../scene-service/src/render_plan.mjs';
 import { RpcClient } from '../../service-core/src/client.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
+
+function buildDirName() {
+  return resolve(join(process.cwd(), 'build', 'local'));
+}
 
 function isAlive(pid) {
   try {
@@ -45,6 +50,8 @@ async function main() {
     if (args[i] === '--time') flags.time = args[++i];
     if (args[i] === '--count') flags.count = args[++i];
     if (args[i] === '--frame') flags.frame = args[++i];
+    if (args[i] === '--times') flags.times = args[++i];
+    if (args[i] === '--delay') flags.delay = args[++i];
   }
   const sub = positional[0] ?? 'doctor';
 
@@ -537,6 +544,53 @@ async function main() {
       /* noop */
     }
     return emit({ ok: true, out, width: Number(m[1]), height: Number(m[2]), quads: meta.quads ?? 0 });
+  }
+
+  // —— frame gif <scene> --out x.gif --times 0,0.1,0.2 [--size WxH] [--delay 20] ——
+  if (sub === 'frame' && positional[1] === 'gif') {
+    const sceneFile = positional[2];
+    if (!sceneFile || !existsSync(sceneFile) || !flags.times || !flags.out) {
+      return emit({ ok: false, error: '用法: ccx frame gif <scene> --times 0,0.1 --out x.gif [--size 160x90] [--delay 20]' });
+    }
+    const m = /^(\d+)x(\d+)$/.exec(flags.size ?? '160x90');
+    if (!m) return emit({ ok: false, error: '--size 须为 WxH' });
+    const dumpExe = resolve(join(here, '..', '..', '..', 'build', 'local', 'engine', 'tests', 'ccx_frame_dump.exe'));
+    if (!existsSync(dumpExe)) {
+      return emit({ ok: false, error: '未构建 ccx_frame_dump（先 cmake --build build/local）' });
+    }
+    const times = flags.times.split(',').map((t) => t.trim()).filter(Boolean);
+    const frames = [];
+    const tmpPpms = [];
+    try {
+      for (const t of times) {
+        const ppm = resolve(buildDirName(), 'frame-' + t.replace('.', '_') + '.ppm');
+        mkdirSync(dirname(ppm), { recursive: true });
+        tmpPpms.push(ppm);
+        const r = spawnSync(dumpExe, [sceneFile, ppm, m[1], m[2], t], { encoding: 'utf8' });
+        if (r.status !== 0) return emit({ ok: false, error: ('帧 t=' + t + ' 失败: ' + r.stderr).trim() });
+        const { w, h, data } = parsePpm(readFileSync(ppm));
+        const pixels = new Uint8Array(w * h * 4);
+        for (let i = 0; i < w * h; ++i) {
+          pixels[i * 4] = data[i * 3];
+          pixels[i * 4 + 1] = data[i * 3 + 1];
+          pixels[i * 4 + 2] = data[i * 3 + 2];
+          pixels[i * 4 + 3] = 255;
+        }
+        frames.push({ w, h, pixels });
+      }
+      const gif = buildGif(frames, { delayCs: Number(flags.delay) || 20 });
+      const out = resolve(flags.out);
+      writeFileSync(out, gif);
+      return emit({ ok: true, out, frames: frames.length, width: frames[0].w, height: frames[0].h, bytes: gif.length });
+    } finally {
+      for (const pp of tmpPpms) {
+        try {
+          rmSync(pp, { force: true });
+        } catch {
+          /* noop */
+        }
+      }
+    }
   }
 
   // —— profiler snapshot [--count N]：临时 daemon -> 帧统计快照 ——

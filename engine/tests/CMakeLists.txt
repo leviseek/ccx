@@ -195,6 +195,11 @@ add_executable(ccx_physics_test physics_test.cpp)
 target_link_libraries(ccx_physics_test PRIVATE ccx_physics)
 add_test(NAME physics.grid COMMAND ccx_physics_test)
 
+# M1：碰撞宽相接入帧循环（移动实体 -> 候选对时序）
+add_executable(ccx_tick_collision_test tick_collision_test.cpp)
+target_link_libraries(ccx_tick_collision_test PRIVATE ccx_physics ccx_ecs ccx_scene)
+add_test(NAME e2e.tick_collision COMMAND ccx_tick_collision_test)
+
 # M1：动画整合（状态机选 clip -> 精灵帧采样 -> 帧循环）
 add_executable(ccx_integrated_animation_test integrated_animation_test.cpp)
 target_link_libraries(ccx_integrated_animation_test PRIVATE ccx_animation ccx_ecs ccx_scene)

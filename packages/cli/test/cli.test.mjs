@@ -276,6 +276,48 @@ test('ccx editor preview --frame：渲染帧图嵌入', () => {
   }
 });
 
+test('ccx frame gif：多时间点 -> GIF 动画文件', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ccx-gifcli-'));
+  try {
+    const sceneFile = join(dir, 's.json');
+    writeFileSync(sceneFile, JSON.stringify({
+      schema: 'ccx.scene/1', meta: {},
+      entities: [{
+        id: 1, name: 'hero', parent: null,
+        components: [
+          { type: 'ccx.Sprite', data: { atlas: 1, material: 1 } },
+          { type: 'ccx.SpriteAnimator', data: { frameCount: 4, fps: 10 } },
+        ],
+      }],
+      systems: [],
+    }));
+    // 非仓库 cwd 时 dump 工具从仓库 build 取（runCli 的 cwd 与仓库 build 路径），用仓库 cwd 跑
+    const dumpExe = join(import.meta.dirname, '..', '..', '..', 'build', 'local',
+                         'engine', 'tests', 'ccx_frame_dump.exe');
+    if (!existsSync(dumpExe)) return;  // 跳过（未构建）
+    const out = join(dir, 'anim.gif');
+    const r = runCli([
+      'frame', 'gif', sceneFile, '--times', '0,0.1,0.2', '--out', out,
+      '--size', '64x64', '--delay', '10',
+    ], import.meta.dirname);  // cwd=仓库（dump 相对路径无依赖，但干净）
+    assert.equal(r.status, 0, r.err + r.out);
+    const parsed = JSON.parse(r.out);
+    assert.equal(parsed.ok, true);
+    assert.equal(parsed.frames, 3);
+    const gif = readFileSync(out);
+    assert.equal(gif.toString('ascii', 0, 6), 'GIF89a');
+    let gce = 0, img = 0;
+    for (let i = 0; i < gif.length - 1; ++i) {
+      if (gif[i] === 0x21 && gif[i + 1] === 0xF9) ++gce;
+      if (gif[i] === 0x2C) ++img;
+    }
+    assert.equal(gce, 3);
+    assert.equal(img, 3);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('scene apply：非法命令拒绝且不写坏文件', () => {
   const dir = mkdtempSync(join(tmpdir(), 'ccx-apply-bad-'));
   try {

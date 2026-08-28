@@ -560,6 +560,36 @@ test('ccx cook + CCX_EXTERNAL_COMPRESSOR：外部压缩器端到端', () => {
   }
 });
 
+test('ccx script run：命令脚本驱动场景（exit3 用户命令面）', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ccx-script-'));
+  try {
+    const script = join(dir, 'build.ccx.js');
+    writeFileSync(script, [
+      '# scene build script',
+      JSON.stringify({ op: 'create_entity', name: 'hero', parent: 1 }),
+      JSON.stringify({ op: 'create_entity', name: 'npc', parent: 1 }),
+      JSON.stringify({ op: 'add_component', id: 2, type: 'game.Health', data: { max: 100 } }),
+    ].join('\n') + '\n');
+    const out = join(dir, 'scene.json');
+    const r = runCli(['script', 'run', script, '--out', out, '--json'], dir);
+    assert.equal(r.status, 0, r.err + r.out);
+    const parsed = JSON.parse(r.out);
+    assert.equal(parsed.ok, true);
+    assert.equal(parsed.commands, 3);
+    assert.deepEqual(parsed.applied, ['create_entity', 'create_entity', 'add_component']);
+    const scene = JSON.parse(readFileSync(out, 'utf8'));
+    assert.equal(scene.entities.length, 3, '场景文件实体');
+    assert.equal(parsed.entities, 3);
+    // 非法命令行 -> 明确报错
+    writeFileSync(script, '{bad json}\n');
+    const bad = runCli(['script', 'run', script, '--out', out, '--json'], dir);
+    assert.equal(JSON.parse(bad.out).ok, false);
+    assert.ok(JSON.parse(bad.out).error.includes('JSON'));
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('scene apply：非法命令拒绝且不写坏文件', () => {
   const dir = mkdtempSync(join(tmpdir(), 'ccx-apply-bad-'));
   try {

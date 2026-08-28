@@ -911,6 +911,54 @@ async function main() {
     }
   }
 
+  // —— script run <file> --out <scene.json>：命令脚本驱动场景（每行 JSON 命令）——
+  if (sub === 'script' && positional[1] === 'run') {
+    const scriptFile = positional[2];
+    const out = flags.out ? resolve(flags.out) : resolve('scene.json');
+    if (!scriptFile || !existsSync(scriptFile)) {
+      return emit({ ok: false, error: '用法: ccx script run <commands.ccx.js> --out <scene.json>' });
+    }
+    const lines = readFileSync(scriptFile, 'utf8').split('\n')
+      .map((l) => l.trim()).filter((l) => l && !l.startsWith('#'));
+    const daemonEntry = resolve(join(here, '..', '..', 'service-core', 'bin', 'daemon.mjs'));
+    const client = new RpcClient(process.execPath, [daemonEntry]);
+    try {
+      await new Promise((resolve, reject) => {
+        const off = client.onEvent((m) => {
+          if (m.method === 'system.ready') { off(); resolve(); }
+        });
+        setTimeout(() => reject(new Error('daemon 未就绪')), 2500);
+      });
+      const tmpScene = join(buildDirName(), 'script-run-scene.json');
+      mkdirSync(dirname(tmpScene), { recursive: true });
+      writeFileSync(tmpScene, JSON.stringify({
+        schema: 'ccx.scene/1', meta: {},
+        entities: [{ id: 1, name: 'root', parent: null, components: [] }],
+        systems: [],
+      }));
+      const open = await client.request('scene.open', { path: tmpScene });
+      if (!open.ok) return emit({ ok: false, error: '打开失败: ' + open.error });
+      const applied = [];
+      for (const line of lines) {
+        let cmd;
+        try {
+          cmd = JSON.parse(line);
+        } catch {
+          return emit({ ok: false, error: '命令不是合法 JSON: ' + line.slice(0, 60) });
+        }
+        const r = await client.request('scene.apply', { command: cmd });
+        if (!r.ok) return emit({ ok: false, error: '命令失败: ' + (r.error ?? '') });
+        applied.push(cmd.op);
+      }
+      const saved = await client.request('scene.save', { path: out });
+      if (!saved.ok) return emit({ ok: false, error: '保存失败: ' + saved.error });
+      return emit({ ok: true, commands: applied.length, applied, out,
+                    entities: (await client.request('scene.query')).entities.length });
+    } finally {
+      client.close();
+    }
+  }
+
   // —— mcp tools / mcp call <name> [json]：MCP 工具面 CLI 入口（services-spec §7）——
   if (sub === 'mcp') {
     const daemonEntry = resolve(join(here, '..', '..', 'service-core', 'bin', 'daemon.mjs'));

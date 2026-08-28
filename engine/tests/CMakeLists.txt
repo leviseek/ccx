@@ -268,3 +268,8 @@ add_test(NAME e2e.script_to_frame COMMAND ccx_script_to_frame_test)
 
 add_executable(ccx_script_runner script_runner.cpp)
 target_link_libraries(ccx_script_runner PRIVATE ccx_script ccx_scene)
+if(TARGET ccx_gfx_wgpu)
+  add_executable(ccx_wgpu_device_test wgpu_device_test.cpp)
+  target_link_libraries(ccx_wgpu_device_test PRIVATE ccx_gfx_wgpu)
+  add_test(NAME w1.wgpu_device COMMAND ccx_wgpu_device_test)
+endif()

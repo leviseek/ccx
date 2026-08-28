@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.111（2026-08-28）★ W1 里程碑**——**真后端首帧达成**（ccx_gfx_wgpu：WgpuDevice（wgpu-native Vulkan）L1 设备/缓冲/上传 + L2 清屏 readback 全像素断言，RTX 4070 实跑 0.49s）；构建链九连排障（CallbackInfo 新 API/userdata×2/TexelCopy 改名/256 行对齐/映射 size/MinGW ABI/dlltool-gendef 完整导出/-lgcc_eh 别名/系统库）；ctest 52/52 + node 111/111。
 - **v0.3.110（2026-08-28）**：W1 构建链全通——**wgpu-native 本地构建成功**（wgpu_native.dll 8.7MB；LLVM 经 scoop+代理 7897 安装（工具安装规则：scoop 优先+本地代理落档））；环境全链：真 GPU + webgpu.h + wgpu 库；ctest 51/51 + node 111/111。
 - **v0.3.109（2026-08-28）**：W1 环境突破——**真 GPU 就绪**（vulkaninfo 枚举 RTX 4070 SUPER / Vulkan 1.4.325；SwiftShader ICD 备选）、**webgpu.h vendor 落位**（260KB + UPSTREAM，ADR-005；vendor 6 包）、doctor --env gpu 探测升级（设备名枚举）；剩余缺口：wgpu-native 二进制；ctest 51/51 + node 111/111。
 - **v0.3.108（2026-08-28）**：M2 环境面——**ccx doctor --env 环境就绪探测**（GPU（Vulkan loader 检测——本机就绪！）/真机（adb 设备数）/Actions（CI 标记）/网络（webgpu.h 可达）四键 + ready/detail；每项 false 对应 ticket ⏳ 与 push 清单）；ctest 51/51 + node 111/111。

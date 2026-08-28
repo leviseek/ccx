@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.86（2026-08-28）**：M1 总页面——**ccx doctor --all --verify**（验收总键：W1 五级 + M2 首批 9 票一页输出；修复 cmd 引号拆词（pattern 无空格）+ 子进程超时治理（120s）；batch 复核从 55s 提速到 13s）；ctest 51/51 + node 105/105。
 - **v0.3.85（2026-08-28）**：M2 验收走查——**首批 9 张 ticket 自动化验收**（ci/verify_m2_batch1.mjs：逐张执行凭据（node/ctest 双形态）→ JSON 表；T-W2-1 静态源码 grep 规避 node24 管道二进制 TAP；9/9 全过 ≈55s）；ctest 51/51 + node 104/104。
 - **v0.3.84（2026-08-28）**：W1 命令面——**ccx doctor --w1**（五级里程碑验收一键（仿真侧）：ok/allPassed/gpu 标记；GPU 到达接真后端同骨架）；ctest 51/51 + node 103/103。
 - **v0.3.83（2026-08-28）**：W1 验收面——**五级里程碑验收脚本**（ci/verify_w1_sim.mjs：L1-L5 仿真验收 JSON（rhi_fake/fake_gpu_frame/render_frame/fake_gpu_runtime/script_to_frame）5/5 全过；GPU/lavapipe 到达后同骨架接真后端段；测试含 CC_CTEST 注入）；ctest 51/51 + node 102/102。

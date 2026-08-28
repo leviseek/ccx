@@ -103,6 +103,7 @@ async function main() {
     if (args[i] === '--all') flags.all = true;
     if (args[i] === '--net') flags.net = true;
     if (args[i] === '--w1') flags.w1 = true;
+    if (args[i] === '--verify') flags.verify = true;
     if (args[i] === '--js') flags.js = true;
   }
   const sub = positional[0] ?? 'doctor';
@@ -1180,8 +1181,28 @@ async function main() {
     }
     return emit({ ok: true, tool: 'ccx doctor --net', probes: results });
   }
-  // —— doctor --all：五合一总页 ——
+  // —— doctor --all：五合一总页（--verify 时并入验收键）——
   if (sub === 'doctor' && flags.all) {
+    if (flags.verify) {
+      const runVerify = (script) => {
+        const r = spawnSync(process.execPath, [script, '--json'],
+                            { encoding: 'utf8', timeout: 180000 });
+        let data = null;
+        try {
+          data = JSON.parse(r.stdout);
+        } catch {
+          /* noop */
+        }
+        return { ok: r.status === 0 && data?.allPassed === true,
+                 ...(data ?? { error: (r.stderr || 'exit ' + r.status).slice(0, 100) }) };
+      };
+      return emit({
+        ok: true,
+        tool: 'ccx doctor --all --verify',
+        w1: runVerify(resolve(join(here, '..', '..', '..', 'ci', 'verify_w1_sim.mjs'))),
+        m2Batch1: runVerify(resolve(join(here, '..', '..', '..', 'ci', 'verify_m2_batch1.mjs'))),
+      });
+    }
     const root = resolve(join(here, '..', '..', '..'));
     const checksAll = {
       node: process.version,

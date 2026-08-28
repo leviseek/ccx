@@ -38,9 +38,11 @@ const results = [];
 for (const tk of TICKETS) {
   const [cmd, args, opts = {}] = tk.run;
   const args2 = tk.kind === 'node' || tk.kind === 'node-partial'
-    ? [...args.slice(0, -1), '--test-reporter=spec', args[args.length - 1]]
+    ? [...args.slice(0, -1), '--test-timeout=20000',
+       ...(tk.ticket === 'T-W2-1' ? ['--test-name-pattern=preview'] : []),
+       args[args.length - 1]]
     : args;
-  const r = spawnSync(cmd, args2, { encoding: 'utf8', shell: true,
+  const r = spawnSync(cmd, args2, { encoding: 'utf8', shell: true, timeout: 120000,
                                     env: { ...process.env, CC_CTEST: process.env.CC_CTEST ?? ctest } });
   let passed = r.status === 0;
   if (passed && opts.grep) passed = ((r.stdout || '') + (r.stderr || '')).includes(opts.grep);

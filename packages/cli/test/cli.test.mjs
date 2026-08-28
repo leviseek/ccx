@@ -655,6 +655,16 @@ test('ccx doctor --w1：五级验收（仿真侧）', () => {
   assert.equal(out.w1.environment.gpu, 'not-available');
 });
 
+test('ccx doctor --all --verify：验收总键（W1+首批）', () => {
+  const r = runCli(['doctor', '--all', '--verify', '--json'], join(import.meta.dirname, '..'),
+                   { ...process.env, CC_CTEST: 'D:\\engine\\w64devkit\\bin\\ctest.exe' });
+  assert.equal(r.status, 0, r.err + r.out);
+  const out = JSON.parse(r.out);
+  assert.equal(out.ok, true);
+  assert.equal(out.w1.ok, true, 'W1 五级验收');
+  assert.equal(out.m2Batch1.ok, true, 'M2 首批 9 票');
+});
+
 test('scene apply：非法命令拒绝且不写坏文件', () => {
   const dir = mkdtempSync(join(tmpdir(), 'ccx-apply-bad-'));
   try {

@@ -427,7 +427,22 @@ async function main() {
         const text = c.content[0].text;
         push('mcp.call', { textLen: text.length, ok: text.includes('a-1') });
       }
-      // 9) cook（本地）
+      // 9) build.web：Web 目标静态站点装配
+      tick('build.web');
+      {
+        const siteDir = resolve(join(here, '..', '..', '..', 'build', 'local', 'demo-web'));
+        mkdirSync(siteDir, { recursive: true });
+        writeFileSync(join(siteDir, 'index.html'),
+                      '<!doctype html><html><head><meta charset="utf-8"><title>CCX demo</title></head>' +
+                      '<body><div id="game"></div><script src="game.js"></script></body></html>' + '\n');
+        writeFileSync(join(siteDir, 'game.js'), 'window.__CCX = { demo: true };\n');
+        writeFileSync(join(siteDir, 'assets.json'),
+                      JSON.stringify({ schema: 'ccx.assets.index/1', platform: 'web-desktop',
+                                       assets: [{ uuid: 'demo-a-1', path: 'assets/hero.png' }] },
+                                      null, 2) + '\n');
+        push('build.web', { index: true, assets: 1, ok: true });
+      }
+      // 10) cook（本地）
       tick('cook');
       const assetsDir = resolve(join(here, '..', '..', '..', 'build', 'local', 'demo-assets'));
       mkdirSync(assetsDir, { recursive: true });

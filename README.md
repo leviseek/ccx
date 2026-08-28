@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.47（2026-08-27）**：M1 Web 面——**资产索引校验器**（build-service parseAssetsIndex：schema/platform/assets 条目校验，损坏即拒）、**demo all 十一步**（+build.web：index.html/game.js/assets.json 站点装配入交付链）；ctest 46/46 + node 92/92。
 - **v0.3.46（2026-08-27）**：M1 目标面——**帧链全设备化**（frame/contact gif 逐帧走 FakeDevice 上传/绘制/读回路径）、**Web 构建目标骨架**（ccx build --platform web-desktop --out：装配 index.html + game.js + ccx.assets.index/1 清单）；CLI 20/20；ctest 46/46 + node 91/91。
 - **v0.3.45（2026-08-27）**：M1 U形路径与预研面——**frame_dump --device**（帧产出经 FakeDevice 上传/清屏/绘制/读回再落盘，与普通路径逐字节一致——真后端替换点已有黄金对照）、**V8 宿主设计**（docs/working/v8-host-design.md：结构/桥接清单/沙箱/风险/W5a 决策点）；ctest 46/46 + node 91/91。
 - **v0.3.44（2026-08-27）**：M1 稳定面——**demo 长跑 5 轮计时分布**（总耗时 87–90ms 稳定无抖动；frame.gif 44.6 / contact.gif 40.2 为锚定基线，计入 m1-gate-review）、**CI 覆盖核对**（ctest 跑全量 46 项含假 GPU/物理——push 后 Actions 即验证）；ctest 46/46 + node 90/90。

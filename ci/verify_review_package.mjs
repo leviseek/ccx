@@ -35,7 +35,7 @@ const commands = [
   { name: 'doctor --all', run: [node, [cli, 'doctor', '--all', '--json']],
     check: (out) => out.ok && out.checks && out.summary && out.demo },
   { name: 'demo all', run: [node, [cli, 'demo', 'all', '--json']],
-    check: (out) => out.ok && out.steps?.length === 16 },
+    check: (out) => out.ok && out.steps?.length === 17 },
 ];
 
 const cmdResults = [];
@@ -65,3 +65,4 @@ if (process.argv.includes('--json')) {
   console.log(all ? 'REVIEW PACKAGE READY' : 'REVIEW PACKAGE NOT READY');
 }
 process.exit(all ? 0 : 1);
+

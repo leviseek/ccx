@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.57（2026-08-28）**：M1 决策面——**脚本引擎决策评估**（docs/working/script-engine-decision.md：v8 vs QuickJS 八维对比 + 绑定衔接（IDL→quickjs 目标）+ 风险缓解 → **采纳 QuickJS 主选、v8 备选（接口不变双后端）**）、终评数字刷新（95/162/12 步）；ctest 46/46 + node 95/95。
 - **v0.3.56（2026-08-28）**：M1 配置可见面——**doctor 外部压缩器配置位**（CCX_EXTERNAL_COMPRESSOR 已配置/未配置提示；doctor 路径统一仓库根修复）、**M2 首批进度表**（W3 会话全交付 ✅ / W4 环境变量接入 ✅ / W5a 待决策点）；ctest 46/46 + node 95/95。
 - **v0.3.55（2026-08-28）**：M1 压缩配置面——**ccx cook 环境变量接入外部压缩器**（CCX_EXTERNAL_COMPRESSOR=格式|cmd|args 注册，png 走外挂端到端 okCount=1；修复 cook 漏传 path 致外挂源缺失的 bug），runCli 支持 env 透传；ctest 46/46 + node 95/95。
 - **v0.3.54（2026-08-28）**：M1 会话命令与压缩面——**scene apply 流内 --undo/--redo**（与 --cmd 同序执行，进程内共享历史（跨命令新会话语义澄清）；scene status 命令保留）、**外部压缩器接口**（cook externalCompressor：spawn 任一工具（pngquant/astcenc…），{src} 模板 + 产物字节上报 + 全流接入（web-desktop png 经外挂）——W4 真实接入形态验证）；ctest 46/46 + node 95/95。

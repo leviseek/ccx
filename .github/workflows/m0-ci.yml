@@ -57,13 +57,18 @@ jobs:
           node --test
           node bin/bindgen.mjs examples/hello.idl --out out
           npx tsc --noEmit --strict out/ccx_hello.d.ts
-      - name: napi 编译（node-gyp，生成源码拷贝到 gen/）
+      - name: napi 编译（CMake 直连 MSVC，绕过 node-gyp 对 VS18 的探测限制）
+        shell: pwsh
         working-directory: tools/bindgen/napi
         run: |
           mkdir gen
           copy ..\out\ccx_hello_bindings.cpp gen\
           npm install --no-audit --no-fund
-          npx node-gyp rebuild
+          npx node-gyp install
+          $nodeRoot = "$env:LOCALAPPDATA\node-gyp\Cache"
+          $ver = Get-ChildItem $nodeRoot | Select-Object -First 1 -ExpandProperty Name
+          cmake -S . -B build -G Ninja -DNODE_ROOT="$nodeRoot\$ver\x64" -DCMAKE_BUILD_TYPE=Release
+          cmake --build build
       - name: smoke（JS 调 C++，出口④）
         working-directory: tools/bindgen/napi
         run: node napi_smoke.mjs

@@ -25,6 +25,13 @@
 #ifndef CUTILS_H
 #define CUTILS_H
 
+/* CCX vendor patch (msvc-packed): MSVC 无 __attribute__((packed))，用 pragma pack 等价 */
+#ifdef _MSC_VER
+#define CCX_PACKED_STRUCT(name) __pragma(pack(push, 1)) struct name __pragma(pack(pop))
+#else
+#define CCX_PACKED_STRUCT(name) struct __attribute__((packed)) name
+#endif
+
 #include <stdlib.h>
 #include <string.h>
 #include <inttypes.h>
@@ -149,15 +156,15 @@ static inline int ctz64(uint64_t a)
     return __builtin_ctzll(a);
 }
 
-struct __attribute__((packed)) packed_u64 {
+CCX_PACKED_STRUCT(packed_u64) {
     uint64_t v;
 };
 
-struct __attribute__((packed)) packed_u32 {
+CCX_PACKED_STRUCT(packed_u32) {
     uint32_t v;
 };
 
-struct __attribute__((packed)) packed_u16 {
+CCX_PACKED_STRUCT(packed_u16) {
     uint16_t v;
 };
 

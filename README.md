@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.92（2026-08-28）**：M2 就绪面——**评审就绪实录**（m2-review-ready.md：自检实跑（10 材料/3 命令 READY）+ 评审现场速览 + 结论栏——评审当天状态页）；ctest 51/51 + node 106/106。
 - **v0.3.91（2026-08-28）**：M1 预算链面——**脚本预算入交付链**（runner --budget <ms>（overBudget 输出）+ demo script.engine 步 budgetMs/budgetOk（100ms 预算实跑未超支，7ms）；断言入链）；ctest 51/51 + node 106/106。
 - **v0.3.90（2026-08-28）**：M1 链终态——**文档链数字终检**（summary/md/README 对齐 106/51/15/182；29 测试文件；109+ commits）；ctest 51/51 + node 106/106。
 - **v0.3.89（2026-08-28）**：M2 评审预检——**评审包自检脚本**（ci/verify_review_package.mjs：10 件材料存在性 + 3 条一键复核命令实跑（--all --verify/--all/demo all）→ READY 判定；评审前 30 秒自检）；ctest 51/51 + node 106/106。

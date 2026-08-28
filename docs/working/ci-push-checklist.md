@@ -25,4 +25,5 @@
 
 - GPU 首帧（W1）：RHI 契约 + FakeDevice 仿真 + 软件光栅黄金对照齐全，待 GPU/lavapipe runner。
 - 真机/渠道（W6）：账号与设备待配置。
-`n`n## 4b. W6 真机预备（2026-08-28）`n`n- adb 工具：scoop install adb 需 dl.google.com（当前 DNS 不可达，如实待网络）。`n- doctor --env device 段已可探测 adb 路径与设备数。`n
+`n`n## 4b. W6 真机预备（2026-08-28）`n`n- adb 工具：**已安装**（经代理手动下载 platform-tools 37.0.1 → %USERPROFILE%\Android\platform-tools；doctor --env 可探测）。`n- doctor --env device 段已可探测 adb 路径与设备数。`n
+

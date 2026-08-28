@@ -17,12 +17,13 @@
 | 首批 9 票 + W1×2 + W7（12 张 ✅） | ✅ 已验收（13s） | node ci/verify_m2_batch1.mjs |
 | W1 五级（双后端） | ✅ 10/10（5 sim + 5 wgpu，RTX 4070） | ccx doctor --w1 |
 | 门禁 | layered 78 文件 + vendor 6 包全绿 | node ci/gates/*.mjs |
-| 环境依赖 | GPU ✅ + 设备 ✅（ALN-AL00：四链 + 壳运行/帧循环/引擎光栅/**QuickJS 脚本驱动场景**）/ 网络待复测 / Actions 待办 | doctor --env / ccx device |
+| 环境依赖 | GPU ✅ + 设备 ✅（ALN-AL00：四链 + 壳运行/帧循环/引擎光栅/**QuickJS 脚本驱动场景**/帧统计）/ 网络待复测 / Actions 待办 | doctor --env / ccx device |
 
 ## 评审结论栏
 
 - 结论：☐ 批准 ☐ 待补（列项） ☐ 退回（列项）
 - 评审人：＿＿＿＿＿ 日期：＿＿＿＿＿
+
 
 
 

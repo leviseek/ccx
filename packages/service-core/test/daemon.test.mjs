@@ -370,3 +370,21 @@ test('daemon: asset.subscribe -> assetChanged push (real fs change)', async () =
     rmSync(dir, { recursive: true, force: true });
   }
 });
+
+
+test('daemon: M4 token 鉴权（env CCX_TOKEN 开启后拒绝/放行）', async () => {
+  process.env.CCX_TOKEN = 'tok-123456';
+  const old = process.env.CCX_TOKEN;
+  // in-process：tokenCheck 校验（无 token 拒绝 / 正确 token 放行）
+  const d = createDaemon({ asset: { list: () => ({ ok: true }) } });
+  const noTok = await d.handle(JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'asset.list' }));
+  assert.equal(noTok.error.code, -32001, '无 token 拒绝');
+  const badTok = await d.handle(JSON.stringify({ jsonrpc: '2.0', id: 2, method: 'asset.list', auth: { token: 'wrong' } }));
+  assert.equal(badTok.error.code, -32001, '错 token 拒绝');
+  const okTok = await d.handle(JSON.stringify({ jsonrpc: '2.0', id: 3, method: 'asset.list', auth: { token: 'tok-123456' } }));
+  assert.deepEqual(okTok.result, { ok: true }, '正确 token 放行');
+  delete process.env.CCX_TOKEN;
+  const open = await d.handle(JSON.stringify({ jsonrpc: '2.0', id: 4, method: 'asset.list' }));
+  assert.deepEqual(open.result, { ok: true }, '未配置 token 开放');
+});
+

@@ -13,6 +13,18 @@ export function parseMessage(line) {
   return { error: { code: -32600, message: 'Invalid Request' } };
 }
 
+// 鉴权（M4 远端 daemon token）：env CCX_TOKEN 未配置 -> 开放；配置后需 msg.auth.token 匹配
+// 返回 null=通过；返回 {code,message}=拒绝
+export function tokenCheck(msg) {
+  const expected = process.env.CCX_TOKEN;
+  if (!expected) return null;
+  const got = msg && msg.auth && typeof msg.auth.token === 'string' ? msg.auth.token : '';
+  if (got !== expected) {
+    return { code: -32001, message: 'Unauthorized: invalid token' };
+  }
+  return null;
+}
+
 export function success(id, result) {
   return { jsonrpc: '2.0', id, result };
 }

@@ -1,6 +1,6 @@
 // stdio daemon（services-spec §1 的 daemon 形态；stream 可注入便于测试）
 import { createInterface } from 'node:readline';
-import { dispatch, failure, parseMessage, success } from './rpc.mjs';
+import { dispatch, failure, parseMessage, success, tokenCheck } from './rpc.mjs';
 
 export function createDaemon(services) {
   const pushFns = new Set();
@@ -34,6 +34,11 @@ export function createDaemon(services) {
         return failure(null, parsed.error.code, parsed.error.message);
       }
       const { msg } = parsed;
+      // M4 远端 daemon 鉴权：env CCX_TOKEN 配置后校验（系统通知除外）
+      if (msg.method !== 'system.ready') {
+        const authErr = tokenCheck(msg);
+        if (authErr) return failure(msg.id ?? null, authErr.code, authErr.message);
+      }
       if (msg.id === undefined || msg.id === null) return null;  // 通知
       const out = await dispatch(handlers, msg);
       if (out.code !== undefined) return failure(msg.id, out.code, out.message);

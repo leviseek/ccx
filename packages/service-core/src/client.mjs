@@ -34,9 +34,11 @@ export class RpcClient {
     else pending.resolve(msg.result);
   }
 
-  request(method, params = {}, timeoutMs = 5000) {
+  request(method, params = {}, timeoutMs = 5000, token = null) {
     const id = ++this.seq;
-    this.proc.stdin.write(JSON.stringify({ jsonrpc: '2.0', id, method, params }) + '\n');
+    const msg = { jsonrpc: '2.0', id, method, params };
+    if (token) msg.auth = { token };  // M4 远端 daemon 鉴权
+    this.proc.stdin.write(JSON.stringify(msg) + '\n');
     return new Promise((resolve, reject) => {
       const timer = setTimeout(() => {
         this.pending.delete(id);

@@ -389,6 +389,26 @@ test('ccx doctor --demo：一键 e2e 健康', () => {
   assert.ok(out.demo.slowest.length > 0, '最慢步已标注');
 });
 
+test('ccx mcp：工具列表与工具调用', () => {
+  const tools = runCli(['mcp', 'tools', '--json'], join(import.meta.dirname, '..'));
+  assert.equal(tools.status, 0, tools.err + tools.out);
+  const t = JSON.parse(tools.out);
+  assert.equal(t.ok, true);
+  assert.ok(t.tools.length >= 9, '至少 9 个工具');
+  assert.ok(t.tools.some((x) => x.name === 'scene.apply'));
+  // 调用 asset.list
+  const call = runCli(['mcp', 'call', 'asset.list', '{}', '--json'], join(import.meta.dirname, '..'));
+  assert.equal(call.status, 0, call.err + call.out);
+  const r = JSON.parse(call.out);
+  assert.equal(r.ok, true);
+  assert.equal(r.tool, 'asset.list');
+  assert.ok(r.result.assets.length >= 2, '工具结果返回');
+  // 非法 JSON 参数
+  const bad = runCli(['mcp', 'call', 'asset.list', '{nope', '--json'], join(import.meta.dirname, '..'));
+  assert.equal(JSON.parse(bad.out).ok, false);
+  assert.ok(JSON.parse(bad.out).error.includes('JSON'));
+});
+
 test('scene apply：非法命令拒绝且不写坏文件', () => {
   const dir = mkdtempSync(join(tmpdir(), 'ccx-apply-bad-'));
   try {

@@ -724,6 +724,50 @@ async function main() {
     }
   }
 
+  // —— mcp tools / mcp call <name> [json]：MCP 工具面 CLI 入口（services-spec §7）——
+  if (sub === 'mcp') {
+    const daemonEntry = resolve(join(here, '..', '..', 'service-core', 'bin', 'daemon.mjs'));
+    const client = new RpcClient(process.execPath, [daemonEntry]);
+    try {
+      await new Promise((resolve, reject) => {
+        const off = client.onEvent((m) => {
+          if (m.method === 'system.ready') {
+            off();
+            resolve();
+          }
+        });
+        setTimeout(() => reject(new Error('daemon 未就绪')), 2500);
+      });
+      if (positional[1] === 'tools') {
+        const t = await client.request('mcp.listTools');
+        return emit({ ok: true, tools: t.tools.map((x) => ({ name: x.name, description: x.description })) });
+      }
+      if (positional[1] === 'call') {
+        const name = positional[2];
+        if (!name) return emit({ ok: false, error: '用法: ccx mcp call <name> [<json-args>]' });
+        let args = {};
+        if (positional[3]) {
+          try {
+            args = JSON.parse(positional[3]);
+          } catch {
+            return emit({ ok: false, error: '参数不是合法 JSON' });
+          }
+        }
+        const out = await client.request('mcp.callTool', { name, arguments: args });
+        let parsed;
+        try {
+          parsed = JSON.parse(out.content[0].text);
+        } catch {
+          parsed = out.content[0].text;
+        }
+        return emit({ ok: true, tool: name, result: parsed });
+      }
+      return emit({ ok: false, error: '用法: ccx mcp tools | ccx mcp call <name> [<json-args>]' });
+    } finally {
+      client.close();
+    }
+  }
+
   // —— profiler snapshot [--count N]：临时 daemon -> 帧统计快照 ——
   if (sub === 'profiler' && positional[1] === 'snapshot') {
     const daemonEntry = resolve(join(here, '..', '..', 'service-core', 'bin', 'daemon.mjs'));

@@ -74,3 +74,12 @@
 
 - nativeFrameStats：帧计数 + 最近帧耗时 ms（chrono）；屏幕显示（脚本/统计双行）。
 
+
+
+## 签名链验证（2026-08-29）
+
+- **release 签名环已闭：**keytool 生成 dev keystore（android/app/keystore/ccx-release.jks，本地不入库）→ build.gradle.kts signingConfigs.release（keystore.properties 可覆盖）→ assembleRelease BUILD SUCCESSFUL。
+- apksigner verify --print-certs：CN=CCX Dev，SHA-256 1b8eec80…；安装推送成功，引擎帧循环正常（frames 递增，lastMs<1）。
+- 物件：app-release.apk ≈3MB（x86_64 + arm64-v8a）。
+- 余下环境缺口：运行时签名制度（官方 keystore） / 应用市场发布。
+

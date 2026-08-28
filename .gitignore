@@ -34,5 +34,11 @@ build/
 **/.cxx/
 android/app/build/
 android/.gradle/
+android/local.properties
 
+
+
+# Android release 签名（本地 dev keystore，不入库）
+android/app/keystore/
+android/app/keystore.properties
 

@@ -9,6 +9,6 @@
   - dtoa.{c,h} 44875+3306 / list.h 3089
   - 生成头：quickjs-atom.h 8295 / quickjs-opcode.h 15801
 - 许可：MIT（文本副本 LICENSE.txt）
-- 本地变更：**2 个 patch**（2026-08-29）：① `patches/msvc-packed.patch`——cutils.h 用 `CCX_PACKED_STRUCT` 宏（MSVC pragma pack / GCC 原生）替换 3 处 `__attribute__((packed))`；② `patches/msvc-time.patch`——quickjs.c 在 MSVC 下提供 `struct timeval` 定义 + `gettimeofday`（Windows FILETIME 实现，无 sys/time.h）。Windows CI（VS18/MSVC）编译必需。CONFIG_VERSION 由构建定义 |"1.0.0"| 兜底（无 config.h 时）
+- 本地变更：**2 个 patch**（2026-08-29）：① `patches/msvc-packed.patch`——cutils.h MSVC 兼容全套：`CCX_PACKED_STRUCT` 宏（pragma pack）替换 3 处 packed；`__attribute__(x)` 整体置空宏（format/aligned/warn_unused_result）；likely/unlikely/force_inline 等宏条件化；clz/ctz 用 `_BitScan` 等价。② `patches/msvc-time.patch`——quickjs.c 在 MSVC 下提供 `struct timeval` + `gettimeofday`（Windows FILETIME 实现）+ `_AddressOfReturnAddress`（栈指针）。Windows CI（VS18/MSVC）编译必需。CONFIG_VERSION 由构建定义 |"1.0.0"| 兜底（无 config.h 时）
 - 注意：任何改动必须经 patches/ 并本文件记录
 

@@ -1,37 +1,44 @@
 diff --git a/engine/platform/vendor/quickjs/cutils.h b/engine/platform/vendor/quickjs/cutils.h
-index 094a8f1..e1a01db 100644
+index e1a01db..6bcfd6f 100644
 --- a/engine/platform/vendor/quickjs/cutils.h
 +++ b/engine/platform/vendor/quickjs/cutils.h
-@@ -25,6 +25,13 @@
- #ifndef CUTILS_H
- #define CUTILS_H
- 
-+/* CCX vendor patch (msvc-packed): MSVC 无 __attribute__((packed))，用 pragma pack 等价 */
-+#ifdef _MSC_VER
-+#define CCX_PACKED_STRUCT(name) __pragma(pack(push, 1)) struct name __pragma(pack(pop))
-+#else
-+#define CCX_PACKED_STRUCT(name) struct __attribute__((packed)) name
-+#endif
-+
- #include <stdlib.h>
+@@ -28,6 +28,8 @@
+ /* CCX vendor patch (msvc-packed): MSVC 无 __attribute__((packed))，用 pragma pack 等价 */
+ #ifdef _MSC_VER
+ #define CCX_PACKED_STRUCT(name) __pragma(pack(push, 1)) struct name __pragma(pack(pop))
++/* CCX vendor patch (msvc-attrs): MSVC 无 __attribute__ 语法，整体置空（format/aligned/warn_unused_result 等） */
++#define __attribute__(x)
+ #else
+ #define CCX_PACKED_STRUCT(name) struct __attribute__((packed)) name
+ #endif
+@@ -36,11 +38,30 @@
  #include <string.h>
  #include <inttypes.h>
-@@ -149,15 +156,15 @@ static inline int ctz64(uint64_t a)
-     return __builtin_ctzll(a);
- }
  
--struct __attribute__((packed)) packed_u64 {
-+CCX_PACKED_STRUCT(packed_u64) {
-     uint64_t v;
- };
++/* CCX vendor patch (msvc-attrs): 与 quickjs.h 一致的 MSVC 兼容（attribute 全部置空） */
++#if defined(__GNUC__) || defined(__clang__)
+ #define likely(x)       __builtin_expect(!!(x), 1)
+ #define unlikely(x)     __builtin_expect(!!(x), 0)
+ #define force_inline inline __attribute__((always_inline))
+ #define no_inline __attribute__((noinline))
+ #define __maybe_unused __attribute__((unused))
++#define __js_printf_like(f, a) __attribute__((format(printf, f, a)))
++#define __js_malloc_aligned __attribute__((aligned(JS_MALLOC_ALIGN)))
++#else
++#define likely(x)       (x)
++#define unlikely(x)     (x)
++#define force_inline inline
++#define no_inline
++#define __maybe_unused
++#define __js_printf_like(f, a)
++#define __js_malloc_aligned
++/* CCX vendor patch (msvc-builtins): MSVC 用 _BitScan 等价 clz/ctz */
++#include <intrin.h>
++static inline int clz32(unsigned int a) { unsigned long i; _BitScanReverse(&i, a); return 31 - (int)i; }
++static inline int clz64(uint64_t a) { unsigned long i; _BitScanReverse64(&i, a); return 63 - (int)i; }
++static inline int ctz32(unsigned int a) { unsigned long i; _BitScanForward(&i, a); return (int)i; }
++static inline int ctz64(uint64_t a) { unsigned long i; _BitScanForward64(&i, a); return (int)i; }
++#endif
  
--struct __attribute__((packed)) packed_u32 {
-+CCX_PACKED_STRUCT(packed_u32) {
-     uint32_t v;
- };
- 
--struct __attribute__((packed)) packed_u16 {
-+CCX_PACKED_STRUCT(packed_u16) {
-     uint16_t v;
- };
- 
+ #define xglue(x, y) x ## y
+ #define glue(x, y) xglue(x, y)

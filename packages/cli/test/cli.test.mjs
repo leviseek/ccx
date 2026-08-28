@@ -124,6 +124,13 @@ test('ccx demo all：端到端编排（open/apply/save/build/cook）', () => {
   assert.equal(out.steps[4].frames, 1, 'profiler 帧快照');
   assert.equal(out.steps[5].frames, 3, 'GIF 三帧');
   assert.equal(out.steps[6].frames, 3, '接触 GIF 三帧');
+  // 性能回归：各步耗时宽松基线（动画步本地 ~40ms，上限防回归）
+  for (const s of out.steps) {
+    assert.ok(s.ms !== undefined && s.ms < 500,
+              s.name + ' 耗时 <500ms（实际 ' + s.ms + 'ms）');
+  }
+  const anim = out.steps.find((s) => s.name === 'frame.gif');
+  assert.ok(anim.ms < 200, 'frame.gif <200ms（实际 ' + anim.ms + 'ms）');
 });
 
 test('ccx service start/status/stop：常驻生命周期', async () => {

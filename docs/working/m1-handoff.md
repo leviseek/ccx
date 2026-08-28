@@ -39,5 +39,5 @@
 
 ## 交接终检终版（2026-08-28，v0.3.134）
 
-- 三件一致：handoff/completion/launch 数字对齐（62 CTest / 116 node / 17 步 / 13 张 ✅）——以 m1-final-summary 为唯一事实源。
+- 三件一致：handoff/completion/launch 数字对齐（62 CTest / **125 node** / 18 步 / 13 张 ✅，2026-08-29 复跑）——以 m1-final-summary 为唯一事实源。
 

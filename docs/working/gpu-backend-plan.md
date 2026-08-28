@@ -87,3 +87,11 @@
 - 环境全链：真 GPU（RTX 4070）+ webgpu.h（vendor）+ wgpu_native.dll。
 - 下一步：gfx 真后端（wgpuDevice）实现 → 五级验收真后端段。
 
+
+
+## 五级里程碑验收（2026-08-28）
+
+- **L1-L5 真后端全达成**（w1.wgpu_* 5 测试，RTX 4070）。
+- 双后端验收：verify_w1 10/10（5 sim + 5 wgpu）。
+- T-W1-1/2 ✅（凭据见 m2-tickets）。
+

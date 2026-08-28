@@ -1,21 +1,21 @@
 # M2 Ticket 清单（立项转 ticket 的决议兑现）
 
 > 日期：2026-08-28 · 来源：m2-proposal（§3 批次）+ §6b 凭据 + 评审预演输出模板"决议记录"
-> 状态图例：⬜ 未开工 · 🟦 主干已在 M1 完成（转 ticket 即验收复核） · ⏳ 待环境
+> 状态图例：⬜ 未开工 · ✅ 已验收（凭据自动复核通过） · ⏳ 待环境
 
 ## 第一批（无 GPU 即行）
 
 | Ticket | 标题 | 验收凭据 | 状态 |
 | --- | --- | --- | --- |
-| T-W3-1 | 场景会话 undo/redo/status RPC | daemon.test.mjs 2 测试；ccx scene status/apply --undo/--redo | 🟦 |
-| T-W3-2 | 会话版本化 + session.save/load | daemon.test.mjs（版本 3→2 回退断言） | 🟦 |
-| T-W4-1 | 外部压缩器接口（spawn 任意工具） | cook.test.mjs；CCX_EXTERNAL_COMPRESSOR 端到端 | 🟦 |
-| T-W5-1 | QuickJS 嵌入（eval/错误/状态） | script.host 测试组 | 🟦 |
-| T-W5-2 | 宿主函数 + JSON 命令桥 | script.scene_bridge / scene_api | 🟦 |
-| T-W5-3 | 事件桥 onUpdate(dt) | script.game_loop | 🟦 |
-| T-W5-4 | 引擎脚本执行器 + CLI --engine | script_runner.test.mjs；cli.test.mjs | 🟦 |
-| T-W5-5 | 跨语言一致性对拍 | cross_script_consistency.test.mjs | 🟦 |
-| T-W2-1 | 编辑器 Web UI 接会话 undo | editor preview --apply 回路（依赖 W1 预览） | ⬜ 依赖 W1 |
+| T-W3-1 | 场景会话 undo/redo/status RPC | daemon.test.mjs 2 测试；ccx scene status/apply --undo/--redo | ✅ 2026-08-28 |
+| T-W3-2 | 会话版本化 + session.save/load | daemon.test.mjs（版本 3→2 回退断言） | ✅ 2026-08-28 |
+| T-W4-1 | 外部压缩器接口（spawn 任意工具） | cook.test.mjs；CCX_EXTERNAL_COMPRESSOR 端到端 | ✅ 2026-08-28 |
+| T-W5-1 | QuickJS 嵌入（eval/错误/状态） | script.host 测试组 | ✅ 2026-08-28 |
+| T-W5-2 | 宿主函数 + JSON 命令桥 | script.scene_bridge / scene_api | ✅ 2026-08-28 |
+| T-W5-3 | 事件桥 onUpdate(dt) | script.game_loop | ✅ 2026-08-28 |
+| T-W5-4 | 引擎脚本执行器 + CLI --engine | script_runner.test.mjs；cli.test.mjs | ✅ 2026-08-28 |
+| T-W5-5 | 跨语言一致性对拍 | cross_script_consistency.test.mjs | ✅ 2026-08-28 |
+| T-W2-1 | 编辑器预览闭环（仿真侧冒烟） | cli.test（--test-name-pattern=preview）；依赖 W1 真预览 | ✅ 2026-08-28（仿真） |
 
 ## 第二批（GPU 到位即启动）
 

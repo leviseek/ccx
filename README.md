@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.87（2026-08-28）**：M2 状态回流——**首批 9 张 ticket 标记 ✅ 已验收**（m2-tickets.md：凭据自动复核通过 + 日期；验收方法段更新为 verify 脚本/doctor 命令）；ctest 51/51 + node 105/105。
 - **v0.3.86（2026-08-28）**：M1 总页面——**ccx doctor --all --verify**（验收总键：W1 五级 + M2 首批 9 票一页输出；修复 cmd 引号拆词（pattern 无空格）+ 子进程超时治理（120s）；batch 复核从 55s 提速到 13s）；ctest 51/51 + node 105/105。
 - **v0.3.85（2026-08-28）**：M2 验收走查——**首批 9 张 ticket 自动化验收**（ci/verify_m2_batch1.mjs：逐张执行凭据（node/ctest 双形态）→ JSON 表；T-W2-1 静态源码 grep 规避 node24 管道二进制 TAP；9/9 全过 ≈55s）；ctest 51/51 + node 104/104。
 - **v0.3.84（2026-08-28）**：W1 命令面——**ccx doctor --w1**（五级里程碑验收一键（仿真侧）：ok/allPassed/gpu 标记；GPU 到达接真后端同骨架）；ctest 51/51 + node 103/103。

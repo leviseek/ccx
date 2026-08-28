@@ -120,6 +120,8 @@ bool WgpuDevice::upload(Handle buffer, const void* data, uint32_t size, uint32_t
     if (offset + size > it->second.size) return false;
     wgpuQueueWriteBuffer(static_cast<WGPUQueue>(queue_),
                          static_cast<WGPUBuffer>(it->second.wgpu), offset, data, size);
+    ++uploads_;
+    bytesUploaded_ += size;
     poll();
     return true;
 }
@@ -148,6 +150,8 @@ bool WgpuDevice::uploadTexture(Handle texture, const void* data, uint32_t bytes)
                   src8 + static_cast<size_t>(y) * w * 4, w * 4);
     }
     wgpuQueueWriteTexture(static_cast<WGPUQueue>(queue_), &dst, padded.data(), dataSize, &layout, &extent);
+    ++uploads_;
+    bytesUploaded_ += dataSize;
     poll();
     return true;
 }

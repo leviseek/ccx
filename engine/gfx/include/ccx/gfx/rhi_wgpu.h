@@ -21,6 +21,10 @@ public:
     bool readback(Handle texture, void* out, uint32_t bytes) override;
     void beginFrame() override;
     uint32_t submit() override;
+    // L5 帧统计（profiler 面）：帧数/上传次数/上传字节
+    uint32_t frames() const { return frames_; }
+    uint32_t uploads() const { return uploads_; }
+    uint64_t bytesUploaded() const { return bytesUploaded_; }
 
 private:
     void* instance_ = nullptr;  // WGPUInstance
@@ -29,6 +33,8 @@ private:
     void* queue_ = nullptr;     // WGPUQueue
     uint32_t nextHandle_ = 1;
     uint32_t frames_ = 0;
+    uint32_t uploads_ = 0;
+    uint64_t bytesUploaded_ = 0;
     struct Buffer { void* wgpu = nullptr; uint32_t size = 0; };
     struct Texture { void* wgpu = nullptr; uint32_t w = 0; uint32_t h = 0; };
     std::map<Handle, Buffer> buffers_;

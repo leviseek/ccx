@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.64（2026-08-28）**：M1 一致性面——**跨语言统一断言**（exit3 剧本雏形：脚本桥 exe --dump（固定三命令：create hero/npc + add Health）与 daemon 同序列对拍——entities=2、名字集合一致；脚本/CLI/daemon 三路命令面同构验证）；ctest 49/49 + node 97/97。
 - **v0.3.63（2026-08-28）**：M1 W5b 第三环——**onUpdate(dt) 事件桥**（ScriptHost::invoke：C++ 调脚本全局函数（参数 JSON 字符串、错误面同构）；脚本驱动的游戏循环测试：GameLoop 5 步→每步 invoke onUpdate→脚本建实体×5+tick 计数、未定义函数明确报错——**"脚本驱动游戏"最小闭环**）；ctest 49/49 + node 96/96。
 - **v0.3.62（2026-08-28）**：M1 W5b 第二环——**脚本→引擎场景命令桥**（ScriptHost::setJsonFunction（JS 字符串→C++ 回调→JSON 结果）；CCX/eval 中调 ccxSceneCommand 驱动 C++ 迷你场景总线：create_entity/add_component/snapshot/未知实体错误——**脚本命令直达引擎数据面**）；ctest 48/48 + node 96/96。
 - **v0.3.61（2026-08-28）**：M1 W5b 第一环——**宿主函数接入**（ScriptHost::setHostFunction：HostFn 数值快速路径 + JS_NewCFunctionMagic(generic_magic) 全局注册；脚本调用断言 hostScale(21)+hostSum(1,2,3)=48；调试三连：cproto 调用约定（generic vs generic_magic）、JS_SetProperty 所有权转移、magic 越界防护）；ctest 47/47 + node 96/96。

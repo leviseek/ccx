@@ -70,7 +70,32 @@ const char* sceneCommandBridge(const char* jsonIn) {
 }
 }  // namespace
 
-int main() {
+// 快照模式（--dump）：固定脚本命令序列 -> 单行 JSON（跨语言对拍用）
+std::string runFixedSequence() {
+    ScriptHost host;
+    host.setJsonFunction("ccxSceneCommand", &sceneCommandBridge);
+    host.eval("ccxSceneCommand('{\"op\":\"create_entity\",\"name\":\"hero\"}')");
+    host.eval("ccxSceneCommand('{\"op\":\"create_entity\",\"name\":\"npc\"}')");
+    host.eval("ccxSceneCommand('{\"op\":\"add_component\",\"name\":\"hero\",\"type\":\"game.Health\"}')");
+    gScene.entities.clear();
+    gScene.nextId = 1;
+    host.eval("ccxSceneCommand('{\"op\":\"create_entity\",\"name\":\"hero\"}')");
+    host.eval("ccxSceneCommand('{\"op\":\"create_entity\",\"name\":\"npc\"}')");
+    host.eval("ccxSceneCommand('{\"op\":\"add_component\",\"name\":\"hero\",\"type\":\"game.Health\"}')");
+    std::string names = "[";
+    for (size_t i = 0; i < gScene.entities.size(); ++i) {
+        if (i) names += ",";
+        names += "\"" + gScene.entities[i].name + "\"";
+    }
+    names += "]";
+    return "{\"entities\":" + std::to_string(gScene.entities.size()) + ",\"names\":" + names + "}";
+}
+
+int main(int argc, char** argv) {
+    if (argc >= 2 && std::string(argv[1]) == "--dump") {
+        std::printf("%s\n", runFixedSequence().c_str());
+        return 0;
+    }
     ScriptHost host;
     host.setJsonFunction("ccxSceneCommand", &sceneCommandBridge);
     // 1) 脚本建实体

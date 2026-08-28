@@ -13,7 +13,7 @@
 | 缺口 | 所需环境/动作 | 对应章节 | 建议归属 |
 | --- | --- | --- | --- |
 | GPU 首帧（WebGPU native/Vulkan/Metal/GLES 后端 + SpriteBatch 提交） | GPU 实机或 CI runner（wgpu-native 后端可先软件验证）；M2 硬件里程碑 | renderer-spec §2/§6 | 渲染组 |
-| V8/脚本宿主 + napi 绑定编译 | node-gyp + MSVC（Windows）或 gcc（Linux CI）——**已配好 CI 任务 lighthouse-c-bindgen**，push 后即验证 | ADR-004、tools/bindgen | 引擎组 |
+| V8/脚本宿主 + napi 绑定编译 | node-gyp + MSVC（Windows CI；2026-08-29 起 Linux 移除）——**已配好 CI 任务 lighthouse-c-bindgen**，push 后即验证 | ADR-004、tools/bindgen | 引擎组 |
 | Web 构建目标（浏览器运行） | 无额外环境；CLI build 已产出 bundle 清单，Web 打包器接续 | services-spec §6、asset-spec §2.1 | 工具链组 |
 | 编辑器 Web UI 渲染层（Shell 模型 → DOM） | 无额外环境；纯前端工项 | services-spec §8 | 编辑器组 |
 | 移动端/小游戏真机 | Android/iOS 真机、微信/抖音开发者账号 | platform-spec §5 | 平台组 |

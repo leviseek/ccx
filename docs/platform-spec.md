@@ -86,7 +86,7 @@ class AdapterRegistry {
 | --- | --- | --- | --- |
 | Windows (Vulkan/WebGPU/GLES3) | ✅ | ✅ | CI 实机 |
 | macOS (Metal/WebGPU) | ✅ | ✅ | CI 实机 |
-| Linux (Vulkan/WebGPU) | ✅ | 部分 | CI |
+| Linux (Vulkan/WebGPU) | — | — | 已移除（2026-08-29：开发环境仅 Windows+macOS） |
 | Web (Chrome/FF/Safari) | ✅ | ✅ | 浏览器矩阵 |
 | Android (Vulkan/GLES3) | ✅ | ✅ | 真机池（8 台覆盖） |
 | iOS (Metal) | ✅ | ✅ | 真机池 |

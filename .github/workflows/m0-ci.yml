@@ -1,14 +1,15 @@
-name: CCX M0 CI
+name: CCX CI
 
 on:
   push:
   pull_request:
   workflow_dispatch:
 
+# 平台范围（2026-08-29）：开发环境 = Windows + macOS（Linux 支持已移除）
 jobs:
   gates:
     name: 架构门禁（依赖方向 / vendor / schema）
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
@@ -23,31 +24,22 @@ jobs:
         run: node ci/gates/schema_roundtrip.mjs .
 
   build:
-    name: 构建 + ctest
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ubuntu-latest, windows-latest]
-    runs-on: ${{ matrix.os }}
+    name: 构建 + ctest（Windows）
+    runs-on: windows-latest
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
       - name: 配置（CI preset）
-        run: cmake --preset ci-${{ runner.os == 'Windows' && 'windows' || 'linux' }}
+        run: cmake --preset ci-windows
       - name: 构建
-        run: cmake --build --preset ci-${{ runner.os == 'Windows' && 'windows' || 'linux' }}
-      - name: 测试（Linux）
-        if: runner.os != 'Windows'
-        working-directory: build/ci-linux
-        run: ctest --output-on-failure
+        run: cmake --build --preset ci-windows
       - name: 测试（Windows）
-        if: runner.os == 'Windows'
         working-directory: build/ci-windows
         run: ctest -C Release --output-on-failure
 
   lighthouse-c-bindgen:
     name: 灯塔C bindgen napi 编译冒烟（出口④）
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
@@ -64,8 +56,8 @@ jobs:
       - name: napi 编译（node-gyp，生成源码拷贝到 gen/）
         working-directory: tools/bindgen/napi
         run: |
-          mkdir -p gen
-          cp ../out/ccx_hello_bindings.cpp gen/
+          mkdir gen
+          copy ..\out\ccx_hello_bindings.cpp gen\
           npm install --no-audit --no-fund
           npx node-gyp rebuild
       - name: smoke（JS 调 C++，出口④）

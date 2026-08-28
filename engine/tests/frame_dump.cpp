@@ -205,6 +205,20 @@ int main(int argc, char** argv) {
         return 1;
 #endif
     }
+    // M3 pixel-art 后处理：argv[10] = "scale:bits"（如 "3:2"）-> 整数缩放 + dither
+    if (argc >= 11) {
+        const std::string pa(argv[10]);
+        const std::size_t colon = pa.find(':');
+        const unsigned scale = static_cast<unsigned>(
+            std::atoi(pa.substr(0, colon).c_str()));
+        const unsigned bits = static_cast<unsigned>(
+            std::atoi(pa.substr(colon + 1).c_str()));
+        if (scale >= 1 && bits >= 1 && bits <= 8) {
+            RasterTarget art;
+            pixelArtChain(target, art, scale, bits);
+            target = art;
+        }
+    }
     if (!writePpm(target, argv[2])) {
         std::fprintf(stderr, "write failed: %s\n", argv[2]);
         return 1;

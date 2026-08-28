@@ -100,7 +100,7 @@ class Fence; class Semaphore;   // 帧同步：有限帧在途（max frames in f
 
 | 后端 | 平台 | 时间线 | 说明 |
 | --- | --- | --- | --- |
-| WebGPU (native) | Win/macOS/Linux 桌面 | M1 | 桌面默认 |
+| WebGPU (native) | Win/macOS 桌面（2026-08-29 起 Linux 移除） | M1 | 桌面默认 |
 | WebGPU (web) | 浏览器 | M1 | 同一套代码 |
 | GLES3 / WebGL2 | Android 全档 / 低端移动 / Web fallback | M2 | **移动端默认主后端**（2D 预算富余） |
 | Metal | iOS/macOS | M2 | iOS 唯一后端 |

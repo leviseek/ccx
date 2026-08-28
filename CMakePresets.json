@@ -3,21 +3,6 @@
   "cmakeMinimumRequired": { "major": 3, "minor": 24, "patch": 0 },
   "configurePresets": [
     {
-      "name": "ci-linux",
-      "displayName": "CI Linux (Ninja + GCC/Clang)",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/ci-linux",
-      "cacheVariables": {
-        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
-        "CCX_BUILD_TESTS": "ON"
-      },
-      "condition": {
-        "type": "equals",
-        "lhs": "${hostSystemName}",
-        "rhs": "Linux"
-      }
-    },
-    {
       "name": "ci-windows",
       "displayName": "CI Windows (Visual Studio 17 2022)",
       "generator": "Visual Studio 17 2022",
@@ -34,15 +19,9 @@
     }
   ],
   "buildPresets": [
-    { "name": "ci-linux", "configurePreset": "ci-linux" },
     { "name": "ci-windows", "configurePreset": "ci-windows" }
   ],
   "testPresets": [
-    {
-      "name": "ci-linux",
-      "configurePreset": "ci-linux",
-      "output": { "outputOnFailure": true }
-    },
     {
       "name": "ci-windows",
       "configurePreset": "ci-windows",

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -307,6 +307,41 @@ test('ccx frame dump：虚拟帧导出（CLI 入口）', () => {
     assert.equal(parsed.width, 64);
     assert.ok(existsSync(out), 'PPM 已生成');
     assert.equal(readFileSync(out, 'utf8').slice(0, 2), 'P6', 'P6 头');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('ccx frame dump --pixelart：M3 pixel-art 管线（整数缩放 + dither）', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ccx-pixelart-'));
+  try {
+    const fixture = join(import.meta.dirname, '..', '..', '..', 'examples', 'scenes',
+                         'render_plan.scene.json');
+    const dumpExe = join(import.meta.dirname, '..', '..', '..', 'build', 'local',
+                         'engine', 'tests', 'ccx_frame_dump.exe');
+    if (!existsSync(dumpExe)) return;  // 未构建则跳过
+    const out = join(dir, 'f.ppm');
+    const r = runCli(['frame', 'dump', fixture, '--out', out, '--size', '64x64',
+                      '--pixelart', '3:2'], dir);
+    assert.equal(r.status, 0, r.err + r.out);
+    const parsed = JSON.parse(r.out);
+    assert.equal(parsed.ok, true);
+    assert.equal(parsed.quads, 5);
+    // pixel-art 后：1280x720 应从 64x64 -> 192x192（3x 整数缩放）
+    const st = statSync(out);
+    // PPM P6 头 15 字节 + w*h*3：192*192*3+15 = 110607
+    assert.equal(st.size, 192 * 192 * 3 + 15, '3x 缩放后文件大小');
+    // 2bit dither 后通道值应落 85 网格（{0,85,170,255}）
+    const buf = readFileSync(out);
+    const off = 15;
+    let inGrid = true;
+    for (let i = off; i < buf.length && inGrid; i += 3) {
+      for (let k = 0; k < 3; ++k) {
+        const v = buf[i + k];
+        if (v % 85 !== 0 && v !== 255) { inGrid = false; break; }
+      }
+    }
+    assert.ok(inGrid, '2bit dither 网格');
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

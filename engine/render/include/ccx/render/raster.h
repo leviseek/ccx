@@ -28,4 +28,15 @@ void rasterizeQuads(const PackResult& pk, RasterTarget& target, const OrthoCamer
 // 帧导出：PPM（P6 二进制，三通道）落盘 —— "看到第一帧"的最小途径
 bool writePpm(const RasterTarget& target, const char* path);
 
+// —— M3 pixel-art 管线（renderer-spec §4：整数缩放 + 最近邻采样 + 色深 dither）——
+// 输入 target -> 输出 out：最近邻整数倍放大（scale >= 1），保持像素锐利
+void pixelateNearest(const RasterTarget& src, RasterTarget& out, unsigned scale);
+
+// 输入 target -> 输出 out：Bayer 4x4 ordered dithering 降到指定每通道位数（1..8）
+// 例：ditherToDepth(src, out, 3) => 每通道 3 bit（8 级灰阶/色阶）
+void ditherToDepth(const RasterTarget& src, RasterTarget& out, unsigned bits);
+
+// 便捷链：pixelateNearest + ditherToDepth 一步完成（scale>=1, bits 1..8）
+void pixelArtChain(const RasterTarget& src, RasterTarget& out, unsigned scale, unsigned bits);
+
 }  // namespace ccx::render

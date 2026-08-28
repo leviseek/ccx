@@ -67,4 +67,63 @@ bool writePpm(const RasterTarget& target, const char* path) {
     return true;
 }
 
+// —— M3 pixel-art 管线：整数缩放（最近邻）——
+void pixelateNearest(const RasterTarget& src, RasterTarget& out, unsigned scale) {
+    if (scale == 0) scale = 1;
+    out = RasterTarget(src.width * scale, src.height * scale);
+    for (uint32_t y = 0; y < out.height; ++y) {
+        const uint32_t sy = y / scale;
+        for (uint32_t x = 0; x < out.width; ++x) {
+            out.pixels[y * out.width + x] = src.pixels[sy * src.width + x / scale];
+        }
+    }
+}
+
+// —— M3 pixel-art 管线：Bayer 4x4 ordered dithering（色深量化）——
+namespace {
+// 4x4 Bayer 矩阵（0..15），除 16 归一
+constexpr int kBayer4[4][4] = {
+    {0, 8, 2, 10},
+    {12, 4, 14, 6},
+    {3, 11, 1, 9},
+    {15, 7, 13, 5},
+};
+}  // namespace
+
+void ditherToDepth(const RasterTarget& src, RasterTarget& out, unsigned bits) {
+    if (bits == 0 || bits > 8) bits = 8;
+    out = src;  // 尺寸不变，拷贝像素
+    const int levels = 1 << bits;              // 每通道量化级数
+    const int q = 256 / levels;                // 量化步长（末级归一到 255）
+    for (uint32_t y = 0; y < out.height; ++y) {
+        for (uint32_t x = 0; x < out.width; ++x) {
+            const uint32_t p = out.pixels[y * out.width + x];
+            const int bayer = kBayer4[y % 4][x % 4];
+            // 归一化 Bayer 抖动：c -> [0, levels) 连续值，Bayer 阈值比较小数部分进位
+            const double th = static_cast<double>(bayer) / 16.0;  // 0..0.9375
+            auto quant = [q, levels, th](int c) -> int {
+                const double f = static_cast<double>(c) * (levels - 1) / 255.0;
+                int idx = static_cast<int>(f);
+                if (f - static_cast<double>(idx) > th) ++idx;
+                if (idx < 0) idx = 0;
+                if (idx >= levels) idx = levels - 1;
+                return idx == levels - 1 ? 255 : idx * q;
+            };
+            const int r = quant(static_cast<int>((p >> 24) & 0xFF));
+            const int g = quant(static_cast<int>((p >> 16) & 0xFF));
+            const int b = quant(static_cast<int>((p >> 8) & 0xFF));
+            out.pixels[y * out.width + x] = (static_cast<uint32_t>(r) << 24) |
+                                             (static_cast<uint32_t>(g) << 16) |
+                                             (static_cast<uint32_t>(b) << 8) |
+                                             (p & 0xFFu);
+        }
+    }
+}
+
+void pixelArtChain(const RasterTarget& src, RasterTarget& out, unsigned scale, unsigned bits) {
+    RasterTarget scaled;
+    pixelateNearest(src, scaled, scale);
+    ditherToDepth(scaled, out, bits);
+}
+
 }  // namespace ccx::render

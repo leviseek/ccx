@@ -17,8 +17,8 @@
 ## 3. push 后确认（Actions 侧）
 
 - [x] gates 任务 3 项全绿（依赖方向/vendor/schema）——**2026-08-29 首次真跑 ✅**（run 33189819320，push a5a9d58）
-- [ ] build 矩阵 ubuntu+windows：编译 + ctest 全跑（自动化覆盖 51 项含新 e2e/script）——⏳ 未过（linux 现阶段不考虑；windows 配置失败待查）
-- [ ] lighthouse-c-bindgen：napi 编译 + smoke（出口④真跑首验）——⏳ 未过（linux 上 node-gyp 失败，现阶段不考虑）
+- [ ] build 矩阵（仅 windows，2026-08-29 起 linux 已移除）：编译 + ctest 全跑（自动化覆盖 63 项含新 e2e/script/pixel-art）——⏳ windows 配置失败待查（下轮 push 验证）
+- [ ] lighthouse-c-bindgen：napi 编译 + smoke（出口④真跑首验）——⏳ 改 windows runner 后待验证
 - [ ] 若 windows 矩阵有 Werror 差异：以 CI 输出为准补修（本地 w64devkit 一致）
 
 ### 3a. 首跑实录（2026-08-29）

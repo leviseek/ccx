@@ -92,6 +92,7 @@ async function main() {
     if (args[i] === '--project') flags.project = args[++i];
     if (args[i] === '--size') flags.size = args[++i];
     if (args[i] === '--time') flags.time = args[++i];
+    if (args[i] === '--pixelart') flags.pixelart = args[++i];
     if (args[i] === '--count') flags.count = args[++i];
     if (args[i] === '--frame') flags.frame = args[++i];
     if (args[i] === '--times') flags.times = args[++i];
@@ -1014,8 +1015,12 @@ async function main() {
     if (!existsSync(dumpExe)) {
       return emit({ ok: false, error: '未构建 ccx_frame_dump（先 cmake --build build/local）' });
     }
-    const argsDump = [sceneFile, out, m[1], m[2], String(flags.time ?? 0)];
-    if (flags.device === 'wgpu') argsDump.push('1', 'wgpu');
+    // 参数位：argv[6]=highlight argv[7]=contacts argv[8]=device argv[9]=wgpu argv[10]=pixelart
+    const argsDump = [sceneFile, out, m[1], m[2], String(flags.time ?? 0),
+                      '', flags.contacts ? '1' : '0', flags.device === 'wgpu' ? '1' : '0',
+                      flags.device === 'wgpu' ? 'wgpu' : ''];
+    // M3 pixel-art 后处理：--pixelart <scale>:<bits>（如 3:2 = 整数缩放 3x + 2bit dither）
+    if (flags.pixelart && /^\d+:\d+$/.test(flags.pixelart)) argsDump.push(flags.pixelart);
     const r = spawnSync(dumpExe, argsDump, { encoding: 'utf8' });
     if (r.status !== 0) return emit({ ok: false, error: (r.stderr || 'frame dump 失败').trim() });
     let meta = {};

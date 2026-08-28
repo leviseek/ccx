@@ -36,3 +36,8 @@
 
 - 🟦 ticket 验收 = 跑 §6b 复核路径（ctest -R "script|e2e" && node --test 3 文件 ≈ 5.3s）+ 相关命令演示。
 - 新 ticket 验收模板：标题/验收凭据（一条命令或测试名）/依赖/评审签字。
+## 验收记录（2026-08-28）
+
+- 复核：`node ci/verify_m2_batch1.mjs` → **9/9 PASS**（≈13s；T-W2-1 仿真侧冒烟）
+- 全量：`ccx doctor --all --verify` → W1 五级 ✅ + 首批 9 票 ✅（≈15s）
+- 批次决议（建议）：首批 W3/W4/W5 正式立项后转跟踪（ticket 已 ✅）；二批/三批待环境。

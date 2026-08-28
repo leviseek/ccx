@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.44（2026-08-27）**：M1 稳定面——**demo 长跑 5 轮计时分布**（总耗时 87–90ms 稳定无抖动；frame.gif 44.6 / contact.gif 40.2 为锚定基线，计入 m1-gate-review）、**CI 覆盖核对**（ctest 跑全量 46 项含假 GPU/物理——push 后 Actions 即验证）；ctest 46/46 + node 90/90。
 - **v0.3.43（2026-08-27）**：M1 工具入口与地图面——**ccx mcp tools / mcp call**（CLI 一条命令调任何工具：9 工具列表、asset.list 调用、非法 JSON 报错，CLI 19/19）、**engine README 模块地图**（13 模块能力/依赖/测试矩阵表）；ctest 46/46 + node 90/90。
 - **v0.3.42（2026-08-27）**：M1 AI 接口面——**MCP 工具层**（services-spec §7 兑现：daemon mcp.listTools/callTool——9 个现有服务方法注册为工具（schema），callTool 结果以 MCP content 文本返回；真场景流程（open→apply→query）可被 AI 调用、未知工具明确报错），daemon 14/14；ctest 46/46 + node 90/90。
 - **v0.3.41（2026-08-27）**：M1 运行时帧面——**假 GPU 运行时**（GameLoop 固定步→场景→packer→动态缓冲重传→清屏/绘制/提交每 render 帧→metrics 记账：3 render 帧 3 提交、hero 移动 6 固定步后新位置像素红、旧位置蓝底——"运行时首帧"全链仿真）、**m1-handoff 基线更新**（首帧仿真写入已实现清单）；ctest 46/46 + node 87/87。

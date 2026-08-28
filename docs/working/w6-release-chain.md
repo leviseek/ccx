@@ -68,3 +68,9 @@
 
 - 共享场景 + ccxSceneCommand 桥（script::applySceneCommand）注册进 nativeEval——脚本可驱动设备场景；帧循环渲染共享场景（hero 每帧移动）——设备上脚本驱动游戏的最小闭环。
 
+
+
+## 设备帧统计（2026-08-28）
+
+- nativeFrameStats：帧计数 + 最近帧耗时 ms（chrono）；屏幕显示（脚本/统计双行）。
+

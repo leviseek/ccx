@@ -1,9 +1,14 @@
 // CCX Android 壳（W6 JNI）：版本/编译器桥 + 引擎帧生成（清屏+精灵色块）
+#include <chrono>
 #include <cmath>
 #include <vector>
 
 #include <jni.h>
 #include <string>
+
+// 设备帧统计（profiler 面）：帧计数 + 最近帧生成耗时
+static uint64_t gFrames = 0;
+static double gLastFrameMs = 0.0;
 
 #include "ccx/render/raster.h"
 #include "ccx/scene/scene.h"
@@ -45,6 +50,7 @@ Java_ccx_android_MainActivity_nativeFrame(JNIEnv* env, jobject) {
 // 帧循环版：红块沿圆路径移动（t 秒；1.0 周期）——设备上可见动画
 extern "C" JNIEXPORT jbyteArray JNICALL
 Java_ccx_android_MainActivity_nativeFrameAt(JNIEnv* env, jobject, jfloat t) {
+    const auto t0 = std::chrono::steady_clock::now();
     constexpr int W = 64, H = 64;
     std::vector<uint8_t> px(static_cast<size_t>(W) * H * 4);
     auto put = [&](int x, int y, uint32_t rgba) {
@@ -115,7 +121,18 @@ Java_ccx_android_MainActivity_nativeFrameAt(JNIEnv* env, jobject, jfloat t) {
     jbyteArray out = env->NewByteArray(static_cast<jsize>(px.size()));
     env->SetByteArrayRegion(out, 0, static_cast<jsize>(px.size()),
                             reinterpret_cast<const jbyte*>(px.data()));
+    ++gFrames;
+    gLastFrameMs = std::chrono::duration<double, std::milli>(
+                       std::chrono::steady_clock::now() - t0).count();
     return out;
+}
+
+// 设备帧统计（profiler）：frames 计数 + 最近帧 ms
+extern "C" JNIEXPORT jstring JNICALL
+Java_ccx_android_MainActivity_nativeFrameStats(JNIEnv* env, jobject) {
+    std::string s = "frames=" + std::to_string(gFrames) +
+                    " lastMs=" + std::to_string(static_cast<int>(gLastFrameMs * 10.0) / 10.0);
+    return env->NewStringUTF(s.c_str());
 }
 
 // QuickJS 脚本面（设备上）：eval -> JSON 结果；脚本可经 ccxSceneCommand 驱动场景

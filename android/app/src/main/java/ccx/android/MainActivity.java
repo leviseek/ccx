@@ -20,6 +20,7 @@ public class MainActivity extends Activity {
     private static native String nativeVersion();
     private static native String nativeCompiler();
     private static native byte[] nativeFrameAt(float t);
+    private static native String nativeFrameStats();
     private static native String nativeEval(String code);
     static { System.loadLibrary("ccx_shell"); }
 
@@ -61,6 +62,9 @@ public class MainActivity extends Activity {
             paint.setColor(Color.YELLOW);
             canvas.drawText("script: " + nativeEval("1 + 2 * 3"),
                             l, top + side + 30, paint);
+            paint.setColor(Color.CYAN);
+            canvas.drawText("stats: " + nativeFrameStats(),
+                            l, top + side + 58, paint);
         }
     }
 }

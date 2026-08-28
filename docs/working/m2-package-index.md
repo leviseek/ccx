@@ -45,3 +45,7 @@
 - 评审前：`node ci/verify_review_package.mjs`（READY 判定）
 - 评审中：m2-review-package.md 顺序走 + 签名
 - 立项后：m2-tickets.md 跟踪；首批 ✅ 已验收即转正式
+## 校验记录（2026-08-28）
+
+- 自检（ci/verify_review_package.mjs）16 件 md 材料 **覆盖总纲全部**（A-D 四组 + 索引）；4 个 .mjs 工具由命令段（3 条）覆盖。
+- 结论：**材料包闭环一致（16 md + 4 mjs + 3 命令）→ READY**。

@@ -3,6 +3,7 @@
 //  裸命令模式：每行一个 JSON 命令（# 注释）
 //  -j 模式：每行一个 JS 表达式（可调 ccxSceneCommand(jsonStr)）
 #include <cstdio>
+#include <cstdlib>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -27,6 +28,12 @@ int main(int argc, char** argv) {
         return 2;
     }
     const bool jsMode = argc >= 4 && std::string(argv[3]) == "-j";
+    double budgetMs = -1.0;
+    for (int i = 4; i < argc; ++i) {
+        if (std::string(argv[i]) == "--budget" && i + 1 < argc) {
+            budgetMs = std::atof(argv[i + 1]);
+        }
+    }
     std::ifstream f(argv[1]);
     if (!f) {
         std::fprintf(stderr, "open failed: %s\n", argv[1]);
@@ -38,6 +45,7 @@ int main(int argc, char** argv) {
 
     ccx::script::ScriptHost host;
     host.setJsonFunction("ccxSceneCommand", &sceneCommandBridge);
+    if (budgetMs >= 0.0) host.setBudgetMs(budgetMs);
     int commands = 0;
 
     std::istringstream in(text);
@@ -75,7 +83,7 @@ int main(int argc, char** argv) {
     for (char& ch : outArg) {
         if (ch == '\\') ch = '/';
     }
-    std::printf("{\"commands\":%d,\"entities\":%zu,\"out\":\"%s\"}\n",
-                commands, gSceneLoader.target.renderOrder().size(), outArg.c_str());
+    std::printf("{\"commands\":%d,\"entities\":%zu,\"overBudget\":%s,\"out\":\"%s\"}\n",
+                commands, gSceneLoader.target.renderOrder().size(), host.overBudget() ? "true" : "false", outArg.c_str());
     return 0;
 }

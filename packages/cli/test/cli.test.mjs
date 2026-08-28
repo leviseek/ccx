@@ -164,6 +164,7 @@ test('ccx demo all：端到端编排（open/apply/save/build/cook）', () => {
   assert.equal(out.steps[10].commands, 3, '脚本命令步三命令');
   assert.ok(out.steps[10].ok, '脚本驱动场景 ok');
   assert.ok(out.steps[11].ok, '引擎执行器 ok');
+  assert.equal(out.steps[11].budgetOk, true, '脚本预算未超支');
   assert.ok(out.steps[12].ctest >= 46, '守护规模汇总（CTest）');
   assert.equal(out.steps[13].assets, 1, 'Web 站点资产清单');
   assert.equal(out.steps[13].index, true, 'index.html 已生成');

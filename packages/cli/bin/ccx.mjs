@@ -576,7 +576,7 @@ async function main() {
           push('script.engine', { commands: 0, entities: 0, ok: false, error: 'runner 未构建' });
         } else {
           writeFileSync(scriptIn, '{"op":"create_entity","name":"hero"}\n{"op":"create_entity","name":"npc"}\n');
-          const re = spawnSync(runner, [scriptIn, scriptOut], { encoding: 'utf8' });
+          const re = spawnSync(runner, [scriptIn, scriptOut, '--budget', '100'], { encoding: 'utf8' });
           let meta = {};
           if (re.status === 0) {
             try {
@@ -589,6 +589,8 @@ async function main() {
             commands: meta.commands ?? 0,
             entities: meta.entities ?? 0,
             ok: re.status === 0 && (meta.entities ?? 0) === 2,
+            budgetMs: 100,
+            budgetOk: meta.overBudget !== true,
           });
         }
       }

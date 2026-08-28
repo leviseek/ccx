@@ -418,7 +418,16 @@ async function main() {
         writeFileSync(outGif2, buildGif(cFrames, { delayCs: 25 }));
         push('contact.gif', { frames: cFrames.length, ok: true });
       }
-      // 8) cook（本地）
+      // 8) mcp：工具面自检（AI 接口可用性）
+      tick('mcp.tools');
+      {
+        const t = await client.request('mcp.listTools');
+        push('mcp.tools', { tools: t.tools.length, ok: t.tools.length >= 9 });
+        const c = await client.request('mcp.callTool', { name: 'asset.list' });
+        const text = c.content[0].text;
+        push('mcp.call', { textLen: text.length, ok: text.includes('a-1') });
+      }
+      // 9) cook（本地）
       tick('cook');
       const assetsDir = resolve(join(here, '..', '..', '..', 'build', 'local', 'demo-assets'));
       mkdirSync(assetsDir, { recursive: true });

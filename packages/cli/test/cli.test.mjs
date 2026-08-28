@@ -118,12 +118,14 @@ test('ccx demo all：端到端编排（open/apply/save/build/cook）', () => {
   const names = out.steps.map((s) => s.name);
   assert.deepEqual(names,
     ['scene.open', 'scene.apply', 'scene.save', 'build.run',
-     'profiler.snapshot', 'frame.gif', 'contact.gif', 'cook']);
+     'profiler.snapshot', 'frame.gif', 'contact.gif', 'mcp.tools', 'mcp.call', 'cook']);
   assert.ok(out.steps.every((s) => s.ok), '每步 ok');
   assert.ok(out.steps[3].trace >= 5, 'hooks 走完');
   assert.equal(out.steps[4].frames, 1, 'profiler 帧快照');
   assert.equal(out.steps[5].frames, 3, 'GIF 三帧');
   assert.equal(out.steps[6].frames, 3, '接触 GIF 三帧');
+  assert.ok(out.steps[7].tools >= 9, 'MCP 工具 ≥9');
+  assert.equal(out.steps[8].textLen > 0, true, 'MCP 调用有返回');
   // 性能回归：各步耗时宽松基线（动画步本地 ~40ms，上限防回归）
   for (const s of out.steps) {
     assert.ok(s.ms !== undefined && s.ms < 500,
@@ -383,7 +385,7 @@ test('ccx doctor --demo：一键 e2e 健康', () => {
   assert.equal(r.status, 0, r.err + r.out);
   const out = JSON.parse(r.out);
   assert.equal(out.ok, true);
-  assert.equal(out.demo.steps, 8);
+  assert.equal(out.demo.steps, 10);
   assert.equal(out.demo.allOk, true);
   assert.ok(out.demo.totalMs > 0, '总耗时已测');
   assert.ok(out.demo.slowest.length > 0, '最慢步已标注');

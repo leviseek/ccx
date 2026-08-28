@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.108（2026-08-28）**：M2 环境面——**ccx doctor --env 环境就绪探测**（GPU（Vulkan loader 检测——本机就绪！）/真机（adb 设备数）/Actions（CI 标记）/网络（webgpu.h 可达）四键 + ready/detail；每项 false 对应 ticket ⏳ 与 push 清单）；ctest 51/51 + node 111/111。
 - **v0.3.107（2026-08-28）**：M2 跟踪面——**首批转正式跟踪预演**（m2-tickets 跟踪规则：状态流转（⬜🔄✅⛔）+ 凭据双轨复核（人工+自动）+ 首批 9 张转正式（状态 ✅ 保留））；ctest 51/51 + node 110/110。
 - **v0.3.106（2026-08-28）**：W2 实演面——**undo 栏联演测试**（preview --apply×2 --undo → __HISTORY 一致：undoCount=1（栈消费后剩余）/entities 2/回退后 1——页面会话语义与 CLI 一致）；ctest 51/51 + node 110/110。
 - **v0.3.105（2026-08-28）**：M2 发起面——**评审发起文**（m2-review-invitation.md：邀请/20 分钟议程/会前准备（自检 READY）/预期产出（三择+批次决议+签字）——发起评审的最后一块）；ctest 51/51 + node 109/109。

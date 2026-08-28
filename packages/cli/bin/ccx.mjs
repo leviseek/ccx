@@ -105,6 +105,7 @@ async function main() {
     if (args[i] === '--w1') flags.w1 = true;
     if (args[i] === '--verify') flags.verify = true;
     if (args[i] === '--undo') flags.undo = true;
+    if (args[i] === '--env') flags.env = true;
     if (args[i] === '--redo') flags.redo = true;
     if (args[i] === '--js') flags.js = true;
   }
@@ -1181,6 +1182,36 @@ async function main() {
       tool: 'ccx doctor --w1',
       w1: data ?? { error: 'verify 失败: ' + (r.stderr || 'exit ' + r.status).slice(0, 120) },
       note: 'GPU/lavapipe 到达后同一骨架接真后端段（gpu-backend-plan 附录 B）',
+    });
+  }
+  // —— doctor --env：M2 环境就绪探测（GPU/真机/Actions/网络可检测化）——
+  if (sub === 'doctor' && flags.env) {
+    const probe = (cmd, args) => {
+      const r = spawnSync(cmd, args, { encoding: 'utf8', timeout: 8000 });
+      return r.status === 0 ? (r.stdout || '').trim() : null;
+    };
+    // GPU：Vulkan loader 存在（lavapipe/wgpu 前置）
+    const vulkanDll = existsSync(process.env.SystemRoot + '\\System32\\vulkan-1.dll') ||
+                      existsSync('C:\\Windows\\System32\\vulkan-1.dll');
+    // 真机：adb 可用且有设备
+    const adbOut = probe('adb.exe', ['devices']);
+    const deviceCount = adbOut ? (adbOut.match(/\tdevice/g) || []).length : 0;
+    // Actions：环境标记
+    const actions = process.env.GITHUB_ACTIONS === 'true';
+    // 网络：webgpu.h 可达（doctor --net 同款探测）
+    let webgpu = false;
+    const rw = spawnSync('curl.exe', ['-sIL', '--max-time', '10',
+      'https://raw.githubusercontent.com/webgpu-native/webgpu-headers/main/webgpu.h'],
+      { encoding: 'utf8' });
+    webgpu = rw.status === 0 && /HTTP\/1\.[01] 200/.test(rw.stdout || '');
+    return emit({
+      ok: true,
+      tool: 'ccx doctor --env',
+      gpu: { ready: vulkanDll, detail: vulkanDll ? 'Vulkan loader 在系统路径' : 'vulkan-1.dll 未找到（安装 lavapipe/Vulkan runtime）' },
+      device: { ready: deviceCount > 0, detail: deviceCount > 0 ? deviceCount + ' 台设备在线' : '无真机（adb ' + (adbOut ? '无设备' : '不可用') + '）' },
+      actions: { ready: actions, detail: actions ? 'CI 环境' : '本地环境（push 后 Actions 真跑）' },
+      network: { ready: webgpu, detail: webgpu ? 'webgpu.h 可达' : 'webgpu.h 不可达（待复测）' },
+      note: '每项 ready=false 对应 m2-tickets ⏳/⬜ 与 ci-push-checklist 环境项',
     });
   }
   // —— doctor --net：W1 预备网络探测（webgpu.h / quickjs 源可达性）——

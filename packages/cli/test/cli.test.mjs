@@ -740,6 +740,17 @@ test('ccx editor preview：undo 栏联演（apply×2 --undo 一致性）', () =>
   }
 });
 
+test('ccx doctor --env：环境就绪探测（结构断言）', () => {
+  const r = runCli(['doctor', '--env', '--json'], join(import.meta.dirname, '..'));
+  assert.equal(r.status, 0, r.err + r.out);
+  const out = JSON.parse(r.out);
+  assert.equal(out.ok, true);
+  for (const k of ['gpu', 'device', 'actions', 'network']) {
+    assert.ok(k in out, k + ' 键');
+    assert.ok('ready' in out[k] && 'detail' in out[k], k + ' 结构');
+  }
+});
+
 test('scene apply：非法命令拒绝且不写坏文件', () => {
   const dir = mkdtempSync(join(tmpdir(), 'ccx-apply-bad-'));
   try {

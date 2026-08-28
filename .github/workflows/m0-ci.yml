@@ -65,9 +65,7 @@ jobs:
           copy ..\out\ccx_hello_bindings.cpp gen\
           npm install --no-audit --no-fund
           npx node-gyp install
-          $nodeRoot = "$env:LOCALAPPDATA\node-gyp\Cache"
-          $ver = Get-ChildItem $nodeRoot | Select-Object -First 1 -ExpandProperty Name
-          cmake -S . -B build -G Ninja -DNODE_ROOT="$nodeRoot\$ver\x64" -DCMAKE_BUILD_TYPE=Release
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
           cmake --build build
       - name: smoke（JS 调 C++，出口④）
         working-directory: tools/bindgen/napi

@@ -360,7 +360,12 @@ async function main() {
     shell.addPanel('inspector', 'right', 10);
     shell.registerCommand('scene.save', '保存场景', () => {});
     const view = buildView(shell, bus);
-    let html = renderPreviewPage(view, doc);
+    const history = {
+      undoCount: bus.undoStack.length,
+      entities: view.scene.entityCount,
+      entitiesBefore: bus.undoStack.length > 0 ? view.scene.entityCount - 1 : null,
+    };
+    let html = renderPreviewPage(view, doc, { history });
     // --frame <ppm>：渲染帧图嵌入（PPM -> BMP data URL，浏览器可显示）
     if (flags.frame && existsSync(flags.frame)) {
       const bmp = ppmToBmp(readFileSync(flags.frame));

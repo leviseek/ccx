@@ -688,6 +688,29 @@ test('ccx editor preview --apply --undo：会话回退进预览', () => {
   }
 });
 
+test('ccx editor preview：undo 会话栏（页面交互面）', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ccx-pvbar-'));
+  try {
+    const sceneFile = join(dir, 's.scene.json');
+    writeFileSync(sceneFile, JSON.stringify({
+      schema: 'ccx.scene/1', meta: {},
+      entities: [{ id: 1, name: 'root', parent: null, components: [] }],
+      systems: [],
+    }));
+    const htmlOut = join(dir, 'p.html');
+    const r = runCli(['editor', 'preview', sceneFile, '--out', htmlOut,
+                      '--apply', JSON.stringify({ op: 'create_entity', name: 'npc' }),
+                      '--json'], dir);
+    assert.equal(r.status, 0, r.err + r.out);
+    const html = readFileSync(htmlOut, 'utf8');
+    assert.ok(html.includes('ccx-undo-bar'), 'undo 会话栏');
+    assert.ok(html.includes('可回退 1 步'), '回退计数');
+    assert.ok(html.includes('window.__HISTORY'), '历史内联');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('scene apply：非法命令拒绝且不写坏文件', () => {
   const dir = mkdtempSync(join(tmpdir(), 'ccx-apply-bad-'));
   try {

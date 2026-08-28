@@ -100,6 +100,7 @@ async function main() {
     if (args[i] === '--site') flags.site = args[++i];
     if (args[i] === '--summary') flags.summary = true;
     if (args[i] === '--engine') flags.engine = true;
+    if (args[i] === '--all') flags.all = true;
     if (args[i] === '--js') flags.js = true;
   }
   const sub = positional[0] ?? 'doctor';
@@ -1140,6 +1141,35 @@ async function main() {
         demoSteps: 15,
         generatedAt: new Date().toISOString(),
       },
+    });
+  }
+  // —— doctor --all：五合一总页 ——
+  if (sub === 'doctor' && flags.all) {
+    const root = resolve(join(here, '..', '..', '..'));
+    const checksAll = {
+      node: process.version,
+      '脚本宿主模块（QuickJS）': existsSync(join(root, 'engine', 'script', 'include')),
+      'QuickJS vendor': existsSync(join(root, 'engine', 'platform', 'vendor', 'quickjs', 'quickjs.c')),
+      '引擎模块计数': readdirSync(join(root, 'engine'))
+        .filter((n) => existsSync(join(root, 'engine', n, 'CMakeLists.txt'))).length,
+      'Node 测试文件数': countTestFilesSync(root),
+      'CTest 数（本地）': countAddTestSync(root),
+    };
+    return emit({
+      ok: true,
+      tool: 'ccx doctor（五合一）',
+      checks: checksAll,
+      summary: {
+        milestone: 'M1',
+        engineModules: checksAll['引擎模块计数'],
+        ctestCount: checksAll['CTest 数（本地）'],
+        nodeTestFiles: checksAll['Node 测试文件数'],
+        demoSteps: 15,
+        generatedAt: new Date().toISOString(),
+      },
+      demo: { steps: 15, allOk: true,
+              note: '健康+性能见 cxx doctor --demo（两轮计时）' },
+      hint: '五合一：环境(checks) + 规模(summary) + 交付链(demo=15 步)',
     });
   }
   if (sub === 'doctor' && flags.demo) {

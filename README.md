@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.75（2026-08-28）**：M1 总页面——**ccx doctor --all 五合一**（环境 checks + 规模 summary + 交付链 demo 一页输出；含脚本宿主/QuickJS vendor 检查）；ctest 51/51 + node 100/100。
 - **v0.3.74（2026-08-28）**：M1 治理面——**脚本预算**（setBudgetMs/overBudget：单次执行耗时限额+超支标记+清除；零预算触发/恢复无告警测试）、**CI push 终审清单**（docs/working/ci-push-checklist.md：本地复核/push 后 Actions 确认/待环境项）；ctest 51/51 + node 99/99。
 - **v0.3.73（2026-08-28）**：M1 统计面——**引擎侧脚本统计**（ScriptHost::evalCount/lastScriptMs：每次 eval/invoke 计时毫秒 + 执行计数——QuickJS 耗时入 profiler 视野；game_loop 测试断言计数/耗时）；ctest 51/51 + node 99/99。
 - **v0.3.72（2026-08-28）**：M1 收官——**成品快照**（m1-final-summary.json/md：51/99/15/174 实时值 + 能力清单 + 状态）、**文档链数字核对**（m1-gate-review 全同步）；ctest 51/51 + node 99/99。

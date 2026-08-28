@@ -26,10 +26,15 @@ public:
     // 事件桥（W5b 第三环）：C++ 侧调用脚本全局函数（如 onUpdate(dt)）
     // jsonArgs 传入；返回值与 eval 同构（ok/value 或 ok/error）
     json::Value invoke(const std::string& fnName, const std::string& jsonArgs);
+    // 引擎侧统计（profiler）：eval/invoke 总次数与当次耗时（毫秒）
+    uint64_t evalCount() const { return evalCount_; }
+    double lastScriptMs() const { return lastScriptMs_; }
 
 private:
     void* runtime_;  // JSRuntime*
     void* ctx_;      // JSContext*
+    uint64_t evalCount_ = 0;
+    double lastScriptMs_ = 0.0;
 };
 
 }  // namespace ccx::script

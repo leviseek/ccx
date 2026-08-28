@@ -1,5 +1,6 @@
 #include "ccx/script/host.h"
 
+#include <chrono>
 #include <cstdio>
 #include <cstring>
 #include <vector>
@@ -71,7 +72,11 @@ ScriptHost::~ScriptHost() {
 json::Value ScriptHost::eval(const std::string& code) {
     if (!ctx_) return json::parse("{\"ok\":false,\"error\":\"host not initialized\"}");
     JSContext* ctx = static_cast<JSContext*>(ctx_);
+    const auto t0 = std::chrono::steady_clock::now();
     JSValue result = JS_Eval(ctx, code.c_str(), code.size(), "<eval>", JS_EVAL_TYPE_GLOBAL);
+    ++evalCount_;
+    lastScriptMs_ = std::chrono::duration<double, std::milli>(
+                        std::chrono::steady_clock::now() - t0).count();
     if (JS_IsException(result)) {
         JSValue ex = JS_GetException(ctx);
         std::string msg = "js error";
@@ -140,6 +145,8 @@ void ScriptHost::setJsonFunction(const std::string& name, JsonFn fn) {
 json::Value ScriptHost::invoke(const std::string& fnName, const std::string& jsonArgs) {
     if (!ctx_) return json::parse("{\"ok\":false,\"error\":\"host not initialized\"}");
     JSContext* ctx = static_cast<JSContext*>(ctx_);
+    const auto t0 = std::chrono::steady_clock::now();
+    ++evalCount_;
     // 参数：{...} -> 展开为调用实参（v1：单 JSON 对象参数整体传入）
     JSValue g = JS_GetGlobalObject(ctx);
     JSValue fnVal = JS_GetPropertyStr(ctx, g, fnName.c_str());
@@ -176,5 +183,9 @@ json::Value ScriptHost::invoke(const std::string& fnName, const std::string& jso
     e.emplace_back("ok", json::Value::boolean(true));
     e.emplace_back("value", toJson(ctx, result));
     JS_FreeValue(ctx, result);
+    lastScriptMs_ = std::chrono::duration<double, std::milli>(
+                        std::chrono::steady_clock::now() - t0).count();
     return json::Value::object(std::move(e));
-}}  // namespace ccx::script
+}
+
+}  // namespace ccx::script

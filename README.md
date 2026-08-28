@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.162（2026-08-28）★ W6 脚本面 ★**——**QuickJS 在 Android 设备上运行**（壳编译 vendor quickjs 全套 + script host；nativeEval(1+2*3)=7 屏幕 OCR 实证）——设备上脚本引擎可用；途中第五次规避 read+write 截断（git 恢复+纯 edit）；ctest 62/62 + node 120/120。
 - **v0.3.161（2026-08-28）**：M2 彩排 3——**全链重演含设备**（自检 19s + demo 2.6s + W1 2.7s + 设备 0.3s ≈24.6s；评审随时可举行，仅 Actions 待 push）；ctest 62/62 + node 120/120。
 - **v0.3.160（2026-08-28）**：M1 收口 5——**W6 设备面入快照**（status/screenshot/push-frame + 壳运行/帧循环/场景数据面）；ctest 62/62 + node 120/120。
 - **v0.3.159（2026-08-28）**：W6 场景面——**壳接引擎场景数据面**（NDK 编译 scene/schema/json → Scene 实体 + Sprite → 光栅上屏帧循环——真机帧与引擎场景渲染同源；途中第四次规避 read+write 截断（git 恢复+安全 edit））；ctest 62/62 + node 120/120。

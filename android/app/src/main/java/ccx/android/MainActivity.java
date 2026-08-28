@@ -20,9 +20,9 @@ public class MainActivity extends Activity {
     private static native String nativeVersion();
     private static native String nativeCompiler();
     private static native byte[] nativeFrameAt(float t);
+    private static native String nativeEval(String code);
     static { System.loadLibrary("ccx_shell"); }
 
-    // 引擎帧视图（帧循环：16ms 步进，红块动画上屏）
     static class FrameView extends View {
         private final Bitmap frame = Bitmap.createBitmap(64, 64, Bitmap.Config.ARGB_8888);
         private final Paint paint = new Paint();
@@ -57,6 +57,10 @@ public class MainActivity extends Activity {
             paint.setColor(Color.WHITE);
             canvas.drawText("CCX loop " + nativeVersion() + " (" + nativeCompiler() + ")",
                             l, top - 12, paint);
+            paint.setTextSize(22);
+            paint.setColor(Color.YELLOW);
+            canvas.drawText("script: " + nativeEval("1 + 2 * 3"),
+                            l, top + side + 30, paint);
         }
     }
 }

@@ -7,6 +7,7 @@
 
 #include "ccx/render/raster.h"
 #include "ccx/scene/scene.h"
+#include "ccx/script/host.h"
 
 extern "C" JNIEXPORT jstring JNICALL
 Java_ccx_android_MainActivity_nativeVersion(JNIEnv* env, jobject) {
@@ -101,4 +102,17 @@ Java_ccx_android_MainActivity_nativeFrameAt(JNIEnv* env, jobject, jfloat t) {
     env->SetByteArrayRegion(out, 0, static_cast<jsize>(px.size()),
                             reinterpret_cast<const jbyte*>(px.data()));
     return out;
+}
+
+// QuickJS 脚本面（设备上）：eval 表达式 -> JSON 字符串结果
+extern "C" JNIEXPORT jstring JNICALL
+Java_ccx_android_MainActivity_nativeEval(JNIEnv* env, jobject, jstring code) {
+    const char* utf = env->GetStringUTFChars(code, nullptr);
+    std::string result = "{}";
+    if (utf) {
+        ccx::script::ScriptHost host;
+        result = "script-eval " + ccx::json::dump(host.eval(utf));
+        env->ReleaseStringUTFChars(code, utf);
+    }
+    return env->NewStringUTF(result.c_str());
 }

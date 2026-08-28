@@ -234,3 +234,8 @@ add_test(NAME physics.collider_roundtrip COMMAND ccx_collider_roundtrip_test)
 add_executable(ccx_rhi_fake_test rhi_fake_test.cpp)
 target_link_libraries(ccx_rhi_fake_test PRIVATE ccx_gfx)
 add_test(NAME gfx.rhi_fake COMMAND ccx_rhi_fake_test)
+
+# M1：假 GPU 全链端到端（packer -> FakeDevice 上传 -> 绘制 -> readback 像素）
+add_executable(ccx_fake_gpu_frame_test fake_gpu_frame_test.cpp)
+target_link_libraries(ccx_fake_gpu_frame_test PRIVATE ccx_gfx ccx_render ccx_scene)
+add_test(NAME e2e.fake_gpu_frame COMMAND ccx_fake_gpu_frame_test)

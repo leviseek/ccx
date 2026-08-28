@@ -49,6 +49,16 @@ public:
     bool readback(Handle texture, void* out, uint32_t bytes) override;
     void beginFrame() override { ++frame_; }
     uint32_t submit() override { return frame_; }
+    // 绘制模拟（真后端 = draw call）：逐像素写入（含越界忽略）
+    void putPixel(Handle texture, int x, int y, uint32_t rgba) {
+        const auto it = textures_.find(texture);
+        if (it == textures_.end()) return;
+        if (x < 0 || y < 0 || x >= static_cast<int>(it->second.w) ||
+            y >= static_cast<int>(it->second.h)) {
+            return;
+        }
+        it->second.pixels[static_cast<size_t>(y) * it->second.w + static_cast<size_t>(x)] = rgba;
+    }
 
     uint32_t bufferCount() const { return static_cast<uint32_t>(buffers_.size()); }
     uint32_t textureCount() const { return static_cast<uint32_t>(textures_.size()); }

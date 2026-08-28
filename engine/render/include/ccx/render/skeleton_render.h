@@ -14,6 +14,7 @@ struct SkeletonRenderConfig {
     uint32_t atlas = 1;
     uint32_t material = 1;
     float size = 16.0f;
+    bool useSlotAtlas = false;  // 骨骼名匹配插槽名时用插槽附件 atlas（W7 贴图面）
 };
 
 std::vector<RenderItem> skeletonToRenderItems(const animation::Skeleton& sk, float time,

@@ -48,6 +48,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: 加载 MSVC 开发者环境（node-gyp 需要 VCINSTALLDIR）
+        uses: ilammy/msvc-dev-cmd@v1
       - name: bindgen 生成 + 单元测试 + 类型检查
         working-directory: tools/bindgen
         run: |

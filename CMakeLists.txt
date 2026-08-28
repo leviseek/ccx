@@ -5,6 +5,11 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# MSVC：禁用 CRT 安全函数弃用警告（fopen/fprintf 等，项目统一使用 C 风格 IO；/W4 /WX 下 C4996 会报错）
+if(MSVC)
+  add_compile_definitions(_CRT_SECURE_NO_WARNINGS)
+endif()
+
 # 模块裁剪（engine-spec §2）：默认只开 M0 需要的模块
 option(CCX_BUILD_FOUNDATION "Build foundation module" ON)
 option(CCX_BUILD_TESTS "Build engine tests" ON)

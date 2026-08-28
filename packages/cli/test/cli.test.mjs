@@ -711,6 +711,35 @@ test('ccx editor preview：undo 会话栏（页面交互面）', () => {
   }
 });
 
+test('ccx editor preview：undo 栏联演（apply×2 --undo 一致性）', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ccx-pvplay-'));
+  try {
+    const sceneFile = join(dir, 's.scene.json');
+    writeFileSync(sceneFile, JSON.stringify({
+      schema: 'ccx.scene/1', meta: {},
+      entities: [{ id: 1, name: 'root', parent: null, components: [] }],
+      systems: [],
+    }));
+    const htmlOut = join(dir, 'p.html');
+    const r = runCli(['editor', 'preview', sceneFile, '--out', htmlOut,
+                      '--apply', JSON.stringify({ op: 'create_entity', name: 'a' }),
+                      '--apply', JSON.stringify({ op: 'create_entity', name: 'b' }),
+                      '--undo', '--json'], dir);
+    assert.equal(r.status, 0, r.err + r.out);
+    const out = JSON.parse(r.out);
+    assert.equal(out.entities, 2, 'undo 后 2 实体（root+a）');
+    const html = readFileSync(htmlOut, 'utf8');
+    const m = html.match(/window.__HISTORY = (\{[^<]*?\});/);
+    assert.ok(m, 'HISTORY 内联');
+    const history = JSON.parse(m[1].replace(/&quot;/g, '"'));
+    assert.equal(history.undoCount, 1, 'undo 后剩余可回退 1 步');
+    assert.equal(history.entities, 2, '当前实体 2');
+    assert.equal(history.entitiesBefore, 1, '回退后实体 1');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('scene apply：非法命令拒绝且不写坏文件', () => {
   const dir = mkdtempSync(join(tmpdir(), 'ccx-apply-bad-'));
   try {

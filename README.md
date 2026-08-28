@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.119（2026-08-28）**：W1 统计链——**gpuStats 入帧导出**（frame_dump wgpu 输出 frames/uploads/bytes；demo frame.wgpu 步转存 + 断言入链；途中修复误插代码事故（edit 错位））；ctest 56/56 + node 114/114。
 - **v0.3.118（2026-08-28）**：M2 文档同步——**W1 突破入评审体系**（就绪页：双后端 10/10/16 步/56 CTest/194 守护/GPU ✅；summary/tickets 同步）；ctest 56/56 + node 114/114。
 - **v0.3.117（2026-08-28）**：demo 十六步——**frame.wgpu 真后端帧步入交付链**（GPU 数据面帧导出 482ms 实跑；发现并修复 frame_dump 的 wgpu 块从未写入的隐蔽缺口（早先"成功"实为软件路径）+ 步时断言容差与索引同步）；ctest 56/56 + node 114/114。
 - **v0.3.116（2026-08-28）**：W1 导出面——**ccx frame dump --device wgpu**（真后端帧导出：黄金帧 → GPU 上传/读回 → PPM 落盘；CLI 测试 P6 头+尺寸；frame_dump 条件编译 CCX_WGPU_BACKEND）；ctest 56/56 + node 113/113。

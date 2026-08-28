@@ -189,6 +189,17 @@ int main(int argc, char** argv) {
         std::vector<uint32_t> px(static_cast<size_t>(W) * H, 0);
         if (!device.readback(tex, px.data(), px.size() * 4)) return 1;
         std::copy(px.begin(), px.end(), target.pixels.begin());
+        // L5 帧统计：帧数/上传次数/上传字节（profiler 面）
+        if (!writePpm(target, argv[2])) return 1;
+        std::string ppmW(argv[2]);
+        for (char& cw : ppmW) {
+            if (cw == '\\') cw = '/';
+        }
+        std::printf("{\"quads\":%zu,\"width\":%d,\"height\":%d,\"ppm\":\"%s\","
+                    "\"gpuStats\":{\"frames\":%u,\"uploads\":%u,\"bytes\":%llu}}\n",
+                    items.size(), W, H, ppmW.c_str(), device.frames(), device.uploads(),
+                    static_cast<unsigned long long>(device.bytesUploaded()));
+        return 0;
 #else
         std::fprintf(stderr, "wgpu 后端未构建（无 CCX_WGPU_BACKEND）\n");
         return 1;
@@ -203,7 +214,8 @@ int main(int argc, char** argv) {
     for (char& c : ppmOut) {
         if (c == '\\') c = '/';
     }
-    std::printf("{\"quads\":%zu,\"width\":%d,\"height\":%d,\"ppm\":\"%s\"}\n",
+
+std::printf("{\"quads\":%zu,\"width\":%d,\"height\":%d,\"ppm\":\"%s\"}\n",
                 items.size(), W, H, ppmOut.c_str());
     return 0;
 }

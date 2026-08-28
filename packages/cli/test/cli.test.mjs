@@ -163,6 +163,8 @@ test('ccx demo all：端到端编排（open/apply/save/build/cook）', () => {
   const stepW = out.steps.find((s) => s.name === 'frame.wgpu');
   assert.ok(stepW && stepW.ok, '真后端帧导出');
   assert.ok(stepW.bytes > 1000, 'PPM 落盘尺寸');
+  assert.ok(stepW.gpuStats && stepW.gpuStats.frames >= 1, 'GPU 帧统计入链');
+  assert.ok(stepW.gpuStats.bytes > 0, '上传字节统计');
   assert.ok(out.steps[10].undoWorked && out.steps[10].redoWorked, '会话 undo/redo 演示');
   assert.equal(out.steps[11].commands, 3, '脚本命令步三命令');
   assert.ok(out.steps[11].ok, '脚本驱动场景 ok');

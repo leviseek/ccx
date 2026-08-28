@@ -493,15 +493,23 @@ async function main() {
         const outW = resolve(join(here, '..', '..', '..', 'build', 'local', 'demo-wgpu.ppm'));
         let okW = false;
         let sizeW = 0;
+        let wmeta = {};
         if (existsSync(dumpExe3)) {
           const frw = spawnSync(dumpExe3, [fixture, outW, '160', '90', '0', '', '1', '1', 'wgpu'],
                                 { encoding: 'utf8' });
+          if (frw.status === 0) {
+            try {
+              wmeta = JSON.parse(frw.stdout.trim());
+            } catch {
+              /* noop */
+            }
+          }
           if (frw.status === 0 && existsSync(outW)) {
             sizeW = statSync(outW).size;
             okW = sizeW > 1000;
           }
         }
-        push('frame.wgpu', { ok: okW, bytes: sizeW });
+        push('frame.wgpu', { ok: okW, bytes: sizeW, gpuStats: wmeta.gpuStats ?? null });
       }
       // 8) contact.gif：碰撞时序动画（--contacts 自动高亮）
       tick('contact.gif');

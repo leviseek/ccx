@@ -1,4 +1,5 @@
-// Cook 管线骨架（asset-spec §4：平台矩阵 + 纹理/音频目标推导；压缩执行留 M2 原生 worker）
+// Cook 管线骨架（asset-spec §4：平台矩阵 + 纹理/音频目标推导；压缩执行经压缩器注册表）
+import { spawnSync } from 'node:child_process';
 export const PLATFORM_MATRIX = {
   'web-desktop': { texture: 'png', audio: 'ogg' },
   'web-mobile': { texture: 'webp', audio: 'ogg' },
@@ -52,6 +53,21 @@ export async function compressTexture(intermediate, format) {
   const fn = compressors.get(format);
   if (!fn) return { ok: false, error: '无压缩器: ' + format };
   return fn(intermediate, format);
+}
+
+// 外挂压缩器（W4 接入形态）：把任意外部工具（pngquant/astcenc/…）包成压缩器
+// args 模板：'{src}' 替换为源文件路径；stdout 视为产物（字节数上报）
+export function externalCompressor({ cmd, args = [], srcArg = '{src}' }) {
+  return async (intermediate, format) => {
+    const source = intermediate.path ?? intermediate.source ?? '';
+    if (!source) return { ok: false, error: '外部压缩器需要源路径' };
+    const r = spawnSync(cmd, args.map((a) => (a === srcArg ? source : a)),
+                        { encoding: 'utf8' });
+    if (r.status !== 0 || r.error) {
+      return { ok: false, error: '外部工具失败: ' + (r.error ? String(r.error) : r.stderr?.slice(0, 100) ?? 'exit ' + r.status) };
+    }
+    return { ok: true, bytes: Buffer.byteLength(r.stdout ?? ''), note: 'external:' + cmd };
+  };
 }
 
 // Cook + 真实压缩（每个 texture target 调用已注册压缩器；未注册的跳过并记录）

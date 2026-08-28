@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.54（2026-08-28）**：M1 会话命令与压缩面——**scene apply 流内 --undo/--redo**（与 --cmd 同序执行，进程内共享历史（跨命令新会话语义澄清）；scene status 命令保留）、**外部压缩器接口**（cook externalCompressor：spawn 任一工具（pngquant/astcenc…），{src} 模板 + 产物字节上报 + 全流接入（web-desktop png 经外挂）——W4 真实接入形态验证）；ctest 46/46 + node 95/95。
 - **v0.3.53（2026-08-28）**：M1 会话面——**会话版本化 + session.save/load**（scene 服务：version 随 apply/undo/redo 递进；ccx.session/1 快照落盘/恢复（文档级，undo 栈重置）——W3 续批）、**demo all 十二步**（+session.demo：undo×2/redo×2 角色扮演，undoWorked/redoWorked 断言）；daemon 16/16；ctest 46/46 + node 94/94。
 - **v0.3.52（2026-08-28）**：M1 会话面——**daemon 场景会话 undo/redo/status RPC**（W3 首批：undo 计数/redo 计数/实体数可查可回滚）、**undo 语义 v2（全量快照）**（create/destroy/属性全部可逆——修复 create 不可逆的 v1 缺口；scene+daemon 22/22）；ctest 46/46 + node 92/92。
 - **v0.3.51（2026-08-28）**：M1 汇总面——**doctor --summary**（机器可消费状态：milestone/模块 13/CTest 46/测试文件 25/11 步/时间戳）、**M2 立项建议书**（docs/working/m2-proposal.md：背景/工作包状态/交付节奏三批/资源/验收）；ctest 46/46 + node 92/92。

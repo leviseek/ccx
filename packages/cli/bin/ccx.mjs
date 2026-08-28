@@ -143,8 +143,6 @@ async function main() {
     if (!file || !existsSync(file)) {
       return emit({ ok: false, error: '用法: ccx scene apply <file> --cmd '<json>'（可多次）' });
     }
-    const cmds = args.filter((a, i) => args[i - 1] === '--cmd');
-    if (cmds.length === 0) return emit({ ok: false, error: '缺少 --cmd' });
     let json;
     try {
       json = JSON.parse(readFileSync(file, 'utf8'));
@@ -153,12 +151,29 @@ async function main() {
     }
     const bus = CommandBus.fromSceneFile(json);
     const applied = [];
-    for (const raw of cmds) {
+    const flow = args.filter((a, i) => {
+      const prev = args[i - 1];
+      return prev === '--cmd' || a === '--undo' || a === '--redo';
+    });
+    if (flow.length === 0) return emit({ ok: false, error: '缺少 --cmd' });
+    for (const a of flow) {
+      if (a === '--undo') {
+        const ok = bus.undo();
+        if (!ok) return emit({ ok: false, error: '无可撤销命令（流程中曾 --undo 移除历史）' });
+        applied.push('undo');
+        continue;
+      }
+      if (a === '--redo') {
+        const ok = bus.redo();
+        if (!ok) return emit({ ok: false, error: '无可重放命令（redo 栈空）' });
+        applied.push('redo');
+        continue;
+      }
       let cmd;
       try {
-        cmd = JSON.parse(raw);
+        cmd = JSON.parse(a);
       } catch (e) {
-        return emit({ ok: false, error: '--cmd 不是合法 JSON: ' + raw });
+        return emit({ ok: false, error: '--cmd 不是合法 JSON: ' + a });
       }
       try {
         bus.apply(cmd);
@@ -175,7 +190,9 @@ async function main() {
       file,
       applied,
       entityCount: out.entities.length,
-      note: 'undo/redo 属会话内能力（SceneService），CLI 一次性提交',
+      undoCount: bus.undoStack.length,
+      redoCount: bus.redoStack.length,
+      note: 'undo/redo 为流程内序号能力（--undo/--redo 与 --cmd 同流）',
     });
   }
 
@@ -237,6 +254,46 @@ async function main() {
       batches: plan.batches.map((b) =>
         'atlas=' + b.atlas + ' mat=' + b.material + ' x' + b.count + '@' + b.first).join(' | '),
     });
+  }
+
+  // —— scene status/undo/redo <file>：会话命令面（临时 daemon）——
+  if (sub === 'scene' && positional[1] === 'status') {
+    const op = 'status';
+    const sceneFile = positional[2];
+    if (!sceneFile || !existsSync(sceneFile)) {
+      return emit({ ok: false, error: '用法: ccx scene ' + op + ' <scene.json>' });
+    }
+    const daemonEntry = resolve(join(here, '..', '..', 'service-core', 'bin', 'daemon.mjs'));
+    const client = new RpcClient(process.execPath, [daemonEntry]);
+    try {
+      await new Promise((resolve, reject) => {
+        const off = client.onEvent((m) => {
+          if (m.method === 'system.ready') { off(); resolve(); }
+        });
+        setTimeout(() => reject(new Error('daemon 未就绪')), 2500);
+      });
+      const open = await client.request('scene.open', { path: resolve(sceneFile) });
+      if (!open.ok) return emit({ ok: false, error: '打开失败: ' + open.error });
+      if (op !== 'status') {
+        // undo/redo 需要进程内共享的 undo 栈；单命令会话无历史——
+        // 指引用户走 apply 流内 --undo/--redo（下方实现）
+        return emit({ ok: false, error: op + ' 需要与同一进程的命令流共享历史；' +
+                      '用法: ccx scene apply <file> [--cmd ...] [--undo] [--redo]' });
+      }
+      const st = await client.request('scene.status');
+      if (!st.ok) return emit({ ok: false, error: '状态失败: ' + st.error });
+      return emit({
+        ok: true,
+        session: op,
+        file: sceneFile,
+        entities: st.entities,
+        version: st.version,
+        undo: st.undo,
+        redo: st.redo,
+      });
+    } finally {
+      client.close();
+    }
   }
 
   // —— editor preview <scene.json> [--out preview.html]：自包含预览页 ——

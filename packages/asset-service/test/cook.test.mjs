@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { PLATFORM_MATRIX, cook, planCook } from '../src/cook.mjs';
+import { PLATFORM_MATRIX, compressTexture, cook, planCook } from '../src/cook.mjs';
 
 test('PLATFORM_MATRIX：2D 平台纹理/音频目标（renderer-spec §2.3/asset-spec §4）', () => {
   assert.equal(PLATFORM_MATRIX['web-desktop'].texture, 'png');
@@ -37,6 +37,34 @@ test('compressor 接口：注册 + 调用 + 未注册报错', async () => {
   const tex = full.artifact.parts.find((x) => x.kind === 'texture');
   assert.equal(tex.ok, true);
   assert.equal(tex.bytes, 512);
+});
+
+
+test('外部压缩器：spawn 接入（W4 形态）', async () => {
+  const { externalCompressor, cookWithCompression, registerCompressor } = await import('../src/cook.mjs');
+  const { writeFileSync, mkdtempSync, rmSync } = await import('node:fs');
+  const { tmpdir } = await import('node:os');
+  const { join } = await import('node:path');
+  const dir = mkdtempSync(join(tmpdir(), 'ccx-extc-'));
+  try {
+    const src = join(dir, 'hero.png');
+    writeFileSync(src, 'PNG-DATA');
+    const compressor = externalCompressor({
+      cmd: process.execPath,
+      args: [join(import.meta.dirname, 'fixtures', 'fake_compressor.mjs'), '{src}'],
+    });
+    registerCompressor('png', compressor);
+    const r = await compressTexture({ path: src, uuid: 't1' }, 'png');
+    assert.equal(r.ok, true);
+    assert.ok(r.bytes > 0, '外部产物字节上报');
+    assert.ok(r.note.includes('external'), '标注外部来源');
+    // 经 cook 全流
+    const full = await cookWithCompression({ path: src, uuid: 't1', sourceFormat: 'png' }, 'web-desktop');
+    const tex = full.artifact.parts.find((x) => x.kind === 'texture');
+    assert.ok(tex.ok, '平台矩阵（png）走外挂压缩器');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });
 
 test('cook：产物记录（真实压缩留 M2 worker）', () => {

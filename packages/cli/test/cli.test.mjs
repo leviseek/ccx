@@ -484,6 +484,48 @@ test('ccx doctor --summary：状态汇总（机器可消费）', () => {
   assert.ok(out.summary.generatedAt.length > 0, '时间戳');
 });
 
+test('ccx scene status/undo/redo：会话命令面', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ccx-sesscli-'));
+  try {
+    const sceneFile = join(dir, 's.scene.json');
+    writeFileSync(sceneFile, JSON.stringify({
+      schema: 'ccx.scene/1', meta: {},
+      entities: [{ id: 1, name: 'root', parent: null, components: [] }],
+      systems: [],
+    }));
+    let r = runCli(['scene', 'status', sceneFile, '--json'], dir);
+    assert.equal(r.status, 0, r.err + r.out);
+    let out = JSON.parse(r.out);
+    assert.equal(out.ok, true);
+    assert.equal(out.entities, 1);
+    assert.equal(out.version, 0);
+    // 应用后文件持久化（entities 2）
+    r = runCli(['scene', 'apply', sceneFile, '--json',
+                '--cmd', JSON.stringify({ op: 'create_entity', name: 'npc' })], dir);
+    out = JSON.parse(r.out);
+    assert.equal(out.entityCount, 2, 'apply 持久化');
+    // 流程内 undo/redo：apply -> undo -> redo（同进程共享历史）
+    r = runCli(['scene', 'apply', sceneFile, '--json',
+                '--cmd', JSON.stringify({ op: 'create_entity', name: 'mob' }),
+                '--undo', '--redo'], dir);
+    assert.equal(r.status, 0, r.err + r.out);
+    out = JSON.parse(r.out);
+    assert.deepEqual(out.applied, ['create_entity', 'undo', 'redo']);
+    assert.equal(out.entityCount, 3, 'undo/redo 后网络效果 = 两次 create');
+    assert.equal(out.undoCount, 1, 'undo 后 redo 重建 1 条历史');
+    assert.equal(out.redoCount, 0);
+    // undo 最后一条（不 redo）-> 实体 2
+    r = runCli(['scene', 'apply', sceneFile, '--json',
+                '--cmd', JSON.stringify({ op: 'create_entity', name: 'ghost' }),
+                '--undo'], dir);
+    out = JSON.parse(r.out);
+    assert.equal(out.entityCount, 3, 'undo 移除 ghost（回到 3）');
+    assert.equal(out.applied.at(-1), 'undo');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('scene apply：非法命令拒绝且不写坏文件', () => {
   const dir = mkdtempSync(join(tmpdir(), 'ccx-apply-bad-'));
   try {

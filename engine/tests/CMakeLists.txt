@@ -52,6 +52,10 @@ if(TARGET ccx_network)
   add_executable(ccx_world_sync_test world_sync_test.cpp)
   target_link_libraries(ccx_world_sync_test PRIVATE ccx_network ccx_ecs ccx_foundation)
   add_test(NAME network.world_sync COMMAND ccx_world_sync_test)
+  # M4 exit 1: 16 人同屏 delta 同步收敛 demo
+  add_executable(ccx_net_sync_16p_test net_sync_16p_test.cpp)
+  target_link_libraries(ccx_net_sync_16p_test PRIVATE ccx_network ccx_ecs ccx_foundation)
+  add_test(NAME network.16p_sync COMMAND ccx_net_sync_16p_test)
 endif()
 
 # 灯塔任务 D：SpriteBatch 合批模型（renderer-spec §5，逻辑在 render::batcher）

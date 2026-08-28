@@ -119,3 +119,8 @@ add_test(NAME e2e.asset_chain
 add_executable(ccx_tick_sprite_anim_test tick_sprite_anim_test.cpp)
 target_link_libraries(ccx_tick_sprite_anim_test PRIVATE ccx_animation ccx_ecs ccx_scene)
 add_test(NAME e2e.sprite_anim_tick COMMAND ccx_tick_sprite_anim_test)
+
+# M1：动画整合（状态机选 clip -> 精灵帧采样 -> 帧循环）
+add_executable(ccx_integrated_animation_test integrated_animation_test.cpp)
+target_link_libraries(ccx_integrated_animation_test PRIVATE ccx_animation ccx_ecs ccx_scene)
+add_test(NAME e2e.integrated_animation COMMAND ccx_integrated_animation_test)

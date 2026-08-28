@@ -21,6 +21,10 @@ async function main() {
   for (let i = 0; i < args.length; i++) {
     if (args[i] === '--at') flags.at = args[++i];
     if (args[i] === '--type') flags.type = args[++i];
+    if (args[i] === '--out') flags.out = args[++i];
+    if (args[i] === '--root') flags.root = args[++i];
+    if (args[i] === '--platform') flags.platform = args[++i];
+    if (args[i] === '--project') flags.project = args[++i];
   }
   const sub = positional[0] ?? 'doctor';
 
@@ -126,7 +130,13 @@ async function main() {
       return emit({ ok: false, error: '场景文件解析失败: ' + e.message });
     }
     const plan = renderPlan(json);
-    if (jsonMode) return emit({ ok: true, file, ...plan });
+    if (flags.out) {
+      // 产物：渲染计划 JSON 写盘（工具/CI 消费）
+      const outPath = resolve(flags.out);
+      mkdirSync(dirname(outPath), { recursive: true });
+      writeFileSync(outPath, JSON.stringify({ schema: 'ccx.renderplan/1', ...plan }, null, 2) + '\n');
+    }
+    if (jsonMode) return emit({ ok: true, file, out: flags.out ?? null, ...plan });
     return emit({
       ok: true,
       summary:
@@ -304,20 +314,30 @@ async function main() {
   if (sub === 'doctor') {
     const cwd = process.cwd();
     const git = spawnSync('git', ['--version'], { encoding: 'utf8' });
+    const checks = {
+      node: process.version,
+      git: git.status === 0 ? git.stdout.trim() : 'missing',
+      'engine/ 骨架': existsSync(join(cwd, 'engine', 'foundation', 'include')),
+      'packages/ 骨架': existsSync(join(cwd, 'packages')),
+      'docs/ 规格': existsSync(join(cwd, 'docs', 'engine-spec.md')),
+      'ci/gates': existsSync(join(cwd, 'ci', 'gates')),
+      'CMakeLists': existsSync(join(cwd, 'CMakeLists.txt')),
+      'mise.toml': existsSync(join(cwd, '.mise.toml')),
+      'examples/ 场景': existsSync(join(cwd, 'examples', 'scenes', 'sample.scene.json')),
+      'vendor/ 纪律': existsSync(join(cwd, 'engine', 'platform', 'vendor', 'pal', 'UPSTREAM.md')),
+      '构建产物（本地）': existsSync(join(cwd, 'build', 'local', 'engine', 'tests',
+                                            'ccx_foundation_tests.exe')),
+    };
+    const failed = Object.entries(checks).filter(([, v]) => v === false || v === 'missing');
     return emit({
-      ok: true,
+      ok: failed.length === 0,
       tool: 'ccx doctor',
       cwd,
-      checks: {
-        node: process.version,
-        git: git.status === 0 ? git.stdout.trim() : 'missing',
-        'engine/ 骨架': existsSync(join(cwd, 'engine', 'foundation', 'include')),
-        'packages/ 骨架': existsSync(join(cwd, 'packages')),
-        'docs/ 规格': existsSync(join(cwd, 'docs', 'engine-spec.md')),
-        'ci/gates': existsSync(join(cwd, 'ci', 'gates')),
-        'CMakeLists': existsSync(join(cwd, 'CMakeLists.txt')),
-        'mise.toml': existsSync(join(cwd, '.mise.toml')),
-      },
+      checks,
+      hint: failed.length > 0
+        ? '缺失项：' + failed.map(([k]) => k).join(', ') +
+          '（详见 README 执行状态表与 GITHUB-SETUP.md）'
+        : '环境齐备；下一步：git push 触发 CI（GITHUB-SETUP.md）',
     });
   }
   return emit({

@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
+import { existsSync, readFileSync, writeFileSync, mkdtempSync, rmSync } from 'node:fs';
+import { dirname as pathDirname } from 'node:path';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -22,6 +23,24 @@ test('renderPlan：fixture -> 3 批（与服务/引擎同语义）', () => {
   const iGamma = plan.order.indexOf('gamma');
   const iDelta = plan.order.indexOf('delta');
   assert.ok(iAlpha < iGamma && iGamma < iDelta, '层内/层间顺序');
+});
+
+test('ccx render plan --out：产物落盘', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ccx-plan-out-'));
+  try {
+    const out = join(dir, 'plan.json');
+    const r = spawnSync(process.execPath,
+                        [cli, 'render', 'plan', fixture, '--out', out, '--json'],
+                        { encoding: 'utf8' });
+    assert.equal(r.status, 0, r.stderr);
+    assert.ok(existsSync(out), '计划文件已写');
+    const planFile = JSON.parse(readFileSync(out, 'utf8'));
+    assert.equal(planFile.schema, 'ccx.renderplan/1');
+    assert.equal(planFile.sprites, 5);
+    assert.equal(planFile.batches.length, 3);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });
 
 test('ccx render plan：CLI 冒烟（新建场景 -> 命令添加精灵 -> 计划）', () => {

@@ -4,7 +4,9 @@
 #include <string>
 #include <vector>
 
+#include <optional>
 #include "ccx/animation/clip.h"
+#include "ccx/animation/sprite_anim.h"
 
 namespace ccx::animation {
 
@@ -12,8 +14,9 @@ namespace ccx::animation {
 // 过渡时长只记录不插值——混合在 M2）
 struct AnimState {
     std::string name;
-    Clip clip;
+    Clip clip;                  // 曲线动画（Transform 轨）
     bool loop = true;
+    std::optional<SpriteClip> sprite;  // 精灵帧动画（图集网格；二者取一或并用）
 };
 
 struct AnimTransition {

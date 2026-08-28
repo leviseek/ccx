@@ -188,6 +188,27 @@ test('ccx editor preview：自包含预览页', () => {
   }
 });
 
+test('ccx editor preview --apply：命令回路进预览', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ccx-preview-apply-'));
+  try {
+    const fixture = join(import.meta.dirname, '..', '..', '..', 'examples', 'scenes',
+                         'render_plan.scene.json');
+    const out = join(dir, 'preview.html');
+    const r = runCli([
+      'editor', 'preview', fixture, '--out', out,
+      '--apply', JSON.stringify({ op: 'create_entity', name: 'mover', parent: 1 }),
+      '--apply', JSON.stringify({ op: 'add_component', id: 4, type: 'game.Speed', data: { v: 30 } }),
+    ], dir);
+    assert.equal(r.status, 0, r.err + r.out);
+    assert.equal(JSON.parse(r.out).entities, 8, '7 + 新实体');
+    const html = readFileSync(out, 'utf8');
+    assert.ok(html.includes('mover'), '新实体入视图');
+    assert.ok(html.includes('"game.Speed"'), '新组件入视图');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('scene apply：非法命令拒绝且不写坏文件', () => {
   const dir = mkdtempSync(join(tmpdir(), 'ccx-apply-bad-'));
   try {

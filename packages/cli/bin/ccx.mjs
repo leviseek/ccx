@@ -205,6 +205,21 @@ async function main() {
       return emit({ ok: false, error: '场景文件解析失败' });
     }
     const bus = CommandBus.fromSceneFile(doc);
+    // 命令回路：--apply '<cmd>'（可多次）在生成前应用
+    const applies = args.filter((a, i) => args[i - 1] === '--apply');
+    for (const raw of applies) {
+      let cmd;
+      try {
+        cmd = JSON.parse(raw);
+      } catch {
+        return emit({ ok: false, error: '--apply 不是合法 JSON' });
+      }
+      try {
+        bus.apply(cmd);
+      } catch (e) {
+        return emit({ ok: false, error: '命令执行失败: ' + e.message });
+      }
+    }
     const shell = new EditorShell({ bus });
     shell.addPanel('hierarchy', 'left', 0);
     shell.addPanel('scene', 'center', 0);

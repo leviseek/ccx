@@ -190,6 +190,11 @@ add_executable(ccx_audio_bus_test audio_bus_test.cpp)
 target_link_libraries(ccx_audio_bus_test PRIVATE ccx_audio)
 add_test(NAME audio.bus COMMAND ccx_audio_bus_test)
 
+# M1：2D 碰撞数据面（AABB + 空间网格宽相）
+add_executable(ccx_physics_test physics_test.cpp)
+target_link_libraries(ccx_physics_test PRIVATE ccx_physics)
+add_test(NAME physics.grid COMMAND ccx_physics_test)
+
 # M1：动画整合（状态机选 clip -> 精灵帧采样 -> 帧循环）
 add_executable(ccx_integrated_animation_test integrated_animation_test.cpp)
 target_link_libraries(ccx_integrated_animation_test PRIVATE ccx_animation ccx_ecs ccx_scene)

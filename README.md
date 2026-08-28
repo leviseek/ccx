@@ -131,6 +131,7 @@
 
 ## 变更记录
 
+- **v0.3.24（2026-08-27）**：M1 碰撞与动画文件面——**2D 碰撞数据面**（engine/physics：AABB 相交/接触/包含 + 空间网格宽相（跨 cell 插入、潜在对去重、越界忽略），测试一次修正预期后全绿）、**GIF89a 打包器**（gif.mjs：教科书 LZW 编解码 + 调色板量化 + 双帧结构 GCE/图像描述符/像素解码 roundtrip；调试判定编码 add 时机与解码定址两处结构性错位）；引擎模块增至 16 个；ctest 37/37 + node 80/80。
 - **v0.3.23（2026-08-27）**：M1 帧动画可视面——**精灵帧动画驱动色块**（frame_dump 读 ccx.SpriteAnimator：帧号→tint 色表，t=0 红帧 vs t=0.1 绿帧主色断言；修复帧号浮点取整与残留 tint 覆盖）、**editor preview --frame**（PPM→BMP→data URL 嵌入页面 frame-view，编辑器看到渲染帧——可视闭环）；ctest 36/36 + node 78/78。
 - **v0.3.22（2026-08-27）**：M1 命令与媒体面——**ccx frame dump CLI**（正式入口：--out/--size/--time；flags 解析补 --size/--time/--count）、**PPM→BMP 转换**（24bit BGR 自底向上行对齐，浏览器 data URL 可显示；测试修整 rowSize/行序语义后 2 组全绿）、**音频播放事件数据面**（engine/audio：PlayEvent 队列/音量钳制/主音量/清空，3 组一次通过）；引擎模块增至 15 个；ctest 36/36 + node 76/76。
 - **v0.3.21（2026-08-27）**：M1 动态帧面——**frame_dump 时间参数 + 曲线动画采样**（ccx.CurveAnim 线性轨 pos.x：u 钳位插值）、**两帧像素质心差异断言**（t0/t1/t2 红像素质心单调位移 160→224→288，帧 diff 测试——"会动"的像素验证；途中修正视口外幅度的测试设计）；ctest 35/35 + node 73/73。

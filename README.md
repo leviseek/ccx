@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.120（2026-08-28）**：W7 启动——**Spine 骨骼数据面**（animation::Skeleton：骨轨+关键帧姿态插值（位置/旋转）+ 循环采样；w7.spine_skeleton 测试 4 组（中点/末端/循环/臂插值）——T-W7-1 渲染路径就绪后骨架桥可接）；ctest 57/57 + node 114/114。
 - **v0.3.119（2026-08-28）**：W1 统计链——**gpuStats 入帧导出**（frame_dump wgpu 输出 frames/uploads/bytes；demo frame.wgpu 步转存 + 断言入链；途中修复误插代码事故（edit 错位））；ctest 56/56 + node 114/114。
 - **v0.3.118（2026-08-28）**：M2 文档同步——**W1 突破入评审体系**（就绪页：双后端 10/10/16 步/56 CTest/194 守护/GPU ✅；summary/tickets 同步）；ctest 56/56 + node 114/114。
 - **v0.3.117（2026-08-28）**：demo 十六步——**frame.wgpu 真后端帧步入交付链**（GPU 数据面帧导出 482ms 实跑；发现并修复 frame_dump 的 wgpu 块从未写入的隐蔽缺口（早先"成功"实为软件路径）+ 步时断言容差与索引同步）；ctest 56/56 + node 114/114。

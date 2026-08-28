@@ -4,6 +4,7 @@
 add_library(ccx_animation STATIC
   src/clip.cpp
   src/sprite_anim.cpp
+  src/skeleton.cpp
   src/state_machine.cpp
 )
 

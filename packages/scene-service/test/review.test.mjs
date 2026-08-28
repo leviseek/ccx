@@ -14,8 +14,9 @@ const after = { entities: [
 
 test("review: diff 统计与摘要", () => {
   const r = buildReview(before, after, { note: "加点" });
+  // before: bg + hero(atlas 1)；after: bg + hero(atlas 2) + coin => 实体 +1 字段 +1
   assert.equal(r.summary.total, 2);
-  assert.equal(r.summary.byKind.component, 1);
+  assert.equal(r.summary.byKind.entity, 1);
   assert.equal(r.summary.byKind.field, 1);
   assert.equal(r.state, "draft");
   assert.ok(summaryText(r).includes("变更 2 项"));

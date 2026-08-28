@@ -3,6 +3,7 @@
 
 #include <cstdio>
 #include <cstring>
+#include <vector>
 
 #include "webgpu.h"
 
@@ -95,7 +96,8 @@ Handle WgpuDevice::createTexture(const TextureDesc& desc) {
     td.format = WGPUTextureFormat_RGBA8Unorm;
     td.mipLevelCount = 1;
     td.sampleCount = 1;
-    td.usage = WGPUTextureUsage_RenderAttachment | WGPUTextureUsage_CopySrc;
+    td.usage = WGPUTextureUsage_RenderAttachment | WGPUTextureUsage_CopySrc |
+               WGPUTextureUsage_CopyDst;
     void* tex = wgpuDeviceCreateTexture(static_cast<WGPUDevice>(device_), &td);
     const Handle h = nextHandle_++;
     textures_[h] = { tex, desc.width, desc.height };
@@ -118,6 +120,34 @@ bool WgpuDevice::upload(Handle buffer, const void* data, uint32_t size, uint32_t
     if (offset + size > it->second.size) return false;
     wgpuQueueWriteBuffer(static_cast<WGPUQueue>(queue_),
                          static_cast<WGPUBuffer>(it->second.wgpu), offset, data, size);
+    poll();
+    return true;
+}
+
+bool WgpuDevice::uploadTexture(Handle texture, const void* data, uint32_t bytes) {
+    const auto it = textures_.find(texture);
+    if (it == textures_.end() || !queue_) return false;
+    const uint32_t w = it->second.w, h = it->second.h;
+    if (bytes != w * h * 4) return false;
+    WGPUTexelCopyTextureInfo dst{};
+    dst.texture = static_cast<WGPUTexture>(it->second.wgpu);
+    dst.mipLevel = 0;
+    dst.origin = {0, 0, 0};
+    dst.aspect = WGPUTextureAspect_All;
+    WGPUTexelCopyBufferLayout layout{};
+    layout.offset = 0;
+    layout.bytesPerRow = ((w * 4) + 255u) & ~255u;
+    layout.rowsPerImage = h;
+    WGPUExtent3D extent{ w, h, 1 };
+    // 数据需按对齐布局填充（行尾补零）——wgpu 复制量 = row*(h-1)+w*4
+    const uint32_t dataSize = layout.bytesPerRow * (h - 1) + w * 4;
+    std::vector<uint8_t> padded(dataSize, 0);
+    const auto* src8 = static_cast<const uint8_t*>(data);
+    for (uint32_t y = 0; y < h; ++y) {
+      std::memcpy(padded.data() + static_cast<size_t>(y) * layout.bytesPerRow,
+                  src8 + static_cast<size_t>(y) * w * 4, w * 4);
+    }
+    wgpuQueueWriteTexture(static_cast<WGPUQueue>(queue_), &dst, padded.data(), dataSize, &layout, &extent);
     poll();
     return true;
 }

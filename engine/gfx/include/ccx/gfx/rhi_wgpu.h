@@ -17,6 +17,7 @@ public:
     void destroy(Handle h) override;
     bool upload(Handle buffer, const void* data, uint32_t size, uint32_t offset) override;
     void clear(Handle texture, uint32_t rgba) override;
+    bool uploadTexture(Handle texture, const void* data, uint32_t bytes) override;
     bool readback(Handle texture, void* out, uint32_t bytes) override;
     void beginFrame() override;
     uint32_t submit() override;

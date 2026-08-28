@@ -33,6 +33,8 @@ public:
     virtual void destroy(Handle h) = 0;
     virtual bool upload(Handle buffer, const void* data, uint32_t size, uint32_t offset = 0) = 0;
     virtual void clear(Handle texture, uint32_t rgba) = 0;
+    // 纹理数据面（L3 黄金对照传输面）：整帧像素 RGBA8 上传（等价软件光栅帧）
+    virtual bool uploadTexture(Handle texture, const void* data, uint32_t bytes) = 0;
     virtual bool readback(Handle texture, void* out, uint32_t bytes) = 0;
     virtual void beginFrame() = 0;
     virtual uint32_t submit() = 0;  // 返回已提交帧数

@@ -1,3 +1,5 @@
+#include <cstring>
+
 #include "ccx/gfx/rhi.h"
 
 #include <algorithm>
@@ -34,6 +36,14 @@ void FakeDevice::clear(Handle texture, uint32_t rgba) {
     const auto it = textures_.find(texture);
     if (it == textures_.end()) return;
     std::fill(it->second.pixels.begin(), it->second.pixels.end(), rgba);
+}
+
+bool FakeDevice::uploadTexture(Handle texture, const void* data, uint32_t bytes) {
+    const auto it = textures_.find(texture);
+    if (it == textures_.end() || !data) return false;
+    if (bytes != it->second.pixels.size() * sizeof(uint32_t)) return false;
+    std::memcpy(it->second.pixels.data(), data, bytes);
+    return true;
 }
 
 bool FakeDevice::readback(Handle texture, void* out, uint32_t bytes) {

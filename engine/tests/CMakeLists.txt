@@ -215,6 +215,11 @@ add_executable(ccx_layer_test layer_test.cpp)
 target_link_libraries(ccx_layer_test PRIVATE ccx_physics)
 add_test(NAME physics.layers COMMAND ccx_layer_test)
 
+# M1：Collider 组件化（ccx.Collider -> Body -> 层窄相）
+add_executable(ccx_collider_component_test collider_component_test.cpp)
+target_link_libraries(ccx_collider_component_test PRIVATE ccx_physics ccx_ecs ccx_scene)
+add_test(NAME physics.collider_component COMMAND ccx_collider_component_test)
+
 # M1：动画整合（状态机选 clip -> 精灵帧采样 -> 帧循环）
 add_executable(ccx_integrated_animation_test integrated_animation_test.cpp)
 target_link_libraries(ccx_integrated_animation_test PRIVATE ccx_animation ccx_ecs ccx_scene)

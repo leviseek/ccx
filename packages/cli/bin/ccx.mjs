@@ -696,6 +696,10 @@ async function main() {
       '输入模块': existsSync(join(cwd, 'engine', 'input', 'include')),
       '帧循环模块': existsSync(join(cwd, 'engine', 'game', 'include')),
       '资产注册表模块': existsSync(join(cwd, 'engine', 'assets', 'include')),
+      '物理模块': existsSync(join(cwd, 'engine', 'physics', 'include')),
+      '音频模块': existsSync(join(cwd, 'engine', 'audio', 'include')),
+      '引擎模块计数': readdirSync(join(cwd, 'engine'))
+        .filter((n) => existsSync(join(cwd, 'engine', n, 'CMakeLists.txt'))).length,
     };
     const failed = Object.entries(checks).filter(([, v]) => v === false || v === 'missing');
     return emit({

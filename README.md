@@ -131,6 +131,7 @@
 
 ## 变更记录
 
+- **v0.3.29（2026-08-27）**：M1 组件化面——**ccx.Collider 组件->物理体**（组件 {hx,hy,layer,mask} -> Body -> 宽相+层窄相：英雄移动帧3 起接触，掩码不含对方层时 AABB 重叠也零接触，一次通过）、**doctor 引擎模块计数**（读 engine/*/CMakeLists 如实上报，+物理/音频检查）；ctest 42/42 + node 82/82。
 - **v0.3.28（2026-08-27）**：M1 层与叙事面——**碰撞层/掩码**（engine/physics body：Body{box,layer,mask} + canCollide 双向判定 + narrowPhaseLayered 层+AABB 双重过滤；玩家/环境/子弹三层场景下两对接触、玩家-子弹被过滤，一次通过）、**demo all 七步**（+frame.gif：三时间点帧→GIF 动画文件落盘）；ctest 41/41 + node 82/82。
 - **v0.3.27（2026-08-27）**：M1 接触驱动面——**接触→组件+音效组合**（tick 中碰撞系统：宽相重建→窄相→ccx.Contact 组件写回 + 新接触唯一触发 PlayEvent（AudioBus）——物理/场景/音频三系统一帧联动，一次通过）；ctest 40/40 + node 82/82。
 - **v0.3.26（2026-08-27）**：M1 接触与可视化面——**窄相**（engine/physics contact：宽相候选→AABB 精确接触事件，误报过滤/链式三对/排序稳定，一次通过）、**editor preview --gif**（GIF data URL 嵌入 anim-view——动画序列进编辑器页面）；ctest 39/39 + node 82/82。

@@ -2,8 +2,21 @@
 import { renderViewHtml } from './html.mjs';
 
 export function renderPreviewPage(view, sceneJson,
-  { title = 'CCX Preview', history = null } = {}) {
+  { title = 'CCX Preview', history = null, resolution = null } = {}) {
   const base = renderViewHtml(view, { title });
+  // M4 UI 工具深度：多分辨率视口（design resolution 驱动 viewport + 自适应缩放）
+  const res = resolution && /^\d+x\d+$/.test(resolution)
+    ? (() => { const [w, h] = resolution.split('x').map(Number); return { w, h }; })()
+    : null;
+  const viewport = res
+    ? '<div id="ccx-viewport" style="border:1px solid #888;margin:8px;padding:8px;'
+      + 'display:inline-block;background:#222;">'
+      + '<div style="color:#aaa;font:11px monospace;margin-bottom:2px;">'
+      + 'CCX 视口（设计分辨率 ' + res.w + 'x' + res.h + ' · 自适应缩放）</div>'
+      + '<canvas id="ccx-scene-canvas" width="' + res.w + '" height="' + res.h + '" '
+      + 'style="background:#101020;max-width:100%;height:auto;"></canvas>'
+      + '</div>'
+    : '';
   const undoBar = history
     ? '<div id="ccx-undo-bar" style="font:12px monospace;padding:6px;border-bottom:1px solid #ccc">' +
       '会话：可回退 ' + history.undoCount + ' 步 · 当前实体 ' + history.entities +
@@ -22,5 +35,5 @@ export function renderPreviewPage(view, sceneJson,
     '});',
     '</script>',
   ];
-  return base.replace('</body>', undoBar + lines.join('\n') + '</body>');
+  return base.replace('</body>', undoBar + viewport + lines.join('\n') + '</body>');
 }

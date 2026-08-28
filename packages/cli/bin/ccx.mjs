@@ -95,6 +95,7 @@ async function main() {
     if (args[i] === '--time') flags.time = args[++i];
     if (args[i] === '--pixelart') flags.pixelart = args[++i];
     if (args[i] === '--toon') flags.toon = args[++i];
+    if (args[i] === '--resolution') flags.resolution = args[++i];
     if (args[i] === '--count') flags.count = args[++i];
     if (args[i] === '--frame') flags.frame = args[++i];
     if (args[i] === '--times') flags.times = args[++i];
@@ -372,7 +373,7 @@ async function main() {
       entities: view.scene.entityCount,
       entitiesBefore: bus.undoStack.length > 0 ? view.scene.entityCount - 1 : null,
     };
-    let html = renderPreviewPage(view, doc, { history });
+    let html = renderPreviewPage(view, doc, { history, resolution: flags.resolution ?? null });
     // --frame <ppm>：渲染帧图嵌入（PPM -> BMP data URL，浏览器可显示）
     if (flags.frame && existsSync(flags.frame)) {
       const bmp = ppmToBmp(readFileSync(flags.frame));

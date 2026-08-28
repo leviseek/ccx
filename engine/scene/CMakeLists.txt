@@ -5,10 +5,11 @@ add_library(ccx_scene STATIC
   src/scene.cpp
   src/schema.cpp
   src/bridge.cpp
+  src/collision.cpp
 )
 
 target_include_directories(ccx_scene PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(ccx_scene PUBLIC ccx_foundation ccx_ecs)
+target_link_libraries(ccx_scene PUBLIC ccx_foundation ccx_ecs ccx_physics)
 target_compile_features(ccx_scene PUBLIC cxx_std_20)
 
 if(MSVC)

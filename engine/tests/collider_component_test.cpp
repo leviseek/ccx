@@ -5,8 +5,8 @@
 
 #include "ccx/ecs/scheduler.h"
 #include "ccx/ecs/world.h"
-#include "ccx/physics/body.h"
 #include "ccx/physics/collision.h"
+#include "ccx/scene/collision.h"
 #include "ccx/scene/scene.h"
 
 using namespace ccx;
@@ -21,23 +21,6 @@ void check(bool ok, const char* what) {
         std::printf("FAIL: %s\n", what);
         ++g_failures;
     }
-}
-// 从场景构建物理体表（ccx.Collider {hx,hy,layer,mask}）
-std::map<uint32_t, Body> buildBodies(const Scene& scene) {
-    std::map<uint32_t, Body> bodies;
-    for (const EntityId id : scene.renderOrder()) {
-        const json::Value* coll = scene.component(id, "ccx.Collider");
-        if (!coll) continue;
-        Body b;
-        const float hx = coll->find("hx") ? coll->find("hx")->asNumber() : 25.0f;
-        const float hy = coll->find("hy") ? coll->find("hy")->asNumber() : 25.0f;
-        b.box = Aabb::fromCenter(scene.worldTransform(id).pos, {hx, hy});
-        b.layer = coll->find("layer") ? static_cast<uint32_t>(coll->find("layer")->asNumber()) : 1u;
-        b.mask = coll->find("mask") ? static_cast<uint32_t>(coll->find("mask")->asNumber())
-                                    : 0xFFFFFFFFu;
-        bodies[id.index] = b;
-    }
-    return bodies;
 }
 }  // namespace
 
@@ -65,11 +48,8 @@ int main() {
     int contactFrame = 0;
     for (int f = 1; f <= 5; ++f) {
         check(sched.execute(world, 1.0f), "帧执行");
-        // 物理阶段：重建网格 + 层窄相
-        grid.clear();
-        const auto bodies = buildBodies(scene);
-        for (const auto& [id, b] : bodies) grid.insert(id, b.box);
-        const auto contacts = narrowPhaseLayered(grid, bodies);
+        // 物理阶段（正式 API）：收集组件体 + 宽相 + 层窄相
+        const auto contacts = runCollisionSim(scene, grid);
         if (!contacts.empty()) {
             seen.emplace_back(contacts[0].a, contacts[0].b);
             if (contactFrame == 0) contactFrame = f;
@@ -91,9 +71,7 @@ int main() {
         scene2.setComponent(p2, "ccx.Collider",
                             json::parse("{\"hx\":25,\"hy\":25,\"layer\":2,\"mask\":1}"));
         SpatialGrid g2(32.0f, 4, 4);
-        const auto bodies2 = buildBodies(scene2);
-        for (const auto& [id, b] : bodies2) g2.insert(id, b.box);
-        const auto contacts2 = narrowPhaseLayered(g2, bodies2);
+        const auto contacts2 = runCollisionSim(scene2, g2);
         check(contacts2.empty(), "掩码不含对方层 -> 无接触（AABB 已重叠）");
     }
 

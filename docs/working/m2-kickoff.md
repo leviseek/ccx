@@ -41,3 +41,15 @@
 - M2 gate 主持人：立项人指定
 
 > 改动回溯：任何 exit 修订必须更新本文件与 roadmap §1 M2 行（双处一致）。
+
+## 6. M1 实况更新（v0.3.29，2026-08-27）
+
+| 工作包 | M1 完成的前置 | 状态 |
+| --- | --- | --- |
+| W1 GPU 首帧 | 渲染缓存主线：场景→渲染项→packer(批/顶点/索引)→相机→软件光栅像素断言（frame_dump/帧 diff/帧色测试）；缓冲上传即交 | 只差 GPU 上传/绘制 |
+| W2 编辑器 Web UI | buildView 视图模型 + renderViewHtml + preview 自包含页（--frame BMP / --gif 动画嵌入即"编辑器看到帧"） | 有可消费产物 |
+| W3 服务会话面 | daemon 真实服务（scene/asset/audit/profiler/build RPC）+ EOF 优雅退出 + 常驻模式 | 会话级待 M2 |
+| W4 压缩 worker | registerCompressor 插件接口 + cook 管线（纹理/音频目标、失败不阻塞） | 差真实压缩器 |
+| W5 V8 | tools/bindgen IDL→napi（7/7+tsc）已就绪，CI 任务 lighthouse-c-bindgen 待 push 后真跑 | 环境依赖 |
+| W6 真机 | 平台矩阵（astc4/etc2/bc7…）+ Cook 目标已生成 | 渠道/签名依赖 |
+| W7 Spine 桥 | 帧动画（SpriteClip/Sampler/状态机）与帧循环合流完成 | W1 后可并行 |

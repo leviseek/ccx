@@ -25,6 +25,10 @@ if(TARGET ccx_network)
   add_executable(ccx_sync_channel_test sync_channel_test.cpp)
   target_link_libraries(ccx_sync_channel_test PRIVATE ccx_network)
   add_test(NAME network.sync_channel COMMAND ccx_sync_channel_test)
+  # M4：World A -> 增量 -> encode/decode -> World B 回放（集成）
+  add_executable(ccx_world_sync_test world_sync_test.cpp)
+  target_link_libraries(ccx_world_sync_test PRIVATE ccx_network ccx_ecs ccx_foundation)
+  add_test(NAME network.world_sync COMMAND ccx_world_sync_test)
 endif()
 
 # 灯塔任务 D：SpriteBatch 合批模型（renderer-spec §5，逻辑在 render::batcher）

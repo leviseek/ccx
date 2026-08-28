@@ -470,6 +470,19 @@ test('ccx editor preview --site：Web 产物游戏壳视图', () => {
   }
 });
 
+test('ccx doctor --summary：状态汇总（机器可消费）', () => {
+  const r = runCli(['doctor', '--summary', '--json'], join(import.meta.dirname, '..'));
+  assert.equal(r.status, 0, r.err + r.out);
+  const out = JSON.parse(r.out);
+  assert.equal(out.ok, true);
+  assert.equal(out.summary.milestone, 'M1');
+  assert.ok(out.summary.engineModules >= 13, '引擎模块数');
+  assert.ok(out.summary.ctestCount >= 46, 'CTest 计数');
+  assert.ok(out.summary.nodeTestFiles >= 23, 'Node 测试文件数');
+  assert.equal(out.summary.demoSteps, 11);
+  assert.ok(out.summary.generatedAt.length > 0, '时间戳');
+});
+
 test('scene apply：非法命令拒绝且不写坏文件', () => {
   const dir = mkdtempSync(join(tmpdir(), 'ccx-apply-bad-'));
   try {

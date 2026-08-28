@@ -86,6 +86,7 @@ async function main() {
     if (args[i] === '--highlight') flags.highlight = args[++i];
     if (args[i] === '--demo') flags.demo = true;
     if (args[i] === '--site') flags.site = args[++i];
+    if (args[i] === '--summary') flags.summary = true;
   }
   const sub = positional[0] ?? 'doctor';
 
@@ -899,6 +900,23 @@ async function main() {
 
   // —— doctor / version ——
   if (sub === 'version') return emit({ ok: true, name: '@ccx/cli', version: '0.1.0', milestone: 'M1' });
+  if (sub === 'doctor' && flags.summary) {
+    // 机器可消费的状态汇总（供文档/CI/自动化用；仓库根路径）
+    const root = resolve(join(here, '..', '..', '..'));
+    const mods = readdirSync(join(root, 'engine'))
+      .filter((n) => existsSync(join(root, 'engine', n, 'CMakeLists.txt'))).length;
+    return emit({
+      ok: true,
+      summary: {
+        milestone: 'M1',
+        engineModules: mods,
+        ctestCount: countAddTestSync(root),
+        nodeTestFiles: countTestFilesSync(root),
+        demoSteps: 11,
+        generatedAt: new Date().toISOString(),
+      },
+    });
+  }
   if (sub === 'doctor' && flags.demo) {
     // 一键 e2e 健康：自跑 demo all 并汇总（输出经临时文件，规避嵌套 stdout 怪癖）
     const selfPath = resolve(join(here, '..', 'bin', 'ccx.mjs'));

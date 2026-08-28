@@ -1,4 +1,5 @@
 #pragma once
+#include <cstdint>
 #include <string>
 #include <vector>
 
@@ -22,8 +23,16 @@ struct BoneTrack {
     std::vector<BoneKey> keys;
 };
 
+// 插槽附件（Spine skins -> region attachment -> atlas）
+struct SlotAttachment {
+    std::string slot;
+    std::string attachment;  // region 名（可空 = 无附件）
+    uint32_t atlas = 0;      // 渲染消费用（v0.1：附件名哈希 → atlas 占位）
+};
+
 struct Skeleton {
     std::vector<BoneTrack> tracks;
+    std::vector<SlotAttachment> slots;
     // 采样：t 时刻各骨骼姿态（t 越界循环；无 track 骨骼返回零姿态）
     std::vector<BonePose> sample(float t) const;
     // 骨骼姿态 -> 渲染消费（根位置 + 局部旋转的近似层级：v0.1 仅根骨）

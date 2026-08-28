@@ -74,6 +74,31 @@ bool loadSpineSkeleton(const json::Value& doc, Skeleton& out, std::string& err) 
         }
         out.tracks.push_back(std::move(track));
     }
+    // 插槽 + 附件（skins.default.<slot>.<attachment>.path -> atlas 占位哈希）
+    out.slots.clear();
+    if (const json::Value* slots = doc.find("slots"); slots && slots->kind() == json::Kind::Array) {
+        for (const auto& s : slots->asArray()) {
+            SlotAttachment sa;
+            if (const json::Value* n = s.find("name"); n && n->kind() == json::Kind::String) {
+                sa.slot = n->asString();
+            }
+            if (const json::Value* skins = doc.find("skins");
+                skins && skins->kind() == json::Kind::Object && !skins->asObject().empty()) {
+                const json::Value& def = skins->asObject().begin()->second;
+                for (const auto& [slotName, atts] : def.asObject()) {
+                    if (slotName != sa.slot) continue;
+                    if (atts.kind() != json::Kind::Object || atts.asObject().empty()) break;
+                    sa.attachment = atts.asObject().begin()->first;
+                    // v0.1：附件名稳定哈希 -> atlas 占位（真实图集索引在 M2 资源管线）
+                    uint32_t hash = 0;
+                    for (const char ch : sa.attachment) hash = hash * 31 + static_cast<uint8_t>(ch);
+                    sa.atlas = (hash % 100) + 1;
+                    break;
+                }
+            }
+            out.slots.push_back(std::move(sa));
+        }
+    }
     return true;
 }
 

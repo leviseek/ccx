@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -88,6 +88,26 @@ test('ccx build：经 daemon 的 Builder RPC', async () => {
   assert.equal(bad.status, 1);
   const out2 = JSON.parse(bad.out);
   assert.equal(out2.ok, false);
+});
+
+test('ccx cook：扫描 -> Cook -> bundle 一步全链', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ccx-cook-'));
+  try {
+    writeFileSync(join(dir, 'hero.png'), 'png-data');
+    writeFileSync(join(dir, 'map.tmx'), 'tilemap');
+    const r = runCli(['cook', '--root', dir, '--platform', 'android', '--json'], dir);
+    assert.equal(r.status, 0, r.err + r.out);
+    const out = JSON.parse(r.out);
+    assert.equal(out.ok, true);
+    assert.equal(out.scanned, 2);
+    assert.equal(out.failCount, 2, '无压缩器注册 -> texture 产物标记失败（不阻塞 bundle）');
+    assert.equal(out.bundleId, 'demo@android');
+    assert.equal(out.results.length, 2);
+    // 音频目标永远 ok
+    assert.ok(out.results.every((x) => x.parts >= 2));
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });
 
 test('scene apply：非法命令拒绝且不写坏文件', () => {

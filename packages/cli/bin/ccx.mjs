@@ -2,7 +2,9 @@
 // ccx-cli（M1：create / scene new 落地；doctor/version 保留）
 // 约定：--json 机器可读；--no-interactive 适配 CI。
 import { spawnSync } from 'node:child_process';
-import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync } from 'node:fs';
+import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
+import { cookWithCompression } from '../../asset-service/src/cook.mjs';
+import { createBundleManifest } from '../../build-service/src/bundle.mjs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { CommandBus } from '../../scene-service/src/commands.mjs';
@@ -153,6 +155,55 @@ async function main() {
     } finally {
       client.close();
     }
+  }
+
+  // —— cook --root <dir> [--platform <p>]：资产扫描 -> Cook -> bundle 一步 ——
+  if (sub === 'cook') {
+    const rootDir = flags.root ?? positional[1];
+    const platform = flags.platform ?? 'android';
+    if (!rootDir || !existsSync(rootDir)) {
+      return emit({ ok: false, error: '用法: ccx cook --root <dir> [--platform <p>]' });
+    }
+    const assets = [];
+    for (const name of readdirSync(rootDir)) {
+      const full = join(rootDir, name);
+      const st = statSync(full);
+      if (st.isFile()) {
+        assets.push({
+          uuid: await import('node:crypto').then(() => 'cook-' + name),
+          path: full,
+          sourceFormat: name.split('.').pop() ?? 'bin',
+          sizeBytes: st.size,
+        });
+      }
+    }
+    let okCount = 0;
+    let failCount = 0;
+    const results = [];
+    for (const a of assets) {
+      const r = await cookWithCompression({ uuid: a.uuid, sourceFormat: a.sourceFormat,
+                                             sizeBytes: a.sizeBytes }, platform);
+      const ok = r.artifact.parts.every((p) => p.ok !== false);
+      results.push({ uuid: a.uuid, ok, parts: r.artifact.parts.length });
+      if (ok) okCount += 1;
+      else failCount += 1;
+    }
+    const bundle = createBundleManifest({
+      project: flags.project ?? 'demo',
+      platform,
+      assets: assets.map((a) => ({ uuid: a.uuid, path: a.path })),
+      config: {},
+    });
+    return emit({
+      ok: true,
+      platform,
+      scanned: assets.length,
+      okCount,
+      failCount,
+      bundleId: bundle.buildId,
+      results,
+      note: '真实压缩器可经 registerCompressor 接入（M2 原生 worker）',
+    });
   }
 
   // —— build --platform <p> [--project <name>]：经 daemon 走 Builder RPC ——

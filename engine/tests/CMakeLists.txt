@@ -107,3 +107,10 @@ target_link_libraries(ccx_render_plan_dump PRIVATE ccx_render ccx_scene)
 add_executable(ccx_tick_test tick_test.cpp)
 target_link_libraries(ccx_tick_test PRIVATE ccx_animation ccx_ecs ccx_scene ccx_foundation)
 add_test(NAME e2e.frame_tick COMMAND ccx_tick_test)
+
+# M1：资产全链组装（scene -> material/shader 校验 -> pipeline -> 渲染计划）
+add_executable(ccx_asset_chain_test asset_chain_test.cpp)
+target_link_libraries(ccx_asset_chain_test PRIVATE ccx_render ccx_scene)
+add_test(NAME e2e.asset_chain
+         COMMAND ccx_asset_chain_test
+         WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})

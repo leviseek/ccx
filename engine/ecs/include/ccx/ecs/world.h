@@ -4,7 +4,9 @@
 #include <cstddef>
 #include <cstdint>
 #include <map>
+#include <cstdio>
 #include <tuple>
+#include <typeinfo>
 #include <utility>
 #include <vector>
 

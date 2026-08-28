@@ -135,4 +135,46 @@ void ScriptHost::setJsonFunction(const std::string& name, JsonFn fn) {
     JSValue g = JS_GetGlobalObject(ctx);
     JS_SetPropertyStr(ctx, g, name.c_str(), fnv);
     JS_FreeValue(ctx, g);
+}
+
+json::Value ScriptHost::invoke(const std::string& fnName, const std::string& jsonArgs) {
+    if (!ctx_) return json::parse("{\"ok\":false,\"error\":\"host not initialized\"}");
+    JSContext* ctx = static_cast<JSContext*>(ctx_);
+    // 参数：{...} -> 展开为调用实参（v1：单 JSON 对象参数整体传入）
+    JSValue g = JS_GetGlobalObject(ctx);
+    JSValue fnVal = JS_GetPropertyStr(ctx, g, fnName.c_str());
+    JS_FreeValue(ctx, g);
+    if (JS_IsUndefined(fnVal)) {
+        JS_FreeValue(ctx, fnVal);
+        json::Value::ObjectEntries e;
+        e.emplace_back("ok", json::Value::boolean(false));
+        e.emplace_back("error", json::Value::string("no such function: " + fnName));
+        return json::Value::object(std::move(e));
+    }
+    JSValue arg = JS_NewString(ctx, jsonArgs.c_str());
+    JSValue result = JS_Call(ctx, fnVal, JS_UNDEFINED, 1, &arg);
+    JS_FreeValue(ctx, arg);
+    JS_FreeValue(ctx, fnVal);
+    if (JS_IsException(result)) {
+        JSValue ex = JS_GetException(ctx);
+        std::string msg = "js error";
+        JSValue es = JS_IsString(ex) ? JS_DupValue(ctx, ex) : JS_ToString(ctx, ex);
+        if (JS_IsString(es)) {
+            const char* s = JS_ToCString(ctx, es);
+            msg = s ? s : "js error";
+            if (s) JS_FreeCString(ctx, s);
+        }
+        JS_FreeValue(ctx, es);
+        JS_FreeValue(ctx, ex);
+        JS_FreeValue(ctx, result);
+        json::Value::ObjectEntries e;
+        e.emplace_back("ok", json::Value::boolean(false));
+        e.emplace_back("error", json::Value::string(msg));
+        return json::Value::object(std::move(e));
+    }
+    json::Value::ObjectEntries e;
+    e.emplace_back("ok", json::Value::boolean(true));
+    e.emplace_back("value", toJson(ctx, result));
+    JS_FreeValue(ctx, result);
+    return json::Value::object(std::move(e));
 }}  // namespace ccx::script

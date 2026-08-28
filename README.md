@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.63（2026-08-28）**：M1 W5b 第三环——**onUpdate(dt) 事件桥**（ScriptHost::invoke：C++ 调脚本全局函数（参数 JSON 字符串、错误面同构）；脚本驱动的游戏循环测试：GameLoop 5 步→每步 invoke onUpdate→脚本建实体×5+tick 计数、未定义函数明确报错——**"脚本驱动游戏"最小闭环**）；ctest 49/49 + node 96/96。
 - **v0.3.62（2026-08-28）**：M1 W5b 第二环——**脚本→引擎场景命令桥**（ScriptHost::setJsonFunction（JS 字符串→C++ 回调→JSON 结果）；CCX/eval 中调 ccxSceneCommand 驱动 C++ 迷你场景总线：create_entity/add_component/snapshot/未知实体错误——**脚本命令直达引擎数据面**）；ctest 48/48 + node 96/96。
 - **v0.3.61（2026-08-28）**：M1 W5b 第一环——**宿主函数接入**（ScriptHost::setHostFunction：HostFn 数值快速路径 + JS_NewCFunctionMagic(generic_magic) 全局注册；脚本调用断言 hostScale(21)+hostSum(1,2,3)=48；调试三连：cproto 调用约定（generic vs generic_magic）、JS_SetProperty 所有权转移、magic 越界防护）；ctest 47/47 + node 96/96。
 - **v0.3.60（2026-08-28）**：M1 W5a 突破——**QuickJS 嵌入编译冒烟**（engine/script：ScriptHost（Runtime/Context/eval 错误面/跨 eval 状态保真）；四段调试（enable_language(C)、venor 警告豁免、CONFIG_VERSION 兜底、异常对象转字符串提取）；ctest 47/47 + node 96/96——**脚本宿主在引擎内跑通**。

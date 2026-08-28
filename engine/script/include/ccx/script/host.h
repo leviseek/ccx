@@ -23,6 +23,9 @@ public:
     // 通用 JSON 命令面（W5b 第二环）：脚本传 JSON 字符串 -> 引擎回调返回 JSON 结果
     using JsonFn = const char* (*)(const char* jsonIn);
     void setJsonFunction(const std::string& name, JsonFn fn);
+    // 事件桥（W5b 第三环）：C++ 侧调用脚本全局函数（如 onUpdate(dt)）
+    // jsonArgs 传入；返回值与 eval 同构（ok/value 或 ok/error）
+    json::Value invoke(const std::string& fnName, const std::string& jsonArgs);
 
 private:
     void* runtime_;  // JSRuntime*

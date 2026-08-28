@@ -6,6 +6,7 @@
 #include "ccx/ecs/entity.h"
 #include "ccx/ecs/world.h"
 #include "ccx/foundation/reflection/ccx_type.h"
+#include "ccx/render/batcher.h"
 
 using namespace ccx::ecs;
 
@@ -93,6 +94,16 @@ int main() {
         std::printf("bench: 100k sprite frame advance: %.3f ms\n", dt);
         // 桌面放宽（移动 1.5ms 目标以桌面 1/2 估算）；gate 记录数据供移动端对照
         check(dt < 6.0, "10 万精灵帧推进 < 6 ms (desktop, 移动目标 1.5ms 待真机)");
+    }
+
+    // —— 5) 10 万精灵渲染合批（同图集同材质 = 1 批；renderer-spec §5/§6）——
+    {
+        std::vector<ccx::render::SpriteInst> sprites(100000, {1, 1});
+        const auto t0 = std::chrono::steady_clock::now();
+        const auto batches = ccx::render::buildBatches(sprites);
+        const double dt = msSince(t0);
+        std::printf("bench: 100k same-key batch: %zu batch(es) in %.3f ms\n", batches.size(), dt);
+        check(batches.size() == 1, "10 万同键精灵 = 1 批 (renderer gate)");
     }
 
     if (g_fail == 0) { std::printf("ALL BENCH GATES PASSED\n"); return 0; }

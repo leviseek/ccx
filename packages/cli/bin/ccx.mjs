@@ -1166,6 +1166,22 @@ async function main() {
     }
     const devices = spawnSync(adbExe, ['devices'], { encoding: 'utf8', timeout: 8000 });
     const devId = devices.status === 0 && /^([^\s]+)\s+device/m.exec(devices.stdout || '');
+    if (positional[1] === 'stats') {
+      if (!devId) return emit({ ok: false, error: '无在线设备' });
+      // 设备帧统计：logcat CCX_STATS 最新行（壳每 60 帧上报）
+      const lg = spawnSync(adbExe, ['-s', devId[1], 'logcat', '-d', '-s', 'CCX_STATS:*'],
+                           { encoding: 'utf8', timeout: 15000 });
+      const lines = (lg.stdout || '').split(/\r?\n/).filter((l) => l.includes('CCX_STATS'));
+      const last = lines[lines.length - 1];
+      const m = last && /frames=(\d+) lastMs=([\d.]+)/.exec(last);
+      return emit({
+        ok: !!m,
+        device: devId[1],
+        ...(m ? { frames: Number(m[1]), lastMs: Number(m[2]),
+                 note: '设备帧统计（壳 60 帧上报；logcat CCX_STATS）' }
+             : { error: '无 CCX_STATS 日志（壳未运行或未达 60 帧）' }),
+      });
+    }
     if (positional[1] === 'push-frame') {
       const ppmPath = positional[2];
       if (!ppmPath || !existsSync(ppmPath)) {

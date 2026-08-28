@@ -23,3 +23,4 @@ add_library(ccx_shell SHARED
 target_compile_definitions(ccx_shell PRIVATE CONFIG_VERSION="1.0.0")
 target_compile_features(ccx_shell PUBLIC cxx_std_20)
 target_include_directories(ccx_shell PRIVATE ${ENGINE_INC})
+target_link_libraries(ccx_shell PRIVATE log)

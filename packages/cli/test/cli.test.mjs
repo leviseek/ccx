@@ -848,6 +848,28 @@ test('ccx device push-frame：引擎帧到设备传输链', () => {
   }
 });
 
+test('ccx device stats：设备帧统计上报', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ccx-dst-'));
+  try {
+    const st = runCli(['device', 'status', '--json'], dir);
+    const stOut = JSON.parse(st.out);
+    if (!stOut.ok || stOut.deviceCount === 0) return;  // 无设备跳过
+    // 先启动壳（若无）保证 CCX_STATS 存在
+    const adb = join(process.env.USERPROFILE || '', 'Android', 'platform-tools', 'adb.exe');
+    if (existsSync(adb)) {
+      spawnSync(adb, ['shell', 'am', 'start', '-n', 'ccx.android/.MainActivity'], { encoding: 'utf8' });
+    }
+    const r = runCli(['device', 'stats', '--json'], dir);
+    assert.equal(r.status, 0, r.err + r.out);
+    const out = JSON.parse(r.out);
+    if (!out.ok) return;  // 壳未跑够 60 帧时跳过（可选）
+    assert.ok(out.frames >= 60, '帧计数');
+    assert.ok(out.lastMs >= 0, '帧耗时');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('scene apply：非法命令拒绝且不写坏文件', () => {
   const dir = mkdtempSync(join(tmpdir(), 'ccx-apply-bad-'));
   try {

@@ -3,6 +3,8 @@
 #include <cmath>
 #include <vector>
 
+#include <android/log.h>
+
 #include <jni.h>
 #include <string>
 
@@ -124,6 +126,10 @@ Java_ccx_android_MainActivity_nativeFrameAt(JNIEnv* env, jobject, jfloat t) {
     ++gFrames;
     gLastFrameMs = std::chrono::duration<double, std::milli>(
                        std::chrono::steady_clock::now() - t0).count();
+    if (gFrames % 60 == 0) {
+        __android_log_print(ANDROID_LOG_INFO, "CCX_STATS",
+                            "frames=%llu lastMs=%.1f", gFrames, gLastFrameMs);
+    }
     return out;
 }
 

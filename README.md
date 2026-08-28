@@ -131,6 +131,7 @@
 
 ## 变更记录
 
+- **v0.3.19（2026-08-27）**：M1 像素与审计面——**软件光栅**（render::RasterTarget + rasterizeQuads：虚拟帧缓冲像素断言——红 quad 中心/边界、painter 序绿覆盖、旋转跳过；修复浮点边界多画格）、**daemon 审计记录**（铁律 12 服务化：scene.apply 统一留痕 {at,op,ok,detail}，失败也记录；audit.recent/clear RPC，上限 512）、**demo all 六步**（+profiler.snapshot）；ctest 35/35 + node 71/71。
 - **v0.3.18（2026-08-27）**：M1 屏幕链与采集面——**屏幕帧全链**（资产 byteSize→渲染项→packer→OrthoCamera→屏幕像素坐标，(0,0)→(368,257)/(432,193) 与平移后坐标断言）、**C++ PNG 头尺寸解析**（assets::parsePngSize：签名/IHDR/大端宽高；坏签名/短数据拒绝；IHDR→byteSize→渲染边长 E2E）、**`ccx profiler snapshot`**（临时 daemon record→snapshot→schema ccx.profile/1 输出）；ctest 34/34 + node 70/70。
 - **v0.3.17（2026-08-27）**：M1 视口与采集面——**正交相机/视口**（Mat4 正交投影 + OrthoCamera worldToScreen）、**资产注册表驱动渲染尺寸**（lookup byteSize→边长→quad 范围）、**profiler-service**（Node 帧统计环形缓冲，与 C++ FrameStats 同构 schema ccx.profile/1；daemon profiler.record/snapshot RPC）；ctest 32/32 + node 69/69。
 - **v0.3.16（2026-08-27）**：M1 渲染帧与资产面——**渲染帧全链测试**（GameLoop 固定步 20fps→Scheduler 推进→渲染项收集（含动画 UV）→packer 缓冲→metrics 如实映射 batches/drawCalls/allocBytes，2 精灵 8 顶点 1 draw）、**runtime 资产注册表**（engine/assets：句柄池、槽位复用+版本失效、load 状态、池满拒绝，4 组一次通过）、**doctor 增至 15 项检查**（+粒子/输入/帧循环/资产注册表模块）；引擎模块增至 **13 个**；ctest 30/30 + node 64/64。

@@ -180,6 +180,33 @@ test('daemon: asset.scan real directory', async () => {
   }
 });
 
+test('daemon: 审计记录（apply 统一留痕，铁律 12）', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ccx-audit-'));
+  const client = new RpcClient(process.execPath, [daemonEntry]);
+  try {
+    const sceneFile = join(dir, 's.scene.json');
+    writeFileSync(sceneFile, JSON.stringify({
+      schema: 'ccx.scene/1', meta: {},
+      entities: [{ id: 1, name: 'root', parent: null, components: [] }],
+      systems: [],
+    }));
+    const open = await client.request('scene.open', { path: sceneFile });
+    assert.equal(open.ok, true);
+    await client.request('scene.apply', { command: { op: 'create_entity', name: 'npc' } });
+    await client.request('scene.apply', { command: { op: 'nope_unknown' } });  // 失败也留痕
+    const aud = await client.request('audit.recent');
+    assert.equal(aud.count >= 2, true);
+    assert.equal(aud.entries[0].op, 'create_entity');
+    assert.equal(aud.entries[0].ok, true);
+    assert.equal(aud.entries[1].op, 'nope_unknown');
+    assert.equal(aud.entries[1].ok, false);
+    assert.ok(aud.entries[1].detail.length > 0, '失败带原因');
+  } finally {
+    client.close();
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('daemon: profiler.record/snapshot RPC', async () => {
   const client = new RpcClient(process.execPath, [daemonEntry]);
   try {

@@ -176,6 +176,11 @@ add_executable(ccx_png_size_test png_size_test.cpp)
 target_link_libraries(ccx_png_size_test PRIVATE ccx_assets)
 add_test(NAME assets.png_size COMMAND ccx_png_size_test)
 
+# M1：软件光栅（虚拟帧缓冲像素验证）
+add_executable(ccx_raster_test raster_test.cpp)
+target_link_libraries(ccx_raster_test PRIVATE ccx_render)
+add_test(NAME render.raster COMMAND ccx_raster_test)
+
 # M1：动画整合（状态机选 clip -> 精灵帧采样 -> 帧循环）
 add_executable(ccx_integrated_animation_test integrated_animation_test.cpp)
 target_link_libraries(ccx_integrated_animation_test PRIVATE ccx_animation ccx_ecs ccx_scene)

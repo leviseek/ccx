@@ -8,6 +8,7 @@ add_library(ccx_render STATIC
   src/material.cpp
   src/shader.cpp
   src/packer.cpp
+  src/raster.cpp
 )
 
 target_include_directories(ccx_render PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

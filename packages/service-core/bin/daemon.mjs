@@ -24,6 +24,13 @@ import { createDaemon } from '../src/daemon.mjs';
 
 const profile = new FrameProfile();
 
+// 审计（铁律 12：每次命令执行留痕；daemon 侧统一记录）
+const auditLog = [];
+function recordAudit(op, ok, detail = null) {
+  auditLog.push({ at: Date.now(), op, ok, detail });
+  if (auditLog.length > 512) auditLog.shift();
+}
+
 // 平台 Builder 内置注册（contributes.builder 对齐）
 const builtinBuilder = {
   platform: 'web-desktop',
@@ -64,6 +71,11 @@ function scanDir(root) {
 const services = {
   profiler: {
     record: (params = {}) => ({ ok: true, recorded: profile.recordFrameStats(params).frame }),
+    snapshot: (params = {}) => profile.snapshotJson(params.count ?? 10),
+  },
+  audit: {
+    recent: (params = {}) => ({ count: auditLog.length, entries: auditLog.slice(-(params.n ?? 20)) }),
+    clear: () => { auditLog.length = 0; return { ok: true, cleared: 0 }; },
     snapshot: (params = {}) => profile.snapshotJson(params.count ?? 10),
   },
   asset: {
@@ -123,10 +135,15 @@ const services = {
       };
     },
     apply: ({ command } = {}) => {
-      if (!scene) return { ok: false, error: '未打开场景' };
+      if (!scene) {
+        recordAudit(command?.op ?? 'apply', false, '未打开场景');
+        return { ok: false, error: '未打开场景' };
+      }
       try {
         scene.apply(command);
+        recordAudit(command?.op ?? 'apply', true);
       } catch (e) {
+        recordAudit(command?.op ?? 'apply', false, e.message);
         return { ok: false, error: e.message };
       }
       return { ok: true, entities: scene.scene.entities.size };

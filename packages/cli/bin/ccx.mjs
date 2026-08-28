@@ -264,7 +264,11 @@ async function main() {
       // 4) build
       const run = await client.request('build.run', { platform: 'web-desktop', project: 'demo-all' });
       push('build.run', { trace: run.trace ? run.trace.filter((t) => t.status === 'ok').length : 0, ok: run.ok });
-      // 5) cook（本地）
+      // 5) profiler：记录 1 演示帧 + 快照
+      await client.request('profiler.record', { frame: 1, frameTimeMs: 16.6, entities: 8 });
+      const prof = await client.request('profiler.snapshot', { count: 5 });
+      push('profiler.snapshot', { schema: prof.schema, frames: prof.frames.length, ok: true });
+      // 6) cook（本地）
       const assetsDir = resolve(join(here, '..', '..', '..', 'build', 'local', 'demo-assets'));
       mkdirSync(assetsDir, { recursive: true });
       writeFileSync(join(assetsDir, 'hero.png'), 'png');

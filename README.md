@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.154（2026-08-28）★★ W6 里程碑：真机首帧达成 ★★**——**引擎帧显示在 Android 设备屏幕**（nativeFrame 三精灵块 → Bitmap → Canvas；截图 OCR 实证；exit4 真机首帧截图达成）——W6 设备链全通；ctest 62/62 + node 120/120。
 - **v0.3.153（2026-08-28）★ W6 里程碑 ★**——**壳 App 在 Android 设备上运行**（Kotlin→Java 壳修复 ClassNotFound/SIGSEGV；截图 OCR 实证 "CCX" 显示；无 FATAL）——exit4 真机首帧的壳侧就绪；ctest 62/62 + node 120/120。
 - **v0.3.152（2026-08-28）**：W6 壳工程首建——**APK 构建链全通**（gradle assembleDebug 成功（42KB）/install Success/am start 触发；Kotlin 壳 + JNI shell.cpp）；待 debug：Shutdown SIGSEGV（JNI 生命周期——壳开发项）；ctest 62/62 + node 120/120。
 - **v0.3.151（2026-08-28）**：M2 材料终版——**发布链评估入评审包**（自检 17 材料 READY；就绪页 W6 行（环境 100%）；途中规避 read+write 截断事故（git 恢复+安全 edit））；ctest 62/62 + node 120/120。

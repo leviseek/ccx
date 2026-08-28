@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.77（2026-08-28）**：M2 首批收官——**工作包凭据表**（m2-proposal §6b：W3/W4/W5 每条附可复核验证方法；复核路径实测 5.3s 全绿）；ctest 51/51 + node 100/100。
 - **v0.3.76（2026-08-28）**：M1 push 终核——**提交链 97 commits 连续**（树干净）、**快照刷新**（100/27 files/14 模块/175 守护）；ctest 51/51 + node 100/100。
 - **v0.3.75（2026-08-28）**：M1 总页面——**ccx doctor --all 五合一**（环境 checks + 规模 summary + 交付链 demo 一页输出；含脚本宿主/QuickJS vendor 检查）；ctest 51/51 + node 100/100。
 - **v0.3.74（2026-08-28）**：M1 治理面——**脚本预算**（setBudgetMs/overBudget：单次执行耗时限额+超支标记+清除；零预算触发/恢复无告警测试）、**CI push 终审清单**（docs/working/ci-push-checklist.md：本地复核/push 后 Actions 确认/待环境项）；ctest 51/51 + node 99/99。

@@ -46,3 +46,15 @@
 - **W4 压缩**：registerCompressor 插件 + externalCompressor（spawn 任意工具）✅ + CCX_EXTERNAL_COMPRESSOR 环境变量配置接入 CLI cook ✅ —— 接 pngquant/astcenc 仅差指名工具。
 - **W5a 宿主**：v8-host-design 文档 ✅（决策点：v8 vs QuickJS 未决）—— 待决策后嵌入。
 - 剩余依赖：真 GPU（W1/W7）、渠道（W6）、编辑器 DOM 层（W2，依赖 W1 预览）。
+## 6b. 首批凭据（复核方法，2026-08-28 实况）
+
+| 工作包 | 状态 | 凭据（一条命令/一处测试可复核） |
+| --- | --- | --- |
+| W3 会话 | ✅ 交付 | ccx scene status/apply --cmd/--undo/--redo（CLI 会话面）；daemon.test.mjs：场景会话 undo/redo/status、会话版本化与 session.save/load（2 测试）；demo all 第 10 步 session.demo |
+| W4 压缩 | ✅ 接入 | cook.test.mjs：外部压缩器（spawn 接入）1 测试；CLI 端到端 CCX_EXTERNAL_COMPRESSOR 配置（cli.test.mjs 1 测试）；doctor 输出"外部压缩器配置"键 |
+| W5a 宿主 | ✅ 嵌入 | script.host（eval/错误/状态/宿主函数/预算 断言组）；QuickJS vendor 5 文件 + UPSTREAM（vendor_check 5 包） |
+| W5b 绑定 | ✅ 三环 | script.scene_bridge / script.game_loop / script.scene_api / e2e.script_to_frame（4 测试）；script_runner.test.mjs（引擎执行器双模式）；cross_script_consistency.test.mjs（脚本==daemon 对拍） |
+| W1 真 GPU | ⏳ 待环境 | 仿真全备：fake_gpu_runtime / rhi_fake / render_frame（3 测试）；五级里程碑验收标准见 m2-gate-rehearsal |
+| W6 真机 | ⏳ 待渠道 | 平台矩阵/打包链（cook PLATFORM_MATRIX + build web）本地可跑 |
+
+> 复核路径：ctest --test-dir build/local -R "script|e2e" && node --test packages/service-core/test/daemon.test.mjs packages/cli/test/cross_script_consistency.test.mjs packages/cli/test/script_runner.test.mjs（约 40s）

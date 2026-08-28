@@ -2,6 +2,7 @@
 
 #include <cstdio>
 #include <cstring>
+#include <vector>
 
 // quickjs.h 的 inline 函数在严格标志下触发 unused-parameter 警告：隔离
 #pragma GCC diagnostic push
@@ -33,6 +34,27 @@ json::Value toJson(JSContext* ctx, JSValueConst v) {
     // 复杂类型（对象/数组/函数）：序列化为类型标签
     return json::Value::string(JS_IsFunction(ctx, v) ? "function"
                               : JS_IsObject(v) ? "object" : "value");
+}
+
+// 宿主函数注册表（magic 索引）
+std::vector<ScriptHost::HostFn>& hostFns() {
+    static std::vector<ScriptHost::HostFn> fns;
+    return fns;
+}
+
+// JS -> 宿主调用适配器
+JSValue callHostFn(JSContext* ctx, JSValueConst, int argc, JSValueConst* argv, int magic) {
+    auto& fns = hostFns();
+    if (magic < 0 || magic >= static_cast<int>(fns.size())) return JS_UNDEFINED;
+    std::vector<double> args;
+    for (int i = 0; i < argc; ++i) {
+        double d = 0;
+        JS_ToFloat64(ctx, &d, argv[i]);
+        args.push_back(d);
+    }
+    const double result = fns[static_cast<size_t>(magic)](
+        args.empty() ? nullptr : args.data(), static_cast<int>(args.size()));
+    return JS_NewFloat64(ctx, result);
 }
 }  // namespace
 
@@ -75,10 +97,18 @@ json::Value ScriptHost::eval(const std::string& code) {
     return json::Value::object(std::move(e));
 }
 
-void ScriptHost::setHostFunction(const std::string& name, void* jsFn) {
-    // v1：占位（绑定生成物接入点；宿主函数注册在 W5b）
-    (void)name;
-    (void)jsFn;
+void ScriptHost::setHostFunction(const std::string& name, HostFn fn) {
+    auto& fns = hostFns();
+    if (fns.size() > 128) return;  // 防御
+    const int magic = static_cast<int>(fns.size());
+    fns.push_back(fn);
+    JSContext* ctx = static_cast<JSContext*>(ctx_);
+    JSValue fnv = JS_NewCFunctionMagic(ctx, callHostFn, name.c_str(), 0,
+                                       JS_CFUNC_generic_magic, magic);
+    JSValue g = JS_GetGlobalObject(ctx);
+    // JS_SetProperty 转移 fnv 所有权（不截图后 free）
+    JS_SetPropertyStr(ctx, g, name.c_str(), fnv);
+    JS_FreeValue(ctx, g);
 }
 
 }  // namespace ccx::script

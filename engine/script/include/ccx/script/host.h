@@ -16,8 +16,10 @@ public:
     ScriptHost& operator=(const ScriptHost&) = delete;
 
     json::Value eval(const std::string& code);
-    // 暴露宿主函数（v1：JSON 字符串捕获；绑定生成物接入点）
-    void setHostFunction(const std::string& name, void* jsFn);
+    // 宿主函数（W5b 绑定面第一环）：数值快速路径 hostFn(doubles, count) -> double
+    using HostFn = double (*)(const double* args, int argc);
+    // 注册后脚本可直接调用（如 hostScale(21) -> 42）；同名覆盖
+    void setHostFunction(const std::string& name, HostFn fn);
 
 private:
     void* runtime_;  // JSRuntime*

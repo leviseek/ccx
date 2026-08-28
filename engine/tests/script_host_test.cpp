@@ -2,8 +2,10 @@
 #include <cstdio>
 #include <string>
 
+#include "ccx/foundation/serialization/json.h"
 #include "ccx/script/host.h"
 
+using namespace ccx;
 using namespace ccx::script;
 
 namespace {
@@ -33,7 +35,6 @@ int main() {
     // 4) 错误传播
     const auto r4 = host.eval("no_such_var_xyz");
     check(r4.find("ok")->asBool() == false, "未定义变量 -> 错误");
-    std::printf("  r4 error = %s\n", r4.find("error")->asString().c_str());
     check(r4.find("error")->asString().find("ReferenceError") != std::string::npos,
           "错误消息含 ReferenceError");
     // 5) 状态保真（跨 eval 变量保留）
@@ -42,6 +43,16 @@ int main() {
     check(r5.find("ok")->asBool() && r5.find("value")->asNumber() == 15.0,
           "跨 eval 变量保留");
 
+    // 6) 宿主函数（W5b）：脚本调用 C++ 数值函数
+    host.setHostFunction("hostScale", [](const double* a, int) { return a[0] * 2.0; });
+    host.setHostFunction("hostSum", [](const double* a, int n) {
+        double s = 0;
+        for (int i = 0; i < n; ++i) s += a[i];
+        return s;
+    });
+    const auto r6 = host.eval("hostScale(21) + hostSum(1, 2, 3)");
+    check(r6.find("ok")->asBool(), "宿主函数调用成功");
+    check(r6.find("value")->asNumber() == 48.0, "42 + 6 = 48");
     if (g_failures == 0) {
         std::printf("ALL TESTS PASSED (script host)\n");
         return 0;

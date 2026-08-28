@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.150（2026-08-28）**：W6 环境 100%——**gradle 9.7.1 就绪**（手动经代理下载（scoop 下载器不走代理，与 adb 同因）；发布链环境全齐：SDK+NDK+CMake+Java+gradle+设备——缺口仅 JNI 壳工程）；ctest 62/62 + node 119/119。
 - **v0.3.149（2026-08-28）**：W6 发布链评估——**环境侧 90% 就绪**（SDK 完整（build-tools/platforms/licenses）+ NDK + CMake + Java17 + 设备；缺口仅 gradle 与 JNI 壳工程——样例链可排期，w6-release-chain.md 记录）；ctest 62/62 + node 119/119。
 - **v0.3.148（2026-08-28）**：M2 材料终版——**设备显示验证入评审包**（就绪页四链标注）；ctest 62/62 + node 119/119。
 - **v0.3.147（2026-08-28）**：W6 显示面——**设备显示链路验证**（push-frame 后 am start VIEW → 设备弹出文件打开菜单（screencap OCR 实证）——引擎帧被 Android 系统识别；真实 app 渲染属发布链后续）；ctest 62/62 + node 119/119。

@@ -9,7 +9,7 @@
 | CMake | ✅ | SDK\cmake\3.22.1（引擎 CMake 交叉编译用） |
 | 设备 | ✅ | emulator-5556（ALN-AL00）在线；ccx device 四链可用 |
 | Java | ✅ | OpenJDK 17.0.19 |
-| Gradle | ⏳ | 未装（wrapper 可经代理下载 maven 依赖） |
+| Gradle | ✅ | 9.7.1（手动下载经代理 → %USERPROFILE%\gradle；scoop 下载器不走代理故手动） |
 
 ## 样例链（Android APK）
 
@@ -21,4 +21,4 @@
 
 - Gradle/maven 下载需网络（本地代理 7897 可用）。
 - JNI 壳开发量：小（surface 渲染 + 引擎 tick 桥）。
-- 结论：**环境侧 90% 就绪，缺口仅 gradle 与壳工程**——W6-1 可排期。
+- 结论：**环境侧 100% 就绪**（2026-08-28 gradle 到位）——缺口仅 JNI 壳工程（小量开发），W6-1 可排期。

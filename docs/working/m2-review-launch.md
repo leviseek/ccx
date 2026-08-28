@@ -11,7 +11,7 @@
 | 服务/工具 | node 117/117；CLI 28+ 子命令 |
 | 验收 | W1 双后端 10/10；首批 9 + W1×2 + W7 ✅（13 张）；骨骼帧 GPU 变体 ✅ |
 | 门禁 | layered 80 文件 + vendor 6 包 |
-| 环境 | GPU ✅（RTX 4070）；网络待复测；Actions/真机（W6）待办 |
+| 环境 | GPU ✅（RTX 4070）+ 设备 ✅（ALN-AL00 模拟器）；网络待复测；Actions 待办 |
 
 ## 发起
 
@@ -24,6 +24,7 @@
 - W6 真机（Android/iOS 渠道）：adb 无设备；账号/签名待配置。
 - Actions CI 真跑：push 后确认（ci-push-checklist）。
 - 网络（webgpu.h 等上游源）：doctor --net 可查。
+
 
 
 

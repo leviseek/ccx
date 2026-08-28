@@ -13,16 +13,18 @@
 | 面 | 状态 | 入口 |
 | --- | --- | --- |
 | M1 交付链 | 18 步全 ok（帧×3 + 帧性能汇总） | ccx demo all |
-| 引擎+服务+脚本 | 62 CTest / 117 node / 199 守护 | ctest / node --test |
+| 引擎+服务+脚本 | 62 CTest / 118 node / 200 守护 | ctest / node --test |
 | 首批 9 票 + W1×2 + W7（12 张 ✅） | ✅ 已验收（13s） | node ci/verify_m2_batch1.mjs |
 | W1 五级（双后端） | ✅ 10/10（5 sim + 5 wgpu，RTX 4070） | ccx doctor --w1 |
 | 门禁 | layered 78 文件 + vendor 6 包全绿 | node ci/gates/*.mjs |
-| 环境依赖 | GPU ✅（RTX 4070）/ 网络待复测 / Actions·真机待办 | doctor --env |
+| 环境依赖 | GPU ✅（RTX 4070）/ 设备 ✅（ALN-AL00 模拟器）/ 网络待复测 / Actions 待办 | doctor --env / ccx device |
 
 ## 评审结论栏
 
 - 结论：☐ 批准 ☐ 待补（列项） ☐ 退回（列项）
 - 评审人：＿＿＿＿＿ 日期：＿＿＿＿＿
+
+
 
 
 

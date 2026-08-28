@@ -136,6 +136,60 @@ async function main() {
     });
   }
 
+  // —— demo all：端到端编排（open -> apply -> save -> build -> cook）——
+  if (sub === 'demo' && positional[1] === 'all') {
+    const steps = [];
+    const push = (name, data) => steps.push({ name, ...data, ok: !!data.ok });
+    const daemonEntry = resolve(join(here, '..', '..', 'service-core', 'bin', 'daemon.mjs'));
+    const client = new RpcClient(process.execPath, [daemonEntry]);
+    try {
+      await new Promise((resolve, reject) => {
+        const off = client.onEvent((m) => {
+          if (m.method === 'system.ready') {
+            off();
+            resolve();
+          }
+        });
+        setTimeout(() => reject(new Error('daemon 未就绪')), 2500);
+      });
+      // 1) open
+      const fixture = resolve(join(here, '..', '..', '..', 'examples', 'scenes', 'render_plan.scene.json'));
+      const open = await client.request('scene.open', { path: fixture });
+      push('scene.open', { entities: open.entities, ok: open.ok });
+      if (!open.ok) return emit({ ok: false, steps });
+      // 2) apply
+      const a1 = await client.request('scene.apply', { command: { op: 'create_entity', name: 'npc', parent: 1 } });
+      const a2 = await client.request('scene.apply', { command: { op: 'add_component', id: 2, type: 'game.Health', data: { max: 80 } } });
+      push('scene.apply', { entities: a2.entities, ok: a2.ok });
+      // 3) save
+      const savePath = resolve(join(here, '..', '..', '..', 'build', 'local', 'demo-all.scene.json'));
+      const saved = await client.request('scene.save', { path: savePath });
+      push('scene.save', { entities: saved.ok ? (await client.request('scene.query')).entities.length : -1, ok: saved.ok });
+      // 4) build
+      const run = await client.request('build.run', { platform: 'web-desktop', project: 'demo-all' });
+      push('build.run', { trace: run.trace ? run.trace.filter((t) => t.status === 'ok').length : 0, ok: run.ok });
+      // 5) cook（本地）
+      const assetsDir = resolve(join(here, '..', '..', '..', 'build', 'local', 'demo-assets'));
+      mkdirSync(assetsDir, { recursive: true });
+      writeFileSync(join(assetsDir, 'hero.png'), 'png');
+      writeFileSync(join(assetsDir, 'coin.png'), 'png');
+      const scanned = [];
+      for (const name of readdirSync(assetsDir)) {
+        const full = join(assetsDir, name);
+        scanned.push({ uuid: 'demo-' + name, path: full, sourceFormat: 'png', sizeBytes: 3 });
+      }
+      let cookOk = 0;
+      for (const a of scanned) {
+        const r2 = await cookWithCompression(a, 'android');
+        if (r2.artifact.parts.every((x) => x.ok !== false)) cookOk += 1;
+      }
+      push('cook', { scanned: scanned.length, cookOk, ok: true });
+      return emit({ ok: steps.every((s) => s.ok), steps, note: 'demo-all 端到端串起 open/apply/save/build/cook' });
+    } finally {
+      client.close();
+    }
+  }
+
   // —— service demo：spawn stdio daemon -> RPC 调用 -> 退出 ——
   if (sub === 'service' && positional[1] === 'demo') {
     const daemonEntry = resolve(join(here, '..', '..', 'service-core', 'bin', 'daemon.mjs'));

@@ -114,3 +114,8 @@ target_link_libraries(ccx_asset_chain_test PRIVATE ccx_render ccx_scene)
 add_test(NAME e2e.asset_chain
          COMMAND ccx_asset_chain_test
          WORKING_DIRECTORY ${PROJECT_SOURCE_DIR})
+
+# M1：精灵帧动画接入帧循环（Scheduler -> SpriteSampler -> 场景组件）
+add_executable(ccx_tick_sprite_anim_test tick_sprite_anim_test.cpp)
+target_link_libraries(ccx_tick_sprite_anim_test PRIVATE ccx_animation ccx_ecs ccx_scene)
+add_test(NAME e2e.sprite_anim_tick COMMAND ccx_tick_sprite_anim_test)

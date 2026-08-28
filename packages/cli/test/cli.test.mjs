@@ -110,6 +110,17 @@ test('ccx cook：扫描 -> Cook -> bundle 一步全链', () => {
   }
 });
 
+test('ccx demo all：端到端编排（open/apply/save/build/cook）', () => {
+  const r = runCli(['demo', 'all', '--json'], join(import.meta.dirname, '..'));
+  assert.equal(r.status, 0, r.err + r.out);
+  const out = JSON.parse(r.out);
+  assert.equal(out.ok, true, JSON.stringify(out.steps));
+  const names = out.steps.map((s) => s.name);
+  assert.deepEqual(names, ['scene.open', 'scene.apply', 'scene.save', 'build.run', 'cook']);
+  assert.ok(out.steps.every((s) => s.ok), '每步 ok');
+  assert.ok(out.steps[3].trace >= 5, 'hooks 走完');
+});
+
 test('scene apply：非法命令拒绝且不写坏文件', () => {
   const dir = mkdtempSync(join(tmpdir(), 'ccx-apply-bad-'));
   try {

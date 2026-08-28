@@ -117,10 +117,12 @@ test('ccx demo all：端到端编排（open/apply/save/build/cook）', () => {
   assert.equal(out.ok, true, JSON.stringify(out.steps));
   const names = out.steps.map((s) => s.name);
   assert.deepEqual(names,
-    ['scene.open', 'scene.apply', 'scene.save', 'build.run', 'profiler.snapshot', 'cook']);
+    ['scene.open', 'scene.apply', 'scene.save', 'build.run',
+     'profiler.snapshot', 'frame.gif', 'cook']);
   assert.ok(out.steps.every((s) => s.ok), '每步 ok');
   assert.ok(out.steps[3].trace >= 5, 'hooks 走完');
   assert.equal(out.steps[4].frames, 1, 'profiler 帧快照');
+  assert.equal(out.steps[5].frames, 3, 'GIF 三帧');
 });
 
 test('ccx service start/status/stop：常驻生命周期', async () => {

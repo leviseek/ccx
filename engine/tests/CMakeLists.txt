@@ -210,6 +210,11 @@ add_executable(ccx_tick_contact_test tick_contact_test.cpp)
 target_link_libraries(ccx_tick_contact_test PRIVATE ccx_physics ccx_ecs ccx_scene ccx_audio)
 add_test(NAME e2e.contact_driven COMMAND ccx_tick_contact_test)
 
+# M1：碰撞层/掩码（层过滤 + 双向判定）
+add_executable(ccx_layer_test layer_test.cpp)
+target_link_libraries(ccx_layer_test PRIVATE ccx_physics)
+add_test(NAME physics.layers COMMAND ccx_layer_test)
+
 # M1：动画整合（状态机选 clip -> 精灵帧采样 -> 帧循环）
 add_executable(ccx_integrated_animation_test integrated_animation_test.cpp)
 target_link_libraries(ccx_integrated_animation_test PRIVATE ccx_animation ccx_ecs ccx_scene)

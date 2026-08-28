@@ -3,6 +3,7 @@
 add_library(ccx_physics STATIC
   src/collision.cpp
   src/contact.cpp
+  src/body.cpp
 )
 
 target_include_directories(ccx_physics PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

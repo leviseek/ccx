@@ -299,7 +299,38 @@ async function main() {
       await client.request('profiler.record', { frame: 1, frameTimeMs: 16.6, entities: 8 });
       const prof = await client.request('profiler.snapshot', { count: 5 });
       push('profiler.snapshot', { schema: prof.schema, frames: prof.frames.length, ok: true });
-      // 6) cook（本地）
+      // 6) frame gif（渲染帧动画序列）
+      {
+        const fixture = resolve(join(here, '..', '..', '..', 'examples', 'scenes', 'render_plan.scene.json'));
+        const dumpExe = resolve(join(here, '..', '..', '..', 'build', 'local', 'engine', 'tests', 'ccx_frame_dump.exe'));
+        if (!existsSync(dumpExe)) {
+          push('frame.gif', { ok: false, error: '未构建 ccx_frame_dump' });
+          return emit({ ok: false, steps });
+        }
+        const outGif = resolve(join(here, '..', '..', '..', 'build', 'local', 'demo-anim.gif'));
+        const ppmDir = resolve(join(here, '..', '..', '..', 'build', 'local'));
+        const frameResults = [];
+        for (const t of ['0', '0.1', '0.2']) {
+          const ppm = join(ppmDir, 'demo-frame-' + t.replace('.', '_') + '.ppm');
+          const fr = spawnSync(dumpExe, [fixture, ppm, '160', '90', t], { encoding: 'utf8' });
+          if (fr.status !== 0) {
+            push('frame.gif', { ok: false, error: '帧 t=' + t + ' 失败' });
+            return emit({ ok: false, steps });
+          }
+          const { w, h, data } = parsePpm(readFileSync(ppm));
+          const pixels = new Uint8Array(w * h * 4);
+          for (let i = 0; i < w * h; ++i) {
+            pixels[i * 4] = data[i * 3];
+            pixels[i * 4 + 1] = data[i * 3 + 1];
+            pixels[i * 4 + 2] = data[i * 3 + 2];
+            pixels[i * 4 + 3] = 255;
+          }
+          frameResults.push({ w, h, pixels });
+        }
+        writeFileSync(outGif, buildGif(frameResults, { delayCs: 25 }));
+        push('frame.gif', { frames: frameResults.length, ok: true });
+      }
+      // 7) cook（本地）
       const assetsDir = resolve(join(here, '..', '..', '..', 'build', 'local', 'demo-assets'));
       mkdirSync(assetsDir, { recursive: true });
       writeFileSync(join(assetsDir, 'hero.png'), 'png');

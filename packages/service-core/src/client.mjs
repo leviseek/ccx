@@ -1,6 +1,7 @@
-// stdio 客户端（child_process 桥；RPC + 事件订阅）
+// RPC 客户端：stdio（子进程桥）或 TLS socket（M4 云构建远端 daemon）
 import { spawn } from 'node:child_process';
 import { createInterface } from 'node:readline';
+import { readFileSync } from 'node:fs';
 
 export class RpcClient {
   constructor(cmd, args, { cwd } = {}) {
@@ -11,6 +12,30 @@ export class RpcClient {
     this.rl = createInterface({ input: this.proc.stdout, crlfDelay: Infinity });
     this.rl.on('line', (line) => this.onLine(line));
     this.proc.on('exit', () => this.failAll('daemon exited'));
+  }
+
+  // M4 云构建：TLS socket 客户端（远端 daemon；token 用于握手鉴权）
+  static async tls({ host = '127.0.0.1', port, ca, servername = 'ccx', rejectUnauthorized = true }) {
+    const { connect } = await import('node:tls');
+    const client = Object.create(RpcClient.prototype);
+    client.pending = new Map();
+    client.seq = 0;
+    client.eventListeners = new Set();
+    client.proc = new Proxy({}, { get: () => () => {} });  // 占位（socket 无 stdin/kill 语义）
+    const caPem = ca ? readFileSync(ca, 'utf8') : undefined;  // ca 为文件路径 -> PEM 内容
+    const sock = connect({ host, port, ca: caPem, servername, rejectUnauthorized });
+    client.socket = sock;
+    client.rl = createInterface({ input: sock, crlfDelay: Infinity });
+    client.rl.on('line', (line) => client.onLine(line));
+    sock.on('error', () => client.failAll('tls connection error'));
+    sock.on('close', () => client.failAll('tls closed'));
+    await new Promise((res, rej) => { sock.once('secureConnect', res); sock.once('error', rej); });
+    return client;
+  }
+
+  _write(line) {
+    if (this.socket) this.socket.write(line + '\n');
+    else this.proc.stdin.write(line);
   }
 
   onLine(line) {
@@ -38,7 +63,7 @@ export class RpcClient {
     const id = ++this.seq;
     const msg = { jsonrpc: '2.0', id, method, params };
     if (token) msg.auth = { token };  // M4 远端 daemon 鉴权
-    this.proc.stdin.write(JSON.stringify(msg) + '\n');
+    this._write(JSON.stringify(msg));
     return new Promise((resolve, reject) => {
       const timer = setTimeout(() => {
         this.pending.delete(id);
@@ -49,7 +74,7 @@ export class RpcClient {
   }
 
   notify(method, params = {}) {
-    this.proc.stdin.write(JSON.stringify({ jsonrpc: '2.0', method, params }) + '\n');
+    this._write(JSON.stringify({ jsonrpc: '2.0', method, params }));
   }
 
   onEvent(fn) {
@@ -66,6 +91,10 @@ export class RpcClient {
   }
 
   close() {
+    if (this.socket) {
+      try { this.socket.end(); } catch { /* noop */ }
+      return;
+    }
     try {
       this.proc.stdin.end();
     } catch {

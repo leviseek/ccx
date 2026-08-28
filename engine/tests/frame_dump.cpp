@@ -5,7 +5,10 @@
 #include <string>
 #include <vector>
 
+#include <algorithm>
 #include <set>
+#include <vector>
+#include "ccx/gfx/rhi.h"
 #include "ccx/render/camera.h"
 #include "ccx/render/packer.h"
 #include "ccx/render/raster.h"
@@ -146,7 +149,33 @@ int main(int argc, char** argv) {
     target.clear(0x2020E8FFu);  // 深蓝底（RRGGBBAA）
     OrthoCamera cam{-static_cast<float>(W) / 2.0f, static_cast<float>(W) / 2.0f,
                     -static_cast<float>(H) / 2.0f, static_cast<float>(H) / 2.0f};
-    rasterizeQuads(pk, target, cam);
+    const bool deviceMode = argc >= 9 && std::string(argv[8]) == "1";
+    if (deviceMode) {
+        // 设备路径：缓冲上传 -> 清屏 -> 绘制提交 -> 读回（真后端替换点）
+        gfx::FakeDevice device;
+        const gfx::Handle vb = device.createBuffer(
+            {gfx::BufferDesc::Vertex, pk.vertexCount() * 24, true});
+        const gfx::Handle ib = device.createBuffer(
+            {gfx::BufferDesc::Index, pk.indexCount() * 4, false});
+        if (!device.upload(vb, pk.vertices.data(), pk.vertexCount() * 24, 0)) return 1;
+        if (!device.upload(ib, pk.indices.data(), pk.indexCount() * 4, 0)) return 1;
+        const gfx::Handle tex = device.createTexture(
+            {gfx::TextureDesc::Rgba8, static_cast<uint32_t>(W), static_cast<uint32_t>(H)});
+        device.beginFrame();
+        device.clear(tex, 0x2020E8FFu);
+        rasterizeQuads(pk, target, cam);
+        for (int y = 0; y < H; ++y) {
+            for (int x = 0; x < W; ++x) {
+                device.putPixel(tex, x, y, target.get(x, y));
+            }
+        }
+        device.submit();
+        std::vector<uint32_t> px(static_cast<size_t>(W) * H, 0);
+        if (!device.readback(tex, px.data(), px.size() * 4)) return 1;
+        std::copy(px.begin(), px.end(), target.pixels.begin());
+    } else {
+        rasterizeQuads(pk, target, cam);
+    }
     if (!writePpm(target, argv[2])) {
         std::fprintf(stderr, "write failed: %s\n", argv[2]);
         return 1;

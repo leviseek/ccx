@@ -183,7 +183,7 @@ add_test(NAME render.raster COMMAND ccx_raster_test)
 
 # 虚拟帧导出工具（非 CTest；Node 测试 spawn 后解析 PPM）
 add_executable(ccx_frame_dump frame_dump.cpp)
-target_link_libraries(ccx_frame_dump PRIVATE ccx_render ccx_scene)
+target_link_libraries(ccx_frame_dump PRIVATE ccx_gfx ccx_render ccx_scene)
 
 # M1：音频播放事件数据面
 add_executable(ccx_audio_bus_test audio_bus_test.cpp)

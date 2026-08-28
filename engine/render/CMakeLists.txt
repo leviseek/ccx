@@ -9,10 +9,11 @@ add_library(ccx_render STATIC
   src/shader.cpp
   src/packer.cpp
   src/raster.cpp
+  src/skeleton_render.cpp
 )
 
 target_include_directories(ccx_render PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
-target_link_libraries(ccx_render PUBLIC ccx_foundation)
+target_link_libraries(ccx_render PUBLIC ccx_foundation ccx_animation)
 target_compile_features(ccx_render PUBLIC cxx_std_20)
 
 if(MSVC)

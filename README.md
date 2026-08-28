@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.121（2026-08-28）**：W7 渲染消费——**骨骼→渲染桥**（render::skeletonToRenderItems：姿态采样 → RenderItem（根偏移+骨骼位置/rotZ/atlas/size）；w7.skeleton_render 测试 4 组（v0.1 语义：骨骼独立于根偏移，层级链留 v0.2）；gate render 加 animation）；ctest 58/58 + node 114/114。
 - **v0.3.120（2026-08-28）**：W7 启动——**Spine 骨骼数据面**（animation::Skeleton：骨轨+关键帧姿态插值（位置/旋转）+ 循环采样；w7.spine_skeleton 测试 4 组（中点/末端/循环/臂插值）——T-W7-1 渲染路径就绪后骨架桥可接）；ctest 57/57 + node 114/114。
 - **v0.3.119（2026-08-28）**：W1 统计链——**gpuStats 入帧导出**（frame_dump wgpu 输出 frames/uploads/bytes；demo frame.wgpu 步转存 + 断言入链；途中修复误插代码事故（edit 错位））；ctest 56/56 + node 114/114。
 - **v0.3.118（2026-08-28）**：M2 文档同步——**W1 突破入评审体系**（就绪页：双后端 10/10/16 步/56 CTest/194 守护/GPU ✅；summary/tickets 同步）；ctest 56/56 + node 114/114。

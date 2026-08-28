@@ -101,6 +101,7 @@ async function main() {
     if (args[i] === '--summary') flags.summary = true;
     if (args[i] === '--engine') flags.engine = true;
     if (args[i] === '--all') flags.all = true;
+    if (args[i] === '--net') flags.net = true;
     if (args[i] === '--js') flags.js = true;
   }
   const sub = positional[0] ?? 'doctor';
@@ -1142,6 +1143,24 @@ async function main() {
         generatedAt: new Date().toISOString(),
       },
     });
+  }
+  // —— doctor --net：W1 预备网络探测（webgpu.h / quickjs 源可达性）——
+  if (sub === 'doctor' && flags.net) {
+    const probes = [
+      { name: 'webgpu.h（W1 待复测项）',
+        url: 'https://raw.githubusercontent.com/webgpu-native/webgpu-headers/main/webgpu.h' },
+      { name: 'quickjs master 源',
+        url: 'https://raw.githubusercontent.com/bellard/quickjs/master/quickjs.c' },
+    ];
+    const results = {};
+    for (const p of probes) {
+      const r = spawnSync('curl.exe', ['-sIL', '--max-time', '12', p.url], { encoding: 'utf8' });
+      results[p.name] = {
+        reachable: r.status === 0 && /HTTP\/1\.[01] 200/.test(r.stdout || ''),
+        status: r.status,
+      };
+    }
+    return emit({ ok: true, tool: 'ccx doctor --net', probes: results });
   }
   // —— doctor --all：五合一总页 ——
   if (sub === 'doctor' && flags.all) {

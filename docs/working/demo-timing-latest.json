@@ -1,0 +1,106 @@
+{
+  "ok": true,
+  "steps": [
+    {
+      "name": "scene.open",
+      "entities": 7,
+      "ok": true,
+      "ms": 1
+    },
+    {
+      "name": "scene.apply",
+      "entities": 8,
+      "ok": true,
+      "ms": 1
+    },
+    {
+      "name": "scene.save",
+      "entities": 8,
+      "ok": true,
+      "ms": 2
+    },
+    {
+      "name": "build.run",
+      "trace": 5,
+      "ok": true,
+      "ms": 1
+    },
+    {
+      "name": "profiler.snapshot",
+      "schema": "ccx.profile/1",
+      "frames": 1,
+      "ok": true,
+      "ms": 0
+    },
+    {
+      "name": "frame.gif",
+      "frames": 3,
+      "ok": true,
+      "ms": 47
+    },
+    {
+      "name": "contact.gif",
+      "frames": 3,
+      "ok": true,
+      "ms": 41
+    },
+    {
+      "name": "mcp.tools",
+      "tools": 9,
+      "ok": true,
+      "ms": 1
+    },
+    {
+      "name": "mcp.call",
+      "textLen": 163,
+      "ok": true,
+      "ms": 0
+    },
+    {
+      "name": "session.demo",
+      "version": 6,
+      "undoWorked": true,
+      "redoWorked": true,
+      "ok": true,
+      "ms": 1
+    },
+    {
+      "name": "script.run",
+      "commands": 3,
+      "ok": true,
+      "ms": 1
+    },
+    {
+      "name": "script.engine",
+      "commands": 2,
+      "entities": 2,
+      "ok": true,
+      "ms": 8
+    },
+    {
+      "name": "status.summary",
+      "modules": 14,
+      "ctest": 51,
+      "nodeFiles": 27,
+      "ok": true,
+      "ms": 2
+    },
+    {
+      "name": "build.web",
+      "index": true,
+      "indexValidated": true,
+      "assets": 1,
+      "ok": true,
+      "ms": 1
+    },
+    {
+      "name": "cook",
+      "scanned": 2,
+      "cookOk": 0,
+      "ok": true,
+      "ms": 0
+    }
+  ],
+  "note": "demo-all 端到端串起 open/apply/save/build/cook"
+}
+

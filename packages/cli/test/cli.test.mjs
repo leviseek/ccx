@@ -630,6 +630,19 @@ test('ccx doctor --all：五合一总页', () => {
   assert.equal(out.demo.steps, 15);
 });
 
+test('ccx doctor --net：W1 网络探测（结构断言）', () => {
+  const r = runCli(['doctor', '--net', '--json'], join(import.meta.dirname, '..'));
+  assert.equal(r.status, 0, r.err + r.out);
+  const out = JSON.parse(r.out);
+  assert.equal(out.ok, true);
+  const keys = Object.keys(out.probes);
+  assert.ok(keys.some((k) => k.includes('webgpu.h')), 'webgpu 探测存在');
+  assert.ok(keys.some((k) => k.includes('quickjs')), 'quickjs 探测存在');
+  for (const k of keys) {
+    assert.ok('reachable' in out.probes[k], 'reachable 键');
+  }
+});
+
 test('scene apply：非法命令拒绝且不写坏文件', () => {
   const dir = mkdtempSync(join(tmpdir(), 'ccx-apply-bad-'));
   try {

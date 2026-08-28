@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { PLATFORM_MATRIX, compressTexture, cook, planCook } from '../src/cook.mjs';
+import { PLATFORM_MATRIX, compressTexture, cook, planCook, registerCompressor, cookWithCompression } from '../src/cook.mjs';
 
 test('PLATFORM_MATRIX：2D 平台纹理/音频目标（renderer-spec §2.3/asset-spec §4）', () => {
   assert.equal(PLATFORM_MATRIX['web-desktop'].texture, 'png');
@@ -37,6 +37,19 @@ test('compressor 接口：注册 + 调用 + 未注册报错', async () => {
   const tex = full.artifact.parts.find((x) => x.kind === 'texture');
   assert.equal(tex.ok, true);
   assert.equal(tex.bytes, 512);
+});
+
+
+test('M3 移动保底：android astc4 失败 -> etc2 降级（asset-spec §86）', async () => {
+  // astc4 压缩器失败 + etc2 成功
+  registerCompressor('astc4', async () => ({ ok: false, error: 'astcenc 缺失' }));
+  registerCompressor('etc2', async (intermediate, format) => ({ ok: true, bytes: 300, format }));
+  const r = await cookWithCompression({ uuid: 'fb-1', sourceFormat: 'png' }, 'android');
+  const tex = r.artifact.parts.find((x) => x.kind === 'texture');
+  assert.equal(tex.ok, true, '降级产物成功');
+  assert.equal(tex.format, 'etc2', '保底格式 etc2');
+  assert.equal(tex.fallback, 'astc4', '记录主选 astc4');
+  assert.equal(tex.bytes, 300);
 });
 
 

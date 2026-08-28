@@ -76,7 +76,17 @@ export async function cookWithCompression(intermediate, platformKey) {
   const parts = [];
   for (const t of plan.targets) {
     if (t.kind === 'texture') {
-      const r = await compressTexture(intermediate, t.format);
+      let r = await compressTexture(intermediate, t.format);
+      // M3 移动 pipeline 保底（asset-spec §86）：android 主选 astc 失败 -> etc2 降级
+      const FALLBACK = { astc4: 'etc2' };
+      if (!r.ok && FALLBACK[t.format]) {
+        const fb = FALLBACK[t.format];
+        r = await compressTexture(intermediate, fb);
+        if (r.ok) {
+          parts.push({ kind: 'texture', format: fb, ok: true, bytes: r.bytes ?? 0, fallback: t.format });
+          continue;
+        }
+      }
       if (!r.ok) {
         parts.push({ kind: 'texture', format: t.format, ok: false, error: r.error });
         continue;

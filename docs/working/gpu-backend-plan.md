@@ -34,3 +34,31 @@
 
 - 每个里程碑结束时跑既有 Node 像素断言（frame_ppm/diff/anim_color/contact_gif）——**把 exe 换成 GPU 后端输出 reader**（同一断言函数族）。
 - 全部通过 = exit1（"SPRITE 场景经后端输出非空帧"）完成。
+## 附录 B：W1 接口映射核对表（2026-08-28 评估）
+
+> 目的：GPU 环境到达前，把 RHI Device 契约与 wgpu-native（webgpu.h C API）逐项对齐，缩小接入时的排查面。
+
+| RHI 契约（gfx/rhi.h） | webgpu.h 候选 API | 核对 |
+| --- | --- | --- |
+| createDevice() | wgpuCreateInstance + wgpuInstanceRequestAdapter + wgpuAdapterRequestDevice | 两阶段异步 → 同步封装 |
+| createBuffer(size, usage) | wgpuDeviceCreateBuffer（WGPUBufferDescriptor） | 一一对应 |
+| createTexture(w,h,format) | wgpuDeviceCreateTexture | 对应（format 映射表） |
+| upload(buf, data, size, offset) | wgpuQueueWriteBuffer(queue, buffer, offset, data, size) | 直接对应 |
+| clear(color) | wgpuCommandEncoderBeginRenderPass（loadOp=clear） | 封装 render pass |
+| readback(buf) | wgpuQueueSubmit + 独立 readback buffer + wgpuBufferGetMappedRange | 多步（仿真已建模） |
+| beginFrame/submit | wgpuQueueSubmit + wgpuDevicePoll | 封装 |
+| putPixel（Fake only） | —（软件仿真独有） | 真后端不实现 |
+
+### 风险预判
+
+- wgpu-native 需要 d3d12/vulkan backend 运行时；CI 首选用 **lavapipe（软件 Vulkan）** 跑验收（无 GPU runner 时）。
+- 帧回读（readback）在 GPU 管线是延迟路径：五级里程碑的"像素对照"需要 readback 轮询（与仿真路径同构但异步）。
+- webgpu.h 头文件下载评估（本环境 2026-08-28 网络不可达）：**待复测项**——到达后 vendor 入 engine/platform/vendor/webgpu-headers（ADR-005）。
+
+### 五级里程碑验收细化（从"标准"到"检查项"）
+
+1. **L1 设备与缓冲**：createDevice 成功 + createBuffer/upload/readback 环回（数据一致性断言）。
+2. **L2 清屏帧**：clear 后 readback 全像素 = 目标色（16×16）。
+3. **L3 单精灵帧**：putPixel 等价路径 → 软件光栅黄金 PPM 与 GPU 帧 readback 像素级对照（差分 ≤ 容差）。
+4. **L4 全场景帧**：demo 场景（hero/pillar 等）→ 与 render_frame 仿真帧对照。
+5. **L5 帧统计**：帧耗时/上传字节进 profiler 快照（与引擎侧脚本统计同格式）。

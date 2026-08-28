@@ -99,6 +99,8 @@ async function main() {
     if (args[i] === '--demo') flags.demo = true;
     if (args[i] === '--site') flags.site = args[++i];
     if (args[i] === '--summary') flags.summary = true;
+    if (args[i] === '--engine') flags.engine = true;
+    if (args[i] === '--js') flags.js = true;
   }
   const sub = positional[0] ?? 'doctor';
 
@@ -944,7 +946,30 @@ async function main() {
     const scriptFile = positional[2];
     const out = flags.out ? resolve(flags.out) : resolve('scene.json');
     if (!scriptFile || !existsSync(scriptFile)) {
-      return emit({ ok: false, error: '用法: ccx script run <commands.ccx.js> --out <scene.json>' });
+      return emit({ ok: false, error: '用法: ccx script run <commands.ccx.js> --out <scene.json> [--engine]' });
+    }
+    // --engine：走引擎脚本执行器（QuickJS 真路径；未构建时回落 daemon）
+    if (flags.engine) {
+      const runner = resolve(join(here, '..', '..', '..', 'build', 'local', 'engine', 'tests', 'ccx_script_runner.exe'));
+      if (existsSync(runner)) {
+        const argsE = [scriptFile, out];
+        if (flags.js) argsE.push('-j');
+        const rr = spawnSync(runner, argsE, { encoding: 'utf8' });
+        if (rr.status !== 0) {
+          return emit({ ok: false, error: '引擎执行失败: ' + (rr.stderr || 'exit ' + rr.status).slice(0, 160) });
+        }
+        let meta = {};
+        try {
+          meta = JSON.parse(rr.stdout.trim());
+        } catch {
+          /* noop */
+        }
+        return emit({ ok: true, engine: 'quickjs', commands: meta.commands ?? 0,
+                      entities: meta.entities ?? 0, out });
+      }
+      // runner 缺失：回落 daemon 路径（下方）并注明
+      const fallback = true;
+      return emit({ ok: false, error: '未构建 ccx_script_runner（先 cmake --build build/local）；可去掉 --engine 走 daemon 路径' });
     }
     const lines = readFileSync(scriptFile, 'utf8').split('\n')
       .map((l) => l.trim()).filter((l) => l && !l.startsWith('#'));

@@ -592,6 +592,31 @@ test('ccx script run：命令脚本驱动场景（exit3 用户命令面）', () 
   }
 });
 
+test('ccx script run --engine：引擎执行器路径', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ccx-runcli-'));
+  try {
+    const runner = join(import.meta.dirname, '..', '..', '..', 'build', 'local', 'engine', 'tests', 'ccx_script_runner.exe');
+    if (!existsSync(runner)) return;  // 未构建则跳过
+    const script = join(dir, 's.ccx.js');
+    writeFileSync(script, [
+      JSON.stringify({ op: 'create_entity', name: 'hero' }),
+      JSON.stringify({ op: 'create_entity', name: 'npc' }),
+    ].join('\n') + '\n');
+    const out = join(dir, 'scene.json');
+    const r = runCli(['script', 'run', script, '--out', out, '--engine', '--json'], dir);
+    assert.equal(r.status, 0, r.err + r.out);
+    const parsed = JSON.parse(r.out);
+    assert.equal(parsed.ok, true);
+    assert.equal(parsed.engine, 'quickjs');
+    assert.equal(parsed.commands, 2);
+    assert.equal(parsed.entities, 2);
+    const scene = JSON.parse(readFileSync(out, 'utf8'));
+    assert.equal(scene.entities.length, 2);
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('scene apply：非法命令拒绝且不写坏文件', () => {
   const dir = mkdtempSync(join(tmpdir(), 'ccx-apply-bad-'));
   try {

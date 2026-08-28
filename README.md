@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.70（2026-08-28）**：M1 双路径面——**ccx script run --engine**（CLI 走 QuickJS 引擎执行器（未构建则明确提示回落 daemon）；测试断言 engine=quickjs/2 命令/2 实体）、**终评数字同步**（CTest 51/98/14/172）；ctest 51/51 + node 99/99。
 - **v0.3.69（2026-08-28）**：M1 引擎脚本面——**ccx_script_runner 引擎脚本执行器**（命令文件裸 JSON 行/JS 表达式双模式：QuickJS eval + 真实场景桥 + ADR-003 落盘；Node 冒烟两模式全过；路径 JSON 规整）；终评刷新（97/172/14）；ctest 51/51 + node 98/98。
 - **v0.3.68（2026-08-28）**：M1 闭环面——**脚本→引擎消费闭环**（脚本创作（2 实体+组件+transform）→ ADR-003 保存 → 装载 → packer 渲染帧等价（8 顶点/2 批/位置一致）——脚本场景可被渲染管线直接消费，一次通过）、**doctor 脚本宿主/QuickJS vendor 自检**；ctest 51/51 + node 97/97。
 - **v0.3.67（2026-08-28）**：M1 脚本链面——**demo all 十四步**（+script.run：命令脚本驱动场景入交付链）；summary/断言同步 14；ctest 50/50 + node 97/97。

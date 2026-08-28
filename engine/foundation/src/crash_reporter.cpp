@@ -72,7 +72,7 @@ const char* writeCrashDump(const char* reason) {
     std::string dir = crashDir();
 #ifdef _WIN32
     std::string acc = dir.substr(0, dir.find('/'));
-    if (!acc.empty()) { mkdir(acc.c_str()); mkdir(dir.c_str()); }
+    if (!acc.empty()) { _mkdir(acc.c_str()); _mkdir(dir.c_str()); }
 #else
     std::string acc = dir.substr(0, dir.find('/'));
     if (!acc.empty()) { mkdir(acc.c_str(), 0777); mkdir(dir.c_str(), 0777); }

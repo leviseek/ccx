@@ -131,6 +131,7 @@
 
 ## 变更记录
 
+- **v0.3.36（2026-08-27）**：M1 文档与自检面——**六模块 README**（particle/input/game/assets/audio/physics：用途/API/语义/测试/依赖/M2 接入点）、**doctor 测试计数自检**（引擎模块 13 / Node 测试文件 23 / CTest 43，一键可见守护规模）；ctest 43/43 + node 86/86。
 - **v0.3.35（2026-08-27）**：M1 叙事与透传面——**demo all 八步**（+contact.gif：碰撞时序动画（--contacts 自动高亮）八步全 ok）、**CLI 校验错误透传**（scene apply --cmd Collider 非法数据 → 服务端校验错误原样上浮，CLI 17/17）；ctest 43/43 + node 86/86。
 - **v0.3.34（2026-08-27）**：M1 碰撞时序面——**frame_dump --contacts 自动接触高亮**（曲线应用到节点变换→正式 runCollisionSim→接触对白块；vs 手动列表）、**碰撞时序动画断言**（hero 曲线 x0→140 撞 pillar：t0 零白、t2 白块>400px，GIF 同源可生成）；ctest 43/43 + node 85/85。
 - **v0.3.33（2026-08-27）**：M1 写路径校验面——**component 数据校验**（CommandBus.validateComponentData：Collider hx/hy 非负数字、layer/mask 整数范围内；非法即拒，未知组件原样放行，测试 7/7 全过）、**frame gif --highlight 透传**（接触高亮进入多帧动画序列）；ctest 43/43 + node 84/84。

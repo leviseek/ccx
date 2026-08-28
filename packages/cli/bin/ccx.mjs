@@ -21,6 +21,35 @@ import { RpcClient } from '../../service-core/src/client.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 
+function countTestFilesSync(cwd) {
+  let n = 0;
+  const walk = (dir) => {
+    for (const name of readdirSync(dir)) {
+      const full = join(dir, name);
+      let st;
+      try {
+        st = statSync(full);
+      } catch {
+        continue;
+      }
+      if (st.isDirectory()) walk(full);
+      else if (name.endsWith('.test.mjs')) ++n;
+    }
+  };
+  try {
+    walk(join(cwd, 'packages'));
+  } catch {
+    /* noop */
+  }
+  return n;
+}
+
+function countAddTestSync(cwd) {
+  const cm = join(cwd, 'engine', 'tests', 'CMakeLists.txt');
+  if (!existsSync(cm)) return 0;
+  return readFileSync(cm, 'utf8').split('\n').filter((l) => l.trim().startsWith('add_test(')).length;
+}
+
 function buildDirName() {
   return resolve(join(process.cwd(), 'build', 'local'));
 }
@@ -748,6 +777,8 @@ async function main() {
       '音频模块': existsSync(join(cwd, 'engine', 'audio', 'include')),
       '引擎模块计数': readdirSync(join(cwd, 'engine'))
         .filter((n) => existsSync(join(cwd, 'engine', n, 'CMakeLists.txt'))).length,
+      'Node 测试文件数': countTestFilesSync(cwd),
+      'CTest 数（本地）': countAddTestSync(cwd),
     };
     const failed = Object.entries(checks).filter(([, v]) => v === false || v === 'missing');
     return emit({

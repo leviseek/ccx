@@ -19,11 +19,12 @@
 
 ## 终态数字
 
-- CTest 51/51 · node 109/109 · 守护 ≈185 · 测试文件 32 · 构建模块 14 · commits 121+
-- 交付链 15 步；评审材料 16/16 自检 READY；验收 9/9 票 + W1 五级 5/5（仿真）
+- CTest 62/62 · node 115/115 · 守护 ≈198 · 测试文件 32 · 构建模块 14 · commits 140+
+- 交付链 17 步（含真 GPU/骨骼帧）；评审材料 16/16 自检 READY；验收 13 张 ✅（首批 9 + W1×2 + W7）+ W1 双后端 10/10
 
 ## 申报路径
 
 1. 评审人核 m1-gate-review + m1-final-summary + m1-architecture.html（20 分钟彩排实测）。
 2. 环境项（GPU/Actions/真机）转 M2 环境就绪清单（ci-push-checklist / m2-tickets 待办）。
 3. 签核：＿＿＿＿＿ 日期：＿＿＿＿＿
+

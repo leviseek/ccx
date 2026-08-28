@@ -458,7 +458,15 @@ async function main() {
                       JSON.stringify({ schema: 'ccx.assets.index/1', platform: 'web-desktop',
                                        assets: [{ uuid: 'demo-a-1', path: 'assets/hero.png' }] },
                                       null, 2) + '\n');
-        push('build.web', { index: true, assets: 1, ok: true });
+        // 产物经校验器回读验证（下游安全消费）
+        let indexOk = false;
+        try {
+          parseAssetsIndex(readFileSync(join(siteDir, 'assets.json'), 'utf8'));
+          indexOk = true;
+        } catch {
+          indexOk = false;
+        }
+        push('build.web', { index: true, indexValidated: indexOk, assets: 1, ok: indexOk });
       }
       // 10) cook（本地）
       tick('cook');
@@ -639,10 +647,25 @@ async function main() {
           '<title>CCX ' + platform + '</title></head><body>' +
           '<div id="game"></div><script src="game.js"></script></body></html>' +
           '\n');
-        writeFileSync(
-          join(outDir, 'game.js'),
-          '// CCX web 目标骨架（M2 接运行时入口）\n' +
-          'window.__CCX = {' + platform + ': true, assets: ' + assets.length + '};\n');
+        const gameJs = [
+          '// CCX web 目标入口骨架（M2 接运行时：读索引 -> 就绪回调）',
+          'window.CCX = window.CCX || {};',
+          'window.CCX.boot = (function () {',
+          '  var assets = [];',
+          '  function loadIndex(url) {',
+          '    return fetch(url).then(function (r) { return r.json(); })',
+          '      .then(function (doc) { assets = doc.assets || []; return assets; });',
+          '  }',
+          '  function ready(cb) {',
+          '    if (document.readyState === "complete") cb();',
+          '    else window.addEventListener("load", cb);',
+          '  }',
+          '  return { loadIndex: loadIndex, ready: ready, assets: function () { return assets; } };',
+          '})();',
+          'window.CCX.platform = "' + platform + '";',
+          '',
+        ].join('\n');
+        writeFileSync(join(outDir, 'game.js'), gameJs);
       }
       return emit({
         ok: true,

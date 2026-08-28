@@ -102,6 +102,10 @@ test('ccx build --out：Web 目标静态站点装配', () => {
     assert.ok(out.out.length > 0, '输出目录');
     assert.ok(existsSync(join(dir, 'site', 'index.html')), 'index.html 生成');
     assert.ok(existsSync(join(dir, 'site', 'game.js')), 'game.js 生成');
+    const gj = readFileSync(join(dir, 'site', 'game.js'), 'utf8');
+    assert.ok(gj.includes('window.CCX.boot'), '运行时入口');
+    assert.ok(gj.includes('loadIndex'), '索引读取函数');
+    assert.ok(gj.includes('web-desktop'), '平台注入');
     const assets = JSON.parse(readFileSync(join(dir, 'site', 'assets.json'), 'utf8'));
     assert.equal(assets.schema, 'ccx.assets.index/1');
     assert.equal(assets.platform, 'web-desktop');

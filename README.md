@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.49（2026-08-27）**：M1 入口面——**game.js 运行时入口骨架**（window.CCX.boot：loadIndex（fetch 资产索引）+ ready 回调 + 平台注入——Web 目标的可解释入口形态）、**demo build.web 步产物经校验器回读**（indexValidated: true，校验入交付链）；ctest 46/46 + node 92/92。
 - **v0.3.48（2026-08-27）**：M1 站点视图面——**editor preview --site**（消费 ccx.assets.index/1 展示 Web 游戏壳：平台+资产列表；缺产物优雅降级）、**M1 终评刷新**（46/92/155、demo 十一步）；ctest 46/46 + node 92/92。
 - **v0.3.47（2026-08-27）**：M1 Web 面——**资产索引校验器**（build-service parseAssetsIndex：schema/platform/assets 条目校验，损坏即拒）、**demo all 十一步**（+build.web：index.html/game.js/assets.json 站点装配入交付链）；ctest 46/46 + node 92/92。
 - **v0.3.46（2026-08-27）**：M1 目标面——**帧链全设备化**（frame/contact gif 逐帧走 FakeDevice 上传/绘制/读回路径）、**Web 构建目标骨架**（ccx build --platform web-desktop --out：装配 index.html + game.js + ccx.assets.index/1 清单）；CLI 20/20；ctest 46/46 + node 91/91。

@@ -5,7 +5,7 @@
 ## 自检结果（ci/verify_review_package.mjs）
 
 - 材料：10/10 存在（快照/架构图/提案/预演/ticket/决策/映射/清单/索引）
-- 命令：doctor --all --verify ✅（W1 五级 + 首批 9 票）· doctor --all ✅ · demo all 15 步 ✅
+- 命令：doctor --all --verify ✅（W1 五级 + 首批 9 票 + W1×2 + W7（12 张 ✅））· doctor --all ✅ · demo all 15 步 ✅
 - 判定：**REVIEW PACKAGE READY**
 
 ## 评审现场速览
@@ -13,8 +13,8 @@
 | 面 | 状态 | 入口 |
 | --- | --- | --- |
 | M1 交付链 | 16 步全 ok（含真后端帧） | ccx demo all |
-| 引擎+服务+脚本 | 56 CTest / 114 node / 194 守护 | ctest / node --test |
-| 首批 9 票 | ✅ 已验收（13s） | node ci/verify_m2_batch1.mjs |
+| 引擎+服务+脚本 | 61 CTest / 114 node / 197 守护 | ctest / node --test |
+| 首批 9 票 + W1×2 + W7（12 张 ✅） | ✅ 已验收（13s） | node ci/verify_m2_batch1.mjs |
 | W1 五级（双后端） | ✅ 10/10（5 sim + 5 wgpu，RTX 4070） | ccx doctor --w1 |
 | 门禁 | layered 78 文件 + vendor 6 包全绿 | node ci/gates/*.mjs |
 | 环境依赖 | GPU ✅（RTX 4070）/ 网络待复测 / Actions·真机待办 | doctor --env |
@@ -23,6 +23,7 @@
 
 - 结论：☐ 批准 ☐ 待补（列项） ☐ 退回（列项）
 - 评审人：＿＿＿＿＿ 日期：＿＿＿＿＿
+
 
 
 

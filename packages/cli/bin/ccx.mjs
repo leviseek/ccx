@@ -532,7 +532,35 @@ async function main() {
           ok: undone.entities === before.entities - 1 && after.entities === before.entities,
         });
       }
-      // 10) status.summary：守护规模汇总
+      // 10) script.run：命令脚本驱动场景（exit3 用户命令面）
+      tick('script.run');
+      {
+        const scriptOut = resolve(join(here, '..', '..', '..', 'build', 'local', 'demo-script.scene.json'));
+        const tScene = join(buildDirName(), 'script-run-base.json');
+        mkdirSync(dirname(tScene), { recursive: true });
+        writeFileSync(tScene, JSON.stringify({
+          schema: 'ccx.scene/1', meta: {},
+          entities: [{ id: 1, name: 'root', parent: null, components: [] }],
+          systems: [],
+        }));
+        const open = await client.request('scene.open', { path: tScene });
+        let ok = open.ok === true;
+        const cmds = [
+          { op: 'create_entity', name: 'hero' },
+          { op: 'create_entity', name: 'npc' },
+          { op: 'add_component', id: 1, type: 'game.Health', data: { max: 100 } },
+        ];
+        for (const c of cmds) {
+          const rr = await client.request('scene.apply', { command: c });
+          if (!rr.ok) ok = false;
+        }
+        if (ok) {
+          const saved = await client.request('scene.save', { path: scriptOut });
+          ok = saved.ok === true;
+        }
+        push('script.run', { commands: cmds.length, ok });
+      }
+      // 11) status.summary：守护规模汇总
       tick('status.summary');
       {
         const root = resolve(join(here, '..', '..', '..'));
@@ -1058,7 +1086,7 @@ async function main() {
         engineModules: mods,
         ctestCount: countAddTestSync(root),
         nodeTestFiles: countTestFilesSync(root),
-        demoSteps: 12,
+        demoSteps: 14,
         generatedAt: new Date().toISOString(),
       },
     });
@@ -1178,4 +1206,5 @@ main().catch((e) => {
   console.error(e);
   process.exit(1);
 });
+
 

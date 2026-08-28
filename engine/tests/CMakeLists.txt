@@ -239,3 +239,9 @@ add_test(NAME gfx.rhi_fake COMMAND ccx_rhi_fake_test)
 add_executable(ccx_fake_gpu_frame_test fake_gpu_frame_test.cpp)
 target_link_libraries(ccx_fake_gpu_frame_test PRIVATE ccx_gfx ccx_render ccx_scene)
 add_test(NAME e2e.fake_gpu_frame COMMAND ccx_fake_gpu_frame_test)
+
+# M1：假 GPU 运行时（GameLoop -> 每帧上传/绘制/提交 -> metrics）
+add_executable(ccx_fake_gpu_runtime_test fake_gpu_runtime_test.cpp)
+target_link_libraries(ccx_fake_gpu_runtime_test PRIVATE
+  ccx_gfx ccx_render ccx_scene ccx_ecs ccx_game ccx_foundation)
+add_test(NAME e2e.fake_gpu_runtime COMMAND ccx_fake_gpu_runtime_test)

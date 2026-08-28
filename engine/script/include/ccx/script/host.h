@@ -29,12 +29,18 @@ public:
     // 引擎侧统计（profiler）：eval/invoke 总次数与当次耗时（毫秒）
     uint64_t evalCount() const { return evalCount_; }
     double lastScriptMs() const { return lastScriptMs_; }
+    // 脚本预算：单次执行耗时上限（毫秒；<0 不限）。超支置 overBudget（治理告警面）
+    void setBudgetMs(double ms) { budgetMs_ = ms; }
+    bool overBudget() const { return overBudget_; }
+    void clearOverBudget() { overBudget_ = false; }
 
 private:
     void* runtime_;  // JSRuntime*
     void* ctx_;      // JSContext*
     uint64_t evalCount_ = 0;
     double lastScriptMs_ = 0.0;
+    double budgetMs_ = -1.0;
+    bool overBudget_ = false;
 };
 
 }  // namespace ccx::script

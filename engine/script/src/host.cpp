@@ -77,6 +77,7 @@ json::Value ScriptHost::eval(const std::string& code) {
     ++evalCount_;
     lastScriptMs_ = std::chrono::duration<double, std::milli>(
                         std::chrono::steady_clock::now() - t0).count();
+    if (budgetMs_ >= 0.0 && lastScriptMs_ > budgetMs_) overBudget_ = true;
     if (JS_IsException(result)) {
         JSValue ex = JS_GetException(ctx);
         std::string msg = "js error";
@@ -185,6 +186,7 @@ json::Value ScriptHost::invoke(const std::string& fnName, const std::string& jso
     JS_FreeValue(ctx, result);
     lastScriptMs_ = std::chrono::duration<double, std::milli>(
                         std::chrono::steady_clock::now() - t0).count();
+    if (budgetMs_ >= 0.0 && lastScriptMs_ > budgetMs_) overBudget_ = true;
     return json::Value::object(std::move(e));
 }
 

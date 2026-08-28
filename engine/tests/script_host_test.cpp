@@ -53,6 +53,16 @@ int main() {
     const auto r6 = host.eval("hostScale(21) + hostSum(1, 2, 3)");
     check(r6.find("ok")->asBool(), "宿主函数调用成功");
     check(r6.find("value")->asNumber() == 48.0, "42 + 6 = 48");
+    // 7) 脚本预算：超支标记与清除
+    host.clearOverBudget();
+    host.setBudgetMs(0.0);  // 零预算：任何执行都超支
+    host.eval("1");
+    check(host.overBudget(), "零预算触发超支标记");
+    host.setBudgetMs(-1.0);
+    host.clearOverBudget();
+    host.eval("1");
+    check(!host.overBudget(), "无预算不再超支");
+
     if (g_failures == 0) {
         std::printf("ALL TESTS PASSED (script host)\n");
         return 0;

@@ -20,6 +20,13 @@ add_executable(ccx_crash_reporter_test crash_reporter_test.cpp)
 target_link_libraries(ccx_crash_reporter_test PRIVATE ccx_foundation)
 add_test(NAME platform.crash_reporter COMMAND ccx_crash_reporter_test)
 
+# M4：纹理流送（LOD 选择 + 预算逐出）
+if(TARGET ccx_assets)
+  add_executable(ccx_asset_stream_test asset_stream_test.cpp)
+  target_link_libraries(ccx_asset_stream_test PRIVATE ccx_assets)
+  add_test(NAME assets.stream COMMAND ccx_asset_stream_test)
+endif()
+
 # M4：net sync delta 通道（encode/decode round-trip）
 if(TARGET ccx_network)
   add_executable(ccx_sync_channel_test sync_channel_test.cpp)

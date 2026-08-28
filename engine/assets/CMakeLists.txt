@@ -3,6 +3,7 @@
 add_library(ccx_assets STATIC
   src/registry.cpp
   src/parse_png.cpp
+  src/asset_stream.cpp
 )
 
 target_include_directories(ccx_assets PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

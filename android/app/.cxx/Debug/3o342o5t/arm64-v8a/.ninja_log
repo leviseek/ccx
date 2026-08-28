@@ -1,7 +1,6 @@
 # ninja log v5
-0	445	8096316198583349	CMakeFiles/ccx_shell.dir/shell.cpp.o	42ce43e2e8155a05
-448	510	8096316199227414	D:/engine/ai-ccc/android/app/build/intermediates/cxx/Debug/3o342o5t/obj/arm64-v8a/libccx_shell.so	98ad33513ef122a6
-3	493	8096318761950276	CMakeFiles/ccx_shell.dir/shell.cpp.o	42ce43e2e8155a05
-493	561	8096318762634071	D:/engine/ai-ccc/android/app/build/intermediates/cxx/Debug/3o342o5t/obj/arm64-v8a/libccx_shell.so	98ad33513ef122a6
 2	506	8096320622430395	CMakeFiles/ccx_shell.dir/shell.cpp.o	42ce43e2e8155a05
 506	580	8096320623170251	D:/engine/ai-ccc/android/app/build/intermediates/cxx/Debug/3o342o5t/obj/arm64-v8a/libccx_shell.so	98ad33513ef122a6
+3	397	8096322100049585	CMakeFiles/ccx_shell.dir/D_/engine/ai-ccc/engine/render/src/raster.cpp.o	f56377a0fdde3810
+5	537	8096322101422476	CMakeFiles/ccx_shell.dir/shell.cpp.o	348d6ff1670f0862
+537	615	8096322102211676	D:/engine/ai-ccc/android/app/build/intermediates/cxx/Debug/3o342o5t/obj/arm64-v8a/libccx_shell.so	e0338aabec818bcf

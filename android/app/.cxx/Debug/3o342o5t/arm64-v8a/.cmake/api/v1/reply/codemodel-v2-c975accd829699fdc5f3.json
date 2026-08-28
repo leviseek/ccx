@@ -39,7 +39,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "ccx_shell::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-ccx_shell-Debug-1c82ade367d0e18f5e82.json",
+					"jsonFile" : "target-ccx_shell-Debug-8927ce9a5d1cdd26dbc5.json",
 					"name" : "ccx_shell",
 					"projectIndex" : 0
 				}
@@ -49,7 +49,7 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "D:/engine/ai-ccc/android/app/.cxx/Debug/3o342o5t/x86_64",
+		"build" : "D:/engine/ai-ccc/android/app/.cxx/Debug/3o342o5t/arm64-v8a",
 		"source" : "D:/engine/ai-ccc/android/app/src/main/cpp"
 	},
 	"version" : 

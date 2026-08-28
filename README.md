@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.156（2026-08-28）**：W6 引擎面——**壳帧走引擎光栅路径**（shell 编译引擎 raster.cpp → RasterTarget 精灵帧上屏；NDK 交叉编译引擎渲染源码成功）——W6 真机帧与引擎渲染面同源；ctest 62/62 + node 120/120。
 - **v0.3.155（2026-08-28）**：W6 帧循环——**动态帧上屏**（nativeFrameAt(t) 红块圆路径 + 16ms 重绘；两间隔截图 OCR 红块位移——设备动画验证通过）；ctest 62/62 + node 120/120。
 - **v0.3.154（2026-08-28）★★ W6 里程碑：真机首帧达成 ★★**——**引擎帧显示在 Android 设备屏幕**（nativeFrame 三精灵块 → Bitmap → Canvas；截图 OCR 实证；exit4 真机首帧截图达成）——W6 设备链全通；ctest 62/62 + node 120/120。
 - **v0.3.153（2026-08-28）★ W6 里程碑 ★**——**壳 App 在 Android 设备上运行**（Kotlin→Java 壳修复 ClassNotFound/SIGSEGV；截图 OCR 实证 "CCX" 显示；无 FATAL）——exit4 真机首帧的壳侧就绪；ctest 62/62 + node 120/120。

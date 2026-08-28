@@ -16,6 +16,18 @@
 | M4 | 18–24 月 | 广度：网络同步通道、UI 工具深度、插件市场、云构建（远端 daemon）、纹理流送完善 | ① 2D 联机 demo（16 人同屏）；② 插件市场可安装第三方 builder/importer；③ 云构建公开测试 |
 | M5 | 24 月+ | 存量收割：Creator 迁移器（2D 项目）+ cc4-compat 稳定、DAM/协作评审、v1.0 发布 | ① 真实 Creator 2D 项目迁移演示通过；② 迁移器 beta 公开 |
 
+## 1b. 实施状态矩阵（2026-08-29 终检，证据 = 测试/CI/文档）
+
+| 里程碑 | 工作包 | 状态 | 证据（一条命令/文件） |
+| --- | --- | --- | --- |
+| M0 | 地基/reflection/ECS 最小/服务骨架/CI 门禁 | ✅ | ctest 22+；m0-gate-review |
+| M1 | 首帧/RHI/RenderGraph/批处理/脚本宿主/导入/模板 | ✅ | demo 19 步；ecs.bench_gate；verify_w1 双后端 10/10 |
+| M2 | 编辑器壳/面板/动画/预制体/MCP/移动端 | ✅ | 14 票；verify_editor_game（出口①）；verify_mcp_loop（出口③）；W6-1（出口② Android） |
+| M3 | 渠道插件/移动资产/GLES3 降级/pixel-art/toon/构建农场/崩溃上报/插件市场 | ✅ | channel_sdk 3 测试；cook 保底；render.caps；pixel_art/toon；crash_reporter |
+| M4 | net sync/UI 深度/远端 daemon/纹理流送/插件市场 | ✅ | sync_channel+world_sync；preview_resolution；plugin RPC；asset_stream |
+| M5 | 迁移器/cc4-compat/DAM 评审 | ✅ | creator_migrator 4 测试；m5.cc4_compat；review 3 测试 |
+| 环境缺口 | iOS 真机/渠道真机发布/真实 Creator 项目/QuickJS MSVC eval 上游限制 | ⏳ | 非本地代码可闭环（macOS/渠道账号/素材） |
+
 ## 2. 里程碑内的工作包（与文档对应）
 
 - **M0 工作包**：foundation（容器/数学/内存）、reflection+serialization、ecs 最小（World/Archetype/Query/CommandBuffer）、ADR-003 JSON round-trip、services 骨架（project/asset/scene stub + JSON-RPC + 事件）、CLI 壳（--no-interactive + --json）、CI 门禁（依赖 lint、vendor 目录、schema round-trip）。

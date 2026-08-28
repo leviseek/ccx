@@ -36,7 +36,7 @@ const commands = [
   { name: 'doctor --all', run: [node, [cli, 'doctor', '--all', '--json']],
     check: (out) => out.ok && out.checks && out.summary && out.demo },
   { name: 'demo all', run: [node, [cli, 'demo', 'all', '--json']],
-    check: (out) => out.ok && out.steps?.length === 18 },
+    check: (out) => out.ok && out.steps?.length === 19 && out.steps.every((s) => s.ok) },
 ];
 
 const cmdResults = [];

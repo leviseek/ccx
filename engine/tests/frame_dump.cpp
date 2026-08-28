@@ -24,6 +24,15 @@ Color colorFor(uint32_t atlas) {
         default: return {0.5f, 0.5f, 0.5f, 1.0f};    // 灰
     }
 }
+// 精灵帧号 -> 演示色（tint 替代贴图采样；M2 由真实纹理 UV 采样替代）
+Color frameColor(uint32_t frame) {
+    switch (frame % 4) {
+        case 0: return {1.0f, 0.0f, 0.0f, 1.0f};     // 红
+        case 1: return {0.0f, 1.0f, 0.0f, 1.0f};     // 绿
+        case 2: return {0.0f, 0.0f, 1.0f, 1.0f};     // 蓝
+        default: return {1.0f, 1.0f, 0.0f, 1.0f};    // 黄
+    }
+}
 }  // namespace
 
 int main(int argc, char** argv) {
@@ -63,7 +72,22 @@ int main(int argc, char** argv) {
         it.atlas = static_cast<uint32_t>(spr->find("atlas")->asNumber());
         it.material = static_cast<uint32_t>(spr->find("material")->asNumber());
         it.pos = scene.worldTransform(id).pos;
-        const json::Value* curve = scene.component(id, "ccx.CurveAnim");
+        // 精灵帧动画：ccx.SpriteAnimator {cols,rows,frameCount,fps,startFrame} -> 帧号 -> 色块
+    const json::Value* anim = scene.component(id, "ccx.SpriteAnimator");
+    if (anim != nullptr && anim->find("frameCount") != nullptr) {
+        const float fps = anim->find("fps") ? anim->find("fps")->asNumber() : 10.0f;
+        const uint32_t frameCount =
+            static_cast<uint32_t>(anim->find("frameCount")->asNumber());
+        uint32_t frame = 0;
+        if (fps > 0.0f && frameCount > 0) {
+            // 帧边界取整（0.1*10=0.99999 的浮点坑）
+            frame = static_cast<uint32_t>(animTime * fps + 0.5f) % frameCount;
+        }
+        it.tint = frameColor(frame);
+    } else {
+        it.tint = colorFor(it.atlas);
+    }
+    const json::Value* curve = scene.component(id, "ccx.CurveAnim");
         if (curve != nullptr) {
             const json::Value* t0 = curve->find("t0");
             const json::Value* v0 = curve->find("v0");
@@ -78,7 +102,6 @@ int main(int argc, char** argv) {
             }
         }
         it.size = 64.0f;
-        it.tint = colorFor(it.atlas);
         items.push_back(it);
     }
     const auto pk = packItems(items);

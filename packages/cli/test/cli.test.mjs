@@ -245,6 +245,37 @@ test('ccx frame dump：虚拟帧导出（CLI 入口）', () => {
   }
 });
 
+test('ccx editor preview --frame：渲染帧图嵌入', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ccx-prev-frame-'));
+  try {
+    const fixture = join(import.meta.dirname, '..', '..', '..', 'examples', 'scenes',
+                         'render_plan.scene.json');
+    const ppm = join(dir, 'f.ppm');
+    const out = join(dir, 'preview.html');
+    const r = runCli(['editor', 'preview', fixture, '--out', out, '--frame', ppm], dir);
+    // 无帧文件 -> 仍成功且不嵌入
+    assert.equal(r.status, 0, r.err + r.out);
+    assert.equal(JSON.parse(r.out).frame, null);
+    let html = readFileSync(out, 'utf8');
+    assert.ok(!html.includes('data:image/bmp'), '无帧时不嵌入');
+    // 生成帧后嵌入
+    const dumpExe = join(import.meta.dirname, '..', '..', '..', 'build', 'local',
+                         'engine', 'tests', 'ccx_frame_dump.exe');
+    if (existsSync(dumpExe)) {
+      const d = spawnSync(dumpExe, [fixture, ppm, '64', '64', '0'], { encoding: 'utf8' });
+      assert.equal(d.status, 0);
+      const r2 = runCli(['editor', 'preview', fixture, '--out', out, '--frame', ppm], dir);
+      assert.equal(r2.status, 0);
+      assert.ok(JSON.parse(r2.out).frame.length > 0, '帧已嵌入');
+      html = readFileSync(out, 'utf8');
+      assert.ok(html.includes('data:image/bmp;base64,'), 'BMP data URL 在页面');
+      assert.ok(html.includes('frame-view'), '帧视图节点');
+    }
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('scene apply：非法命令拒绝且不写坏文件', () => {
   const dir = mkdtempSync(join(tmpdir(), 'ccx-apply-bad-'));
   try {

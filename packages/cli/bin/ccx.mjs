@@ -11,6 +11,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildView } from '../../editor-shell/src/viewmodel.mjs';
 import { EditorShell } from '../../editor-shell/src/shell.mjs';
+import { ppmToBmp } from '../../editor-shell/src/ppm_to_bmp.mjs';
 import { renderPreviewPage } from '../../editor-shell/src/preview_page.mjs';
 import { CommandBus } from '../../scene-service/src/commands.mjs';
 import { diffScenes } from '../../scene-service/src/diff.mjs';
@@ -43,6 +44,7 @@ async function main() {
     if (args[i] === '--size') flags.size = args[++i];
     if (args[i] === '--time') flags.time = args[++i];
     if (args[i] === '--count') flags.count = args[++i];
+    if (args[i] === '--frame') flags.frame = args[++i];
   }
   const sub = positional[0] ?? 'doctor';
 
@@ -229,10 +231,20 @@ async function main() {
     shell.addPanel('inspector', 'right', 10);
     shell.registerCommand('scene.save', '保存场景', () => {});
     const view = buildView(shell, bus);
-    const html = renderPreviewPage(view, doc);
+    let html = renderPreviewPage(view, doc);
+    // --frame <ppm>：渲染帧图嵌入（PPM -> BMP data URL，浏览器可显示）
+    if (flags.frame && existsSync(flags.frame)) {
+      const bmp = ppmToBmp(readFileSync(flags.frame));
+      const dataUrl = 'data:image/bmp;base64,' + bmp.toString('base64');
+      html = html.replace('</footer>',
+        '<section id="frame-view"><img alt="render frame" src="' + dataUrl +
+        '" style="image-rendering:pixelated;border:1px solid #333;max-width:100%"></section>' +
+        '</footer>');
+    }
     const out = flags.out ? resolve(flags.out) : resolve('preview.html');
     writeFileSync(out, html);
-    return emit({ ok: true, out, entities: view.scene.entityCount });
+    return emit({ ok: true, out, entities: view.scene.entityCount,
+                  frame: flags.frame && existsSync(flags.frame) ? resolve(flags.frame) : null });
   }
 
   // —— demo all：端到端编排（open -> apply -> save -> build -> cook）——

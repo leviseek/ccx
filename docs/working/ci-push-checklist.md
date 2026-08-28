@@ -36,3 +36,10 @@
 - 环境：GPU ✅ + 设备 ✅ + vendor 6 包；仅 Actions CI 真跑待 push。
 - 结论：**push 就绪**——push 后按 §3 确认 Actions 三任务。
 
+
+
+## 终核记录 3（2026-08-28，v0.3.165）
+
+- 树干净（0 entries）；195 commits；GPU ✅ + 设备 ✅（全链）；仅 Actions CI 真跑待 push。
+- 结论：**push 就绪（终态）**。
+

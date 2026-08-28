@@ -131,6 +131,7 @@
 
 ## 变更记录
 
+- **v0.3.12（2026-08-27）**：M1 编辑器渲染与运维面——**最小 HTML 渲染器**（renderViewHtml：buildView→HTML 字符串产物，实体/组件/选中/命令/转义，M2 实 DOM 起点）、**M2 立项材料**（docs/working/m2-kickoff.md：7 工作包/5 exit 标准/依赖风险/Owner）、**`ccx service start/status/stop` 常驻模式**（detached+pid 文件+日志流；阶段复现并修复三个真问题：worker fork 不支持 stdio 路径、detached 下 stdin 为 ignore 事件循环空、常驻需心跳保持）；ctest 23/23 + node 62/62。
 - **v0.3.11（2026-08-27）**：M1 编辑器与差分面——**编辑器视图模型**（buildView：panel 分区/命令/快捷键/选中/场景实体组件/undo-redo 状态的无头快照，M2 Web UI 渲染层消费）、**结构化场景 diff**（diffScenes：实体/组件/字段三类变更、稳定顺序；`ccx scene diff a b` 可读摘要 + --json 机器输出——兑现 ADR-003 'Git 友好'承诺）；ctest 23/23 + node 60/60。
 - **v0.3.10（2026-08-27）**：M1 资产闭环与运维面——**atlas pack→scene atlas→render plan 闭环**（png 目录→ccx.atlas/1→Sprite 场景→1 批渲染计划，'从像素到渲染计划'单链）、**daemon EOF 优雅退出**（stdlib readline close→清理→exit 0，自终止诊断定位挂起根因：测试失败路径未 kill 残留 daemon，修复后套件 10/10）、**M1 交接清单**（docs/working/m1-handoff.md：基线 + 7 项硬缺口与归属）；ctest 23/23 + node 56/56。
 - **v0.3.9（2026-08-27）**：M1 整合与诊断面——**动画整合**（状态机选 clip→精灵帧采样→帧循环：AnimState 新增可选 sprite 字段，idle(2帧4fps)→walk(6帧10fps) 切换序列 0,0,1,1,0..5,0 断言）、**`ccx doctor` 环境体检**（11 项检查：骨架/规格/门禁/示例场景/vendor 纪律/构建产物，含修复提示）、**render plan `--out` 产物**（ccx.renderplan/1 JSON 落盘；flags 解析补齐五键）；ctest 23/23 + node 55/55。

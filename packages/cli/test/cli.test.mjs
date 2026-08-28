@@ -121,6 +121,54 @@ test('ccx demo all：端到端编排（open/apply/save/build/cook）', () => {
   assert.ok(out.steps[3].trace >= 5, 'hooks 走完');
 });
 
+test('ccx service start/status/stop：常驻生命周期', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ccx-svc-'));
+  try {
+    // 用临时 cwd 免得污染仓库 build/local
+    const start = runCli(['service', 'start'], dir);
+    assert.equal(start.status, 0, start.err + start.out);
+    const started = JSON.parse(start.out);
+    assert.equal(started.ok, true);
+    assert.ok(started.pid > 0, '拿到 pid');
+    // start 幂等拒绝
+    const again = runCli(['service', 'start'], dir);
+    assert.equal(JSON.parse(again.out).ok, false, '重复 start 拒绝');
+    // status 探测
+    const status = runCli(['service', 'status'], dir);
+    const st = JSON.parse(status.out);
+    assert.equal(st.running, true, '常驻进程存活');
+    assert.equal(st.pid, started.pid);
+    // stop
+    const stop = runCli(['service', 'stop'], dir);
+    assert.equal(JSON.parse(stop.out).ok, true);
+    // 给进程退出时间后 status 变 stale
+    const wait = spawnSync('powershell', ['-Command', 'Start-Sleep -Milliseconds 300'],
+                           { encoding: 'utf8' });
+    assert.equal(wait.status, 0);
+    const st2 = JSON.parse(runCli(['service', 'status'], dir).out);
+    assert.equal(st2.running, false, '停止后未运行');
+  } finally {
+    // 常驻 daemon 持有 cwd 句柄：先按 pid 文件强杀子树，再删临时目录
+    try {
+      const pidFile = join(dir, 'build', 'local', 'service.pid');
+      if (existsSync(pidFile)) {
+        const pid = Number(readFileSync(pidFile, 'utf8').trim());
+        if (Number.isFinite(pid) && pid > 0) {
+          spawnSync('taskkill', ['/PID', String(pid), '/F', '/T'], { encoding: 'utf8' });
+        }
+      }
+    } catch {
+      /* noop */
+    }
+    await new Promise((r) => setTimeout(r, 250));
+    try {
+      rmSync(dir, { recursive: true, force: true });
+    } catch {
+      /* Windows 句柄释放可能滞后，忽略 */
+    }
+  }
+});
+
 test('scene apply：非法命令拒绝且不写坏文件', () => {
   const dir = mkdtempSync(join(tmpdir(), 'ccx-apply-bad-'));
   try {

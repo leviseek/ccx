@@ -164,8 +164,14 @@ rl.on('line', async (line) => {
   const out = await daemon.handle(line);
   if (out) process.stdout.write(JSON.stringify(out) + '\n');
 });
-// EOF 优雅退出：先关 watchers 再 exit 0
+// 常驻模式：stdin 为 ignore 时事件循环无活动句柄，需保持（心跳不 unref）
+if (process.env.CCX_DAEMON_DETACHED) {
+  setInterval(() => {}, 60000);
+  console.error('[daemon] resident mode on');
+}
+// EOF 优雅退出：先关 watchers 再 exit 0；常驻模式（CCX_DAEMON_DETACHED）忽略 EOF
 rl.on('close', () => {
+  if (process.env.CCX_DAEMON_DETACHED) return;
   for (const w of watchers) w.close();
   watchers.length = 0;
   process.exit(0);

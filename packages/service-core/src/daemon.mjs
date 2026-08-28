@@ -52,8 +52,15 @@ export function runStdioDaemon(services) {
     const out = await daemon.handle(line);
     if (out) process.stdout.write(JSON.stringify(out) + '\n');
   });
-  // EOF 优雅退出（客户端 close -> exit 0）
-  rl.on('close', () => process.exit(0));
+  // 常驻模式（stdio 为 ignore）：事件循环无活动句柄 -> 心跳保持
+  if (process.env.CCX_DAEMON_DETACHED) {
+    setInterval(() => {}, 60000);
+  }
+  // EOF 优雅退出（客户端 close -> exit 0）；常驻模式（CCX_DAEMON_DETACHED）忽略 EOF
+  rl.on('close', () => {
+    if (process.env.CCX_DAEMON_DETACHED) return;
+    process.exit(0);
+  });
   // 就绪通知（客户端等待）
   process.stdout.write(JSON.stringify({
     jsonrpc: '2.0',

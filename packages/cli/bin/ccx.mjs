@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // ccx-cli（M1：create / scene new 落地；doctor/version 保留）
 // 约定：--json 机器可读；--no-interactive 适配 CI。
-import { spawnSync } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
+import { createWriteStream } from 'node:fs';
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
 import { buildAtlasFromDir } from '../../asset-service/src/atlas_builder.mjs';
 import { cookWithCompression } from '../../asset-service/src/cook.mjs';
@@ -14,6 +15,15 @@ import { renderPlan } from '../../scene-service/src/render_plan.mjs';
 import { RpcClient } from '../../service-core/src/client.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
+
+function isAlive(pid) {
+  try {
+    process.kill(pid, 0);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 async function main() {
   const args = process.argv.slice(2);
@@ -383,6 +393,63 @@ async function main() {
     } finally {
       client.close();
     }
+  }
+
+  // —— service start：常驻 daemon（detached + pid 文件 + 日志）——
+  if (sub === 'service' && positional[1] === 'start') {
+    const stateDir = resolve(join(process.cwd(), 'build', 'local'));
+    mkdirSync(stateDir, { recursive: true });
+    const pidFile = join(stateDir, 'service.pid');
+    const logFile = join(stateDir, 'service.log');
+    if (existsSync(pidFile)) {
+      const pid = Number(readFileSync(pidFile, 'utf8').trim());
+      if (pid && isAlive(pid)) {
+        return emit({ ok: false, error: '服务已在运行 pid=' + pid });
+      }
+    }
+    const daemonEntry = resolve(join(here, '..', '..', 'service-core', 'bin', 'daemon.mjs'));
+    // 流 + 等待 fd 就绪（路径字符串在 worker/fork 上下文不被支持）
+    const log = createWriteStream(logFile, { flags: 'a' });
+    await new Promise((res, rej) => {
+      log.once('open', res);
+      log.once('error', rej);
+    });
+    const child = spawn(process.execPath, [daemonEntry], {
+      detached: true,
+      stdio: ['ignore', log, log],
+      cwd: process.cwd(),
+      env: { ...process.env, CCX_DAEMON_DETACHED: '1' },
+    });
+    child.unref();
+    writeFileSync(pidFile, String(child.pid));
+    return emit({ ok: true, pid: child.pid, log: logFile, stateDir });
+  }
+  // —— service status：探测常驻 daemon ——
+  if (sub === 'service' && positional[1] === 'status') {
+    const pidFile = resolve(join(process.cwd(), 'build', 'local', 'service.pid'));
+    if (!existsSync(pidFile)) return emit({ ok: true, running: false, pid: null });
+    const pid = Number(readFileSync(pidFile, 'utf8').trim());
+    if (pid && isAlive(pid)) return emit({ ok: true, running: true, pid });
+    return emit({ ok: true, running: false, pid, stale: true });
+  }
+  // —— service stop：按 pid 文件停止 ——
+  if (sub === 'service' && positional[1] === 'stop') {
+    const pidFile = resolve(join(process.cwd(), 'build', 'local', 'service.pid'));
+    if (!existsSync(pidFile)) return emit({ ok: false, error: '没有 pid 文件' });
+    const pid = Number(readFileSync(pidFile, 'utf8').trim());
+    if (pid && isAlive(pid)) {
+      try {
+        process.kill(pid);
+      } catch (e) {
+        return emit({ ok: false, error: '停止失败: ' + e.message });
+      }
+    }
+    try {
+      writeFileSync(pidFile, '');
+    } catch {
+      /* noop */
+    }
+    return emit({ ok: true, stopped: pid });
   }
 
   // —— doctor / version ——

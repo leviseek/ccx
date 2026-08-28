@@ -209,6 +209,16 @@ test('ccx editor preview --apply：命令回路进预览', () => {
   }
 });
 
+test('ccx profiler snapshot：帧统计快照', () => {
+  const r = runCli(['profiler', 'snapshot', '--json'], join(import.meta.dirname, '..'));
+  assert.equal(r.status, 0, r.err + r.out);
+  const out = JSON.parse(r.out);
+  assert.equal(out.ok, true);
+  assert.equal(out.schema, 'ccx.profile/1');
+  assert.equal(out.frames.length, 3);
+  assert.deepEqual(out.frames[2], { frame: 3, ms: 17.1, ents: 3, draws: 2 });
+});
+
 test('scene apply：非法命令拒绝且不写坏文件', () => {
   const dir = mkdtempSync(join(tmpdir(), 'ccx-apply-bad-'));
   try {

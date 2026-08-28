@@ -1,6 +1,9 @@
 # assets — runtime 资产注册表（句柄池 + 失效语义；asset-spec §2 的运行时侧）
 
-add_library(ccx_assets STATIC src/registry.cpp)
+add_library(ccx_assets STATIC
+  src/registry.cpp
+  src/parse_png.cpp
+)
 
 target_include_directories(ccx_assets PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(ccx_assets PUBLIC ccx_foundation)

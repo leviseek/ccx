@@ -495,6 +495,47 @@ async function main() {
     return emit({ ok: true, stopped: pid });
   }
 
+  // —— profiler snapshot [--count N]：临时 daemon -> 帧统计快照 ——
+  if (sub === 'profiler' && positional[1] === 'snapshot') {
+    const daemonEntry = resolve(join(here, '..', '..', 'service-core', 'bin', 'daemon.mjs'));
+    const client = new RpcClient(process.execPath, [daemonEntry]);
+    try {
+      await new Promise((resolve, reject) => {
+        const off = client.onEvent((m) => {
+          if (m.method === 'system.ready') {
+            off();
+            resolve();
+          }
+        });
+        setTimeout(() => reject(new Error('daemon 未就绪')), 2500);
+      });
+      // 演示采集：记录 3 帧（真实帧数据由运行时经 profiler.record 上报）
+      const demo = [
+        { frame: 1, frameTimeMs: 16.2, entities: 2, batches: 1, drawCalls: 1, allocBytes: 256 },
+        { frame: 2, frameTimeMs: 16.8, entities: 2, batches: 1, drawCalls: 1, allocBytes: 256 },
+        { frame: 3, frameTimeMs: 17.1, entities: 3, batches: 2, drawCalls: 2, allocBytes: 512 },
+      ];
+      for (const d of demo) await client.request('profiler.record', d);
+      const snap = await client.request('profiler.snapshot',
+                                        { count: Number(flags.count) || 10 });
+      const frames = snap.frames.map((f) => ({
+        frame: f.frame,
+        ms: f.frameTimeMs,
+        ents: f.entities,
+        draws: f.drawCalls,
+      }));
+      if (jsonMode) return emit({ ok: true, schema: snap.schema, frames });
+      return emit({
+        ok: true,
+        schema: snap.schema,
+        summary: frames.map((f) =>
+          '#' + f.frame + ' ' + f.ms + 'ms ents=' + f.ents + ' draws=' + f.draws).join('\n'),
+      });
+    } finally {
+      client.close();
+    }
+  }
+
   // —— doctor / version ——
   if (sub === 'version') return emit({ ok: true, name: '@ccx/cli', version: '0.1.0', milestone: 'M1' });
   if (sub === 'doctor') {

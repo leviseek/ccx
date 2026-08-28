@@ -166,6 +166,16 @@ add_executable(ccx_asset_driven_frame_test asset_driven_frame_test.cpp)
 target_link_libraries(ccx_asset_driven_frame_test PRIVATE ccx_assets ccx_render)
 add_test(NAME assets.driven_render COMMAND ccx_asset_driven_frame_test)
 
+# M1：屏幕帧全链（资产尺寸 -> packer -> 相机 -> 屏幕坐标）
+add_executable(ccx_screen_frame_test screen_frame_test.cpp)
+target_link_libraries(ccx_screen_frame_test PRIVATE ccx_assets ccx_render)
+add_test(NAME e2e.screen_frame COMMAND ccx_screen_frame_test)
+
+# M1：PNG 尺寸解析 -> 资产注册表 E2E
+add_executable(ccx_png_size_test png_size_test.cpp)
+target_link_libraries(ccx_png_size_test PRIVATE ccx_assets)
+add_test(NAME assets.png_size COMMAND ccx_png_size_test)
+
 # M1：动画整合（状态机选 clip -> 精灵帧采样 -> 帧循环）
 add_executable(ccx_integrated_animation_test integrated_animation_test.cpp)
 target_link_libraries(ccx_integrated_animation_test PRIVATE ccx_animation ccx_ecs ccx_scene)

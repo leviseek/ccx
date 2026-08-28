@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.42（2026-08-27）**：M1 AI 接口面——**MCP 工具层**（services-spec §7 兑现：daemon mcp.listTools/callTool——9 个现有服务方法注册为工具（schema），callTool 结果以 MCP content 文本返回；真场景流程（open→apply→query）可被 AI 调用、未知工具明确报错），daemon 14/14；ctest 46/46 + node 90/90。
 - **v0.3.41（2026-08-27）**：M1 运行时帧面——**假 GPU 运行时**（GameLoop 固定步→场景→packer→动态缓冲重传→清屏/绘制/提交每 render 帧→metrics 记账：3 render 帧 3 提交、hero 移动 6 固定步后新位置像素红、旧位置蓝底——"运行时首帧"全链仿真）、**m1-handoff 基线更新**（首帧仿真写入已实现清单）；ctest 46/46 + node 87/87。
 - **v0.3.40（2026-08-27）**：M1 首帧仿真面——**假 GPU 全链端到端**（场景→渲染项→packer 缓冲→FakeDevice 上传（顶点/索引）→清屏→模拟绘制（软件光栅逐像素提交 = 真后端 draw call 的位置）→readback 像素断言：中心红/quad 外蓝底/帧提交计数——**"首帧"在无 GPU 环境的完整生产链**）；ctest 45/45 + node 87/87。
 - **v0.3.39（2026-08-27）**：M1 接口面——**RHI 抽象接口核**（engine/gfx rhi.h：Device{createBuffer/createTexture/upload/clear/readback/beginFrame/submit}——PackedVertex→缓冲、RasterTarget→clear/readback 黄金对照的契约）+ **FakeDevice 软件实现**（内存缓冲/纹理像素，无 GPU 环境 3 组契约测试一次通过）；W1 后端实现者拿到明确契约；ctest 44/44 + node 87/87。

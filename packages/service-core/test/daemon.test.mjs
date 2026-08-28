@@ -207,6 +207,62 @@ test('daemon: 审计记录（apply 统一留痕，铁律 12）', async () => {
   }
 });
 
+test('daemon: MCP 工具面（listTools/callTool）', async () => {
+  const client = new RpcClient(process.execPath, [daemonEntry]);
+  const dir = mkdtempSync(join(tmpdir(), 'ccx-mcp-'));  // try 外声明：finally 恒可见
+  try {
+    await new Promise((resolve) => {
+      const off = client.onEvent((m) => {
+        if (m.method === 'system.ready') { off(); resolve(); }
+      });
+      setTimeout(() => resolve(), 2000);
+    });
+    const tools = await client.request('mcp.listTools');
+    assert.ok(tools.tools.some((t) => t.name === 'scene.apply'), 'scene.apply 已注册');
+    assert.ok(tools.tools.some((t) => t.name === 'profiler.snapshot'), 'profiler 已注册');
+    // callTool：真场景流程
+    const sceneFile = join(dir, 's.json');
+    writeFileSync(sceneFile, JSON.stringify({
+      schema: 'ccx.scene/1', meta: {},
+      entities: [{ id: 1, name: 'root', parent: null, components: [] }],
+      systems: [],
+    }));
+    const open = await client.request('mcp.callTool',
+      { name: 'scene.open', arguments: { path: sceneFile } });
+    assert.ok(open.content[0].text.includes('"ok":true'), 'tool 调用返回结果');
+    const apply = await client.request('mcp.callTool',
+      { name: 'scene.apply', arguments: { command: { op: 'create_entity', name: 'npc' } } });
+    assert.ok(apply.content[0].text.includes('"ok":true'), 'apply 工具化');
+    const query = await client.request('mcp.callTool', { name: 'scene.query' });
+    assert.ok(query.content[0].text.includes('"npc"'), '查询结果暴露给 AI');
+    const missing = await client.request('mcp.callTool', { name: 'ghost.tool' });
+    assert.ok(missing.content[0].text.includes('工具不存在'), '未知工具明确错误');
+  } finally {
+    client.close();
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('daemon: MCP callTool 参数错误与返回格式', async () => {
+  const client = new RpcClient(process.execPath, [daemonEntry]);
+  try {
+    await new Promise((resolve) => {
+      const off = client.onEvent((m) => {
+        if (m.method === 'system.ready') { off(); resolve(); }
+      });
+      setTimeout(() => resolve(), 2000);
+    });
+    // 无场景时 query -> 服务错误也走 content 文本（工具化错误可读）
+    const q = await client.request('mcp.callTool', { name: 'scene.query' });
+    assert.ok(q.content[0].text.length > 0, '错误以文本返回');
+    // 参数结构校验：无 name -> 工具不存在
+    const bad = await client.request('mcp.callTool', {});
+    assert.ok(bad.content[0].text.includes('工具不存在'), '缺 name 明确报错');
+  } finally {
+    client.close();
+  }
+});
+
 test('daemon: profiler.record/snapshot RPC', async () => {
   const client = new RpcClient(process.execPath, [daemonEntry]);
   try {

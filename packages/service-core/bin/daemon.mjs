@@ -20,6 +20,7 @@ function listBuildersSafe() {
 }
 import { runBuild } from '../../build-service/src/pipeline.mjs';
 import { FrameProfile } from '../../profiler-service/src/adapter.mjs';
+import { dispatch } from '../src/rpc.mjs';
 import { createDaemon } from '../src/daemon.mjs';
 
 const profile = new FrameProfile();
@@ -68,7 +69,44 @@ function scanDir(root) {
   return { assets: entries };
 }
 
+// MCP 风格工具面（services-spec §7 AI/Agent 接口）：现有服务方法注册为可调用工具
+const MCP_TOOLS = [
+  { name: 'asset.list', description: '列出资产（filter 可选）',
+    inputSchema: { type: 'object', properties: { filter: { type: 'string' } } } },
+  { name: 'asset.scan', description: '扫描目录下的资产',
+    inputSchema: { type: 'object', properties: { root: { type: 'string' } } } },
+  { name: 'scene.open', description: '打开场景文件（ADR-003）',
+    inputSchema: { type: 'object', properties: { path: { type: 'string' } } } },
+  { name: 'scene.query', description: '查询当前场景实体',
+    inputSchema: { type: 'object', properties: {} } },
+  { name: 'scene.apply', description: '应用场景命令（create_entity/add_component/...）',
+    inputSchema: { type: 'object', properties: { command: { type: 'object' } } } },
+  { name: 'scene.save', description: '保存当前场景到文件',
+    inputSchema: { type: 'object', properties: { path: { type: 'string' } } } },
+  { name: 'build.run', description: '运行构建管线（hooks）',
+    inputSchema: { type: 'object', properties: { platform: { type: 'string' } } } },
+  { name: 'profiler.snapshot', description: '帧统计快照',
+    inputSchema: { type: 'object', properties: { count: { type: 'number' } } } },
+  { name: 'audit.recent', description: '最近命令审计',
+    inputSchema: { type: 'object', properties: { n: { type: 'number' } } } },
+];
+
 const services = {
+  mcp: {
+    listTools: () => ({ tools: MCP_TOOLS }),
+    callTool: async (params = {}) => {
+      const name = params.name;
+      const tool = MCP_TOOLS.find((t) => t.name === name);
+      if (!tool) {
+        return { content: [{ type: 'text', text: JSON.stringify({ error: '工具不存在: ' + name }) }] };
+      }
+      const out = await dispatch(services, { method: name, params: params.arguments ?? {} });
+      if (out.code !== undefined) {
+        return { content: [{ type: 'text', text: JSON.stringify(out) }] };
+      }
+      return { content: [{ type: 'text', text: JSON.stringify(out.result) }] };
+    },
+  },
   profiler: {
     record: (params = {}) => ({ ok: true, recorded: profile.recordFrameStats(params).frame }),
     snapshot: (params = {}) => profile.snapshotJson(params.count ?? 10),

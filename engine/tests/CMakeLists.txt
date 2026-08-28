@@ -135,6 +135,16 @@ add_executable(ccx_full_tick_test full_tick_test.cpp)
 target_link_libraries(ccx_full_tick_test PRIVATE ccx_particle ccx_input ccx_animation ccx_ecs ccx_scene ccx_foundation)
 add_test(NAME e2e.full_tick COMMAND ccx_full_tick_test)
 
+# M1：Sprite 渲染提交打包（批/顶点/索引/UV/变换/染色）
+add_executable(ccx_packer_test packer_test.cpp)
+target_link_libraries(ccx_packer_test PRIVATE ccx_render)
+add_test(NAME render.packer COMMAND ccx_packer_test)
+
+# M1：GameLoop 固定步长帧循环宿主
+add_executable(ccx_game_loop_test game_loop_test.cpp)
+target_link_libraries(ccx_game_loop_test PRIVATE ccx_game)
+add_test(NAME game.loop COMMAND ccx_game_loop_test)
+
 # M1：动画整合（状态机选 clip -> 精灵帧采样 -> 帧循环）
 add_executable(ccx_integrated_animation_test integrated_animation_test.cpp)
 target_link_libraries(ccx_integrated_animation_test PRIVATE ccx_animation ccx_ecs ccx_scene)

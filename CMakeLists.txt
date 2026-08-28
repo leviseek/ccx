@@ -16,6 +16,7 @@ option(CCX_BUILD_GFX "Build gfx (RHI) module" ON)
 option(CCX_BUILD_ANIMATION "Build animation module" ON)
 option(CCX_BUILD_PARTICLE "Build particle module" ON)
 option(CCX_BUILD_INPUT "Build input module" ON)
+option(CCX_BUILD_GAME "Build game module" ON)
 
 # 后续模块占位（M1+ 按 roadmap 打开）
 # option(CCX_BUILD_GFX "Build gfx (RHI) module" OFF)

@@ -102,6 +102,7 @@ async function main() {
     if (args[i] === '--engine') flags.engine = true;
     if (args[i] === '--all') flags.all = true;
     if (args[i] === '--net') flags.net = true;
+    if (args[i] === '--w1') flags.w1 = true;
     if (args[i] === '--js') flags.js = true;
   }
   const sub = positional[0] ?? 'doctor';
@@ -1142,6 +1143,23 @@ async function main() {
         demoSteps: 15,
         generatedAt: new Date().toISOString(),
       },
+    });
+  }
+  // —— doctor --w1：五级里程碑验收（仿真侧；GPU 到达后接真后端段）——
+  if (sub === 'doctor' && flags.w1) {
+    const verify = resolve(join(here, '..', '..', '..', 'ci', 'verify_w1_sim.mjs'));
+    const r = spawnSync(process.execPath, [verify, '--json'], { encoding: 'utf8' });
+    let data = null;
+    try {
+      data = JSON.parse(r.stdout);
+    } catch {
+      /* noop */
+    }
+    return emit({
+      ok: r.status === 0 && data?.allPassed === true,
+      tool: 'ccx doctor --w1',
+      w1: data ?? { error: 'verify 失败: ' + (r.stderr || 'exit ' + r.status).slice(0, 120) },
+      note: 'GPU/lavapipe 到达后同一骨架接真后端段（gpu-backend-plan 附录 B）',
     });
   }
   // —— doctor --net：W1 预备网络探测（webgpu.h / quickjs 源可达性）——

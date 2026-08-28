@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.84（2026-08-28）**：W1 命令面——**ccx doctor --w1**（五级里程碑验收一键（仿真侧）：ok/allPassed/gpu 标记；GPU 到达接真后端同骨架）；ctest 51/51 + node 103/103。
 - **v0.3.83（2026-08-28）**：W1 验收面——**五级里程碑验收脚本**（ci/verify_w1_sim.mjs：L1-L5 仿真验收 JSON（rhi_fake/fake_gpu_frame/render_frame/fake_gpu_runtime/script_to_frame）5/5 全过；GPU/lavapipe 到达后同骨架接真后端段；测试含 CC_CTEST 注入）；ctest 51/51 + node 102/102。
 - **v0.3.82（2026-08-28）**：M1 探测面——**ccx doctor --net**（W1 预备网络探测：webgpu.h/quickjs 源可达性（curl HEAD 200 判定）；当前环境如实回报不可达）、**demo 计时快照落库**（demo-timing-latest.json）；ctest 51/51 + node 101/101。
 - **v0.3.81（2026-08-28）**：M2 决议面——**Ticket 清单**（m2-tickets.md：三批 14 张票（首批 9 张主干已完成=验收复核态/二批 W1/W7/三批 W6），每张附验收凭据与依赖）；ctest 51/51 + node 100/100。

@@ -643,6 +643,18 @@ test('ccx doctor --net：W1 网络探测（结构断言）', () => {
   }
 });
 
+test('ccx doctor --w1：五级验收（仿真侧）', () => {
+  const r = runCli(['doctor', '--w1', '--json'], join(import.meta.dirname, '..'),
+                   { ...process.env,
+                     CC_CTEST: 'D:\\engine\\w64devkit\\bin\\ctest.exe' });
+  assert.equal(r.status, 0, r.err + r.out);
+  const out = JSON.parse(r.out);
+  assert.equal(out.ok, true);
+  assert.equal(out.w1.levels.length, 5);
+  assert.equal(out.w1.allPassed, true);
+  assert.equal(out.w1.environment.gpu, 'not-available');
+});
+
 test('scene apply：非法命令拒绝且不写坏文件', () => {
   const dir = mkdtempSync(join(tmpdir(), 'ccx-apply-bad-'));
   try {

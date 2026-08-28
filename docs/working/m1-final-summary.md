@@ -41,6 +41,7 @@
 
 ## W6 设备面（2026-08-28 补充）
 
-- ccx device status/screenshot/push-frame；壳 App 运行（Java 壳）+ 帧循环 + 引擎场景数据面（Scene→光栅→上屏）+ QuickJS 脚本驱动场景（eval=7 OCR 实证，ALN-AL00 模拟器）。
+- ccx device status/screenshot/push-frame；壳 App 运行（Java 壳）+ 帧循环 + 引擎场景数据面（Scene→光栅→上屏）+ QuickJS 脚本驱动场景（eval=7 OCR 实证）+ 帧统计（计数/耗时，ALN-AL00 模拟器）。
+
 
 

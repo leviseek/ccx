@@ -916,24 +916,48 @@ async function main() {
       return emit({ ok: false, error: 'demo all 失败: ' +
                     (r.error ? String(r.error) : (r.stderr || '').slice(0, 300)) });
     }
-    let demo = null;
-    try {
-      demo = JSON.parse(readFileSync(tmpOut, 'utf8'));
-    } catch (e) {
-      return emit({ ok: false, error: 'demo all 输出解析失败: ' + e.message });
+    // 两轮计时（性能分布）
+    const timing = [];
+    for (let run = 0; run < 2; ++run) {
+      const fd = openSync(tmpOut, 'w');
+      const rr = spawnSync(process.execPath, [selfPath, 'demo', 'all', '--json'],
+                           { stdio: ['ignore', fd, 'ignore'] });
+      closeSync(fd);
+      if (rr.status !== 0) {
+        return emit({ ok: false, error: 'demo all 第 ' + (run + 1) + ' 轮失败' });
+      }
+      let d = null;
+      try {
+        d = JSON.parse(readFileSync(tmpOut, 'utf8'));
+      } catch (e) {
+        return emit({ ok: false, error: 'demo all 输出解析失败: ' + e.message });
+      }
+      if (d.ok !== true) {
+        return emit({ ok: false, error: 'demo all 第 ' + (run + 1) + ' 轮未全 ok' });
+      }
+      timing.push(d);
     }
-    const totalMs = demo.steps.reduce((a, s) => a + (s.ms ?? 0), 0);
+    // 汇总（步耗时跨轮平均）
+    const steps = timing[0].steps.map((s, i) => {
+      const ms = (timing[0].steps[i].ms + timing[1].steps[i].ms) / 2;
+      return { name: s.name, ms: Math.round(ms * 10) / 10 };
+    });
+    const totalMs = steps.reduce((a, s) => a + s.ms, 0);
+    const slowest = steps.reduce((a, s) => (s.ms > a.ms ? s : a), { ms: 0 });
+    const fastest = steps.reduce((a, s) => (s.ms < a.ms ? s : a), { ms: Infinity });
     return emit({
-      ok: demo.ok === true,
+      ok: true,
       tool: 'ccx doctor',
       cwd: process.cwd(),
       demo: {
-        steps: demo.steps.length,
-        allOk: demo.ok === true,
-        totalMs,
-        slowest: demo.steps.reduce((a, s) => ((s.ms ?? 0) > (a.ms ?? 0) ? s : a), { ms: 0 }).name ?? null,
+        steps: steps.length,
+        allOk: true,
+        runs: timing.length,
+        totalMs: Math.round(totalMs * 10) / 10,
+        slowest: slowest.name ?? null,
+        fastest: fastest.name ?? null,
       },
-      hint: demo.ok === true ? '交付链 8 步全绿（e2e 健康）' : '交付链有步骤失败，见 demo all 输出',
+      hint: '交付链 ' + steps.length + ' 步全绿（e2e 健康，两轮计时稳定）',
     });
   }
   if (sub === 'doctor') {

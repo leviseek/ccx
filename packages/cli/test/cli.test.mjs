@@ -418,6 +418,8 @@ test('ccx doctor --demo：一键 e2e 健康', () => {
   assert.equal(out.demo.allOk, true);
   assert.ok(out.demo.totalMs > 0, '总耗时已测');
   assert.ok(out.demo.slowest.length > 0, '最慢步已标注');
+  assert.equal(out.demo.runs, 2, '两轮计时');
+  assert.ok(out.demo.fastest.length > 0, '最快步已标注');
 });
 
 test('ccx mcp：工具列表与工具调用', () => {

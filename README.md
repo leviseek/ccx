@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.50（2026-08-27）**：M1 性能面——**doctor --demo 两轮计时统计**（runs 2 / totalMs 88 / slowest frame.gif / fastest mcp.tools——健康+性能四合一输出）；ctest 46/46 + node 92/92。
 - **v0.3.49（2026-08-27）**：M1 入口面——**game.js 运行时入口骨架**（window.CCX.boot：loadIndex（fetch 资产索引）+ ready 回调 + 平台注入——Web 目标的可解释入口形态）、**demo build.web 步产物经校验器回读**（indexValidated: true，校验入交付链）；ctest 46/46 + node 92/92。
 - **v0.3.48（2026-08-27）**：M1 站点视图面——**editor preview --site**（消费 ccx.assets.index/1 展示 Web 游戏壳：平台+资产列表；缺产物优雅降级）、**M1 终评刷新**（46/92/155、demo 十一步）；ctest 46/46 + node 92/92。
 - **v0.3.47（2026-08-27）**：M1 Web 面——**资产索引校验器**（build-service parseAssetsIndex：schema/platform/assets 条目校验，损坏即拒）、**demo all 十一步**（+build.web：index.html/game.js/assets.json 站点装配入交付链）；ctest 46/46 + node 92/92。

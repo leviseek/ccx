@@ -40,6 +40,9 @@ async function main() {
     if (args[i] === '--root') flags.root = args[++i];
     if (args[i] === '--platform') flags.platform = args[++i];
     if (args[i] === '--project') flags.project = args[++i];
+    if (args[i] === '--size') flags.size = args[++i];
+    if (args[i] === '--time') flags.time = args[++i];
+    if (args[i] === '--count') flags.count = args[++i];
   }
   const sub = positional[0] ?? 'doctor';
 
@@ -497,6 +500,31 @@ async function main() {
       /* noop */
     }
     return emit({ ok: true, stopped: pid });
+  }
+
+  // —— frame dump <scene> [--out ppm] [--size WxH] [--time T]：虚拟帧导出 ——
+  if (sub === 'frame' && positional[1] === 'dump') {
+    const sceneFile = positional[2];
+    if (!sceneFile || !existsSync(sceneFile)) {
+      return emit({ ok: false, error: '用法: ccx frame dump <scene.json> [--out <ppm>] [--size 320x180] [--time 0]' });
+    }
+    const out = flags.out ? resolve(flags.out) : resolve('frame.ppm');
+    const m = /^(\d+)x(\d+)$/.exec(flags.size ?? '320x180');
+    if (!m) return emit({ ok: false, error: '--size 须为 WxH' });
+    const dumpExe = resolve(join(here, '..', '..', '..', 'build', 'local', 'engine', 'tests', 'ccx_frame_dump.exe'));
+    if (!existsSync(dumpExe)) {
+      return emit({ ok: false, error: '未构建 ccx_frame_dump（先 cmake --build build/local）' });
+    }
+    const r = spawnSync(dumpExe, [sceneFile, out, m[1], m[2], String(flags.time ?? 0)],
+                        { encoding: 'utf8' });
+    if (r.status !== 0) return emit({ ok: false, error: (r.stderr || 'frame dump 失败').trim() });
+    let meta = {};
+    try {
+      meta = JSON.parse(r.stdout.trim());
+    } catch {
+      /* noop */
+    }
+    return emit({ ok: true, out, width: Number(m[1]), height: Number(m[2]), quads: meta.quads ?? 0 });
   }
 
   // —— profiler snapshot [--count N]：临时 daemon -> 帧统计快照 ——

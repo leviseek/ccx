@@ -185,6 +185,11 @@ add_test(NAME render.raster COMMAND ccx_raster_test)
 add_executable(ccx_frame_dump frame_dump.cpp)
 target_link_libraries(ccx_frame_dump PRIVATE ccx_render ccx_scene)
 
+# M1：音频播放事件数据面
+add_executable(ccx_audio_bus_test audio_bus_test.cpp)
+target_link_libraries(ccx_audio_bus_test PRIVATE ccx_audio)
+add_test(NAME audio.bus COMMAND ccx_audio_bus_test)
+
 # M1：动画整合（状态机选 clip -> 精灵帧采样 -> 帧循环）
 add_executable(ccx_integrated_animation_test integrated_animation_test.cpp)
 target_link_libraries(ccx_integrated_animation_test PRIVATE ccx_animation ccx_ecs ccx_scene)

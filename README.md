@@ -131,6 +131,7 @@
 
 ## 变更记录
 
+- **v0.3.22（2026-08-27）**：M1 命令与媒体面——**ccx frame dump CLI**（正式入口：--out/--size/--time；flags 解析补 --size/--time/--count）、**PPM→BMP 转换**（24bit BGR 自底向上行对齐，浏览器 data URL 可显示；测试修整 rowSize/行序语义后 2 组全绿）、**音频播放事件数据面**（engine/audio：PlayEvent 队列/音量钳制/主音量/清空，3 组一次通过）；引擎模块增至 15 个；ctest 36/36 + node 76/76。
 - **v0.3.21（2026-08-27）**：M1 动态帧面——**frame_dump 时间参数 + 曲线动画采样**（ccx.CurveAnim 线性轨 pos.x：u 钳位插值）、**两帧像素质心差异断言**（t0/t1/t2 红像素质心单调位移 160→224→288，帧 diff 测试——"会动"的像素验证；途中修正视口外幅度的测试设计）；ctest 35/35 + node 73/73。
 - **v0.3.20（2026-08-27）**：M1 帧可视面——**虚拟帧导出工具**（ccx_frame_dump：场景→渲染项（atlas 映射色）→光栅→PPM 落盘 + Node 像素对拍（P6 头/尺寸/红与金 quad 像素存在/面积合理）——"看到第一帧"；途中修复 JSON 反斜杠路径转义、Transform position 组件格式、清除色字节序三处真实问题）；ctest 35/35 + node 72/72。
 - **v0.3.19（2026-08-27）**：M1 像素与审计面——**软件光栅**（render::RasterTarget + rasterizeQuads：虚拟帧缓冲像素断言）、**daemon 审计记录**（铁律 12 服务化：scene.apply 统一留痕 {at,op,ok,detail}，失败也记录；audit.recent/clear RPC，上限 512）、**demo all 六步**（+profiler.snapshot）；ctest 35/35 + node 71/71。

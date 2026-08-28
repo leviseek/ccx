@@ -221,6 +221,30 @@ test('ccx profiler snapshot：帧统计快照', () => {
   assert.deepEqual(out.frames[2], { frame: 3, ms: 17.1, ents: 3, draws: 2 });
 });
 
+test('ccx frame dump：虚拟帧导出（CLI 入口）', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ccx-frame-cli-'));
+  try {
+    const sceneFile = join(dir, 's.json');
+    writeFileSync(sceneFile, JSON.stringify({
+      schema: 'ccx.scene/1', meta: {},
+      entities: [{ id: 1, name: 'hero', parent: null,
+                   components: [{ type: 'ccx.Sprite', data: { atlas: 1, material: 1 } }] }],
+      systems: [],
+    }));
+    const out = join(dir, 'f.ppm');
+    const r = runCli(['frame', 'dump', sceneFile, '--out', out, '--size', '64x64', '--time', '0'], dir);
+    assert.equal(r.status, 0, r.err + r.out);
+    const parsed = JSON.parse(r.out);
+    assert.equal(parsed.ok, true);
+    assert.equal(parsed.quads, 1);
+    assert.equal(parsed.width, 64);
+    assert.ok(existsSync(out), 'PPM 已生成');
+    assert.equal(readFileSync(out, 'utf8').slice(0, 2), 'P6', 'P6 头');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('scene apply：非法命令拒绝且不写坏文件', () => {
   const dir = mkdtempSync(join(tmpdir(), 'ccx-apply-bad-'));
   try {

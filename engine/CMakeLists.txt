@@ -39,6 +39,10 @@ if(CCX_BUILD_ASSETS)
   add_subdirectory(assets)
 endif()
 
+if(CCX_BUILD_AUDIO)
+  add_subdirectory(audio)
+endif()
+
 # 占位模块：README 已建，CMake 随 milestone 打开（roadmap M1/M2）
 # add_subdirectory(render)
 # add_subdirectory(animation)

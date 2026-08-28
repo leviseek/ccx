@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.137（2026-08-28）**：W6 预备——**device 探测深化**（doctor --env：adb 多路径探测（PATH/scoop/SDK）+ 设备计数；安装尝试如实记录（dl.google.com DNS 不可达，待网络））；ctest 62/62 + node 117/117。
 - **v0.3.136（2026-08-28）**：demo 十八步——**profiler.frames 三源汇总**（仿真 GIF/真 GPU/骨骼帧耗时合流（217/482/50ms→749ms）——帧开销统一可见）；ctest 62/62 + node 117/117。
 - **v0.3.135（2026-08-28）**：M1→M2 交接终版——**三件数字一致终核**（handoff/completion/launch：62/116/17/13 ✅；handoff 终检注记 + completion 116 补齐——summary 唯一事实源）；ctest 62/62 + node 116/116。
 - **v0.3.134（2026-08-28）**：M2 发起终版——**评审发起正式文定稿**（13 张 ✅ + 骨骼 GPU 变体 + 62/116 数字）；ctest 62/62 + node 116/116。

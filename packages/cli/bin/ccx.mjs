@@ -1283,8 +1283,22 @@ async function main() {
     } else if (existsSync('C:\\Windows\\System32\\vulkan-1.dll')) {
       gpuDetail = 'Vulkan loader 在系统路径（vulkaninfo 缺失，无法枚举）';
     }
-    // 真机：adb 可用且有设备
-    const adbOut = probe('adb.exe', ['devices']);
+    // 真机：adb 路径探测（PATH + 常见安装位置）-> 设备枚举
+    const adbCands = [
+      'adb.exe',
+      join(process.env.USERPROFILE || 'C:\\Users\\x', 'scoop', 'shims', 'adb.exe'),
+      join(process.env.LOCALAPPDATA || '', 'Android', 'Sdk', 'platform-tools', 'adb.exe'),
+      'C:\\Program Files\\Android\\platform-tools\\adb.exe',
+    ];
+    let adbExe = null;
+    for (const cand of adbCands) {
+      if (cand === 'adb.exe' ? (probe('adb.exe', ['version']) !== null) : existsSync(cand)) {
+        adbExe = cand;
+        break;
+      }
+    }
+    let adbOut = null;
+    if (adbExe) adbOut = probe(adbExe, ['devices']);
     const deviceCount = adbOut ? (adbOut.match(/\tdevice/g) || []).length : 0;
     // Actions：环境标记
     const actions = process.env.GITHUB_ACTIONS === 'true';
@@ -1298,7 +1312,7 @@ async function main() {
       ok: true,
       tool: 'ccx doctor --env',
       gpu: { ready: gpuReady, detail: gpuDetail },
-      device: { ready: deviceCount > 0, detail: deviceCount > 0 ? deviceCount + ' 台设备在线' : '无真机（adb ' + (adbOut ? '无设备' : '不可用') + '）' },
+      device: { ready: deviceCount > 0, detail: deviceCount > 0 ? deviceCount + ' 台设备在线' : '无真机（adb ' + (adbOut ? '无设备' : '不可用' + (adbExe ? '' : '；未找到 adb（scoop install adb）')) + '）' },
       actions: { ready: actions, detail: actions ? 'CI 环境' : '本地环境（push 后 Actions 真跑）' },
       network: { ready: webgpu, detail: webgpu ? 'webgpu.h 可达' : 'webgpu.h 不可达（待复测）' },
       note: '每项 ready=false 对应 m2-tickets ⏳/⬜ 与 ci-push-checklist 环境项',

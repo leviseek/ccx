@@ -56,3 +56,9 @@
 
 - **壳帧走引擎光栅路径**：shell 编译引擎 raster.cpp（RasterTarget）→ 精灵帧上屏（帧循环）——W6 真机帧与引擎渲染面同源。
 
+
+
+## 壳接引擎场景（2026-08-28）
+
+- **场景数据面驱动帧**：壳编译 scene.cpp/schema.cpp/json.cpp（NDK）→ Scene 实体（hero/npc/coin + Sprite）→ 光栅上屏（帧循环）——真机帧与引擎场景渲染同源。
+

@@ -62,3 +62,12 @@
 3. **L3 单精灵帧**：putPixel 等价路径 → 软件光栅黄金 PPM 与 GPU 帧 readback 像素级对照（差分 ≤ 容差）。
 4. **L4 全场景帧**：demo 场景（hero/pillar 等）→ 与 render_frame 仿真帧对照。
 5. **L5 帧统计**：帧耗时/上传字节进 profiler 快照（与引擎侧脚本统计同格式）。
+
+
+## 环境就绪实测（2026-08-28）
+
+- **真 GPU 就绪**：NVIDIA GeForce RTX 4070 SUPER（Vulkan 1.4.325，vulkaninfo 枚举成功）。
+- 软件备选：SwiftShader ICD（Qoder IDE 自带 vk_swiftshader.dll + icd json）。
+- 剩余缺口：wgpu-native 库与 webgpu.h 头（需网络获取或 cargo 构建；webgpu.h 网络待复测）。
+- 验证入口：ccx doctor --env（gpu.ready=true 即此状态）。
+

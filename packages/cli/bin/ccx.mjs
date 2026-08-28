@@ -1190,9 +1190,19 @@ async function main() {
       const r = spawnSync(cmd, args, { encoding: 'utf8', timeout: 8000 });
       return r.status === 0 ? (r.stdout || '').trim() : null;
     };
-    // GPU：Vulkan loader 存在（lavapipe/wgpu 前置）
-    const vulkanDll = existsSync(process.env.SystemRoot + '\\System32\\vulkan-1.dll') ||
-                      existsSync('C:\\Windows\\System32\\vulkan-1.dll');
+    // GPU：Vulkan 运行时枚举（loader + 设备名；vulkaninfo 真枚举）
+    let gpuDetail = 'vulkan-1.dll 未找到（安装 Vulkan runtime）';
+    let gpuReady = false;
+    const vulkaninfo = resolve(process.env.SystemRoot || 'C:\\Windows', 'System32', 'vulkaninfo.exe');
+    if (existsSync(vulkaninfo)) {
+      const vi = spawnSync(vulkaninfo, ['--summary'], { encoding: 'utf8', timeout: 15000 });
+      const dev = (vi.stdout || '').match(/deviceName\s*=\s*([^\n]+)/);
+      gpuReady = vi.status === 0 && !!dev;
+      gpuDetail = gpuReady ? 'Vulkan 可用（设备：' + dev[1].trim() + '）'
+                           : 'Vulkan loader 存在但枚举失败';
+    } else if (existsSync('C:\\Windows\\System32\\vulkan-1.dll')) {
+      gpuDetail = 'Vulkan loader 在系统路径（vulkaninfo 缺失，无法枚举）';
+    }
     // 真机：adb 可用且有设备
     const adbOut = probe('adb.exe', ['devices']);
     const deviceCount = adbOut ? (adbOut.match(/\tdevice/g) || []).length : 0;
@@ -1207,7 +1217,7 @@ async function main() {
     return emit({
       ok: true,
       tool: 'ccx doctor --env',
-      gpu: { ready: vulkanDll, detail: vulkanDll ? 'Vulkan loader 在系统路径' : 'vulkan-1.dll 未找到（安装 lavapipe/Vulkan runtime）' },
+      gpu: { ready: gpuReady, detail: gpuDetail },
       device: { ready: deviceCount > 0, detail: deviceCount > 0 ? deviceCount + ' 台设备在线' : '无真机（adb ' + (adbOut ? '无设备' : '不可用') + '）' },
       actions: { ready: actions, detail: actions ? 'CI 环境' : '本地环境（push 后 Actions 真跑）' },
       network: { ready: webgpu, detail: webgpu ? 'webgpu.h 可达' : 'webgpu.h 不可达（待复测）' },

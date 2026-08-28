@@ -9,6 +9,9 @@
 #include <set>
 #include <vector>
 #include "ccx/gfx/rhi.h"
+#ifdef CCX_WGPU_BACKEND
+#include "ccx/gfx/rhi_wgpu.h"
+#endif
 #include "ccx/render/camera.h"
 #include "ccx/render/packer.h"
 #include "ccx/render/raster.h"

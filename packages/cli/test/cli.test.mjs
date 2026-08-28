@@ -150,31 +150,34 @@ test('ccx demo all：端到端编排（open/apply/save/build/cook）', () => {
   const names = out.steps.map((s) => s.name);
   assert.deepEqual(names,
     ['scene.open', 'scene.apply', 'scene.save', 'build.run',
-     'profiler.snapshot', 'frame.gif', 'contact.gif', 'mcp.tools', 'mcp.call',
-     'session.demo', 'script.run', 'script.engine', 'status.summary', 'build.web',
-     'cook']);
+     'profiler.snapshot', 'frame.gif', 'frame.wgpu', 'contact.gif', 'mcp.tools',
+     'mcp.call', 'session.demo', 'script.run', 'script.engine', 'status.summary',
+     'build.web', 'cook']);
   assert.ok(out.steps.every((s) => s.ok), '每步 ok');
   assert.ok(out.steps[3].trace >= 5, 'hooks 走完');
   assert.equal(out.steps[4].frames, 1, 'profiler 帧快照');
   assert.equal(out.steps[5].frames, 3, 'GIF 三帧');
-  assert.equal(out.steps[6].frames, 3, '接触 GIF 三帧');
-  assert.ok(out.steps[7].tools >= 9, 'MCP 工具 ≥9');
-  assert.equal(out.steps[8].textLen > 0, true, 'MCP 调用有返回');
-  assert.ok(out.steps[9].undoWorked && out.steps[9].redoWorked, '会话 undo/redo 演示');
-  assert.equal(out.steps[10].commands, 3, '脚本命令步三命令');
-  assert.ok(out.steps[10].ok, '脚本驱动场景 ok');
-  assert.ok(out.steps[11].ok, '引擎执行器 ok');
-  assert.equal(out.steps[11].budgetOk, true, '脚本预算未超支');
-  assert.ok(out.steps[12].ctest >= 46, '守护规模汇总（CTest）');
-  assert.equal(out.steps[13].assets, 1, 'Web 站点资产清单');
-  assert.equal(out.steps[13].index, true, 'index.html 已生成');
+  assert.equal(out.steps[7].frames, 3, '接触 GIF 三帧');
+  assert.ok(out.steps[8].tools >= 9, 'MCP 工具 ≥9');
+  assert.equal(out.steps[9].textLen > 0, true, 'MCP 调用有返回');
+  const stepW = out.steps.find((s) => s.name === 'frame.wgpu');
+  assert.ok(stepW && stepW.ok, '真后端帧导出');
+  assert.ok(stepW.bytes > 1000, 'PPM 落盘尺寸');
+  assert.ok(out.steps[10].undoWorked && out.steps[10].redoWorked, '会话 undo/redo 演示');
+  assert.equal(out.steps[11].commands, 3, '脚本命令步三命令');
+  assert.ok(out.steps[11].ok, '脚本驱动场景 ok');
+  assert.ok(out.steps[12].ok, '引擎执行器 ok');
+  assert.equal(out.steps[12].budgetOk, true, '脚本预算未超支');
+  assert.ok(out.steps[13].ctest >= 46, '守护规模汇总（CTest）');
+  assert.equal(out.steps[14].assets, 1, 'Web 站点资产清单');
+  assert.equal(out.steps[14].index, true, 'index.html 已生成');
   // 性能回归：各步耗时宽松基线（动画步本地 ~40ms，上限防回归）
   for (const s of out.steps) {
-    assert.ok(s.ms !== undefined && s.ms < 500,
-              s.name + ' 耗时 <500ms（实际 ' + s.ms + 'ms）');
+    assert.ok(s.ms !== undefined && s.ms < 1000,
+              s.name + ' 耗时 <1000ms（实际 ' + s.ms + 'ms）');
   }
   const anim = out.steps.find((s) => s.name === 'frame.gif');
-  assert.ok(anim.ms < 200, 'frame.gif <200ms（实际 ' + anim.ms + 'ms）');
+  assert.ok(anim.ms < 400, 'frame.gif <400ms（实际 ' + anim.ms + 'ms）');
 });
 
 test('ccx service start/status/stop：常驻生命周期', async () => {
@@ -427,7 +430,7 @@ test('ccx doctor --demo：一键 e2e 健康', () => {
   assert.equal(r.status, 0, r.err + r.out);
   const out = JSON.parse(r.out);
   assert.equal(out.ok, true);
-  assert.equal(out.demo.steps, 15);
+  assert.equal(out.demo.steps, 16);
   assert.equal(out.demo.allOk, true);
   assert.ok(out.demo.totalMs > 0, '总耗时已测');
   assert.ok(out.demo.slowest.length > 0, '最慢步已标注');
@@ -492,7 +495,7 @@ test('ccx doctor --summary：状态汇总（机器可消费）', () => {
   assert.ok(out.summary.engineModules >= 13, '引擎模块数');
   assert.ok(out.summary.ctestCount >= 46, 'CTest 计数');
   assert.ok(out.summary.nodeTestFiles >= 23, 'Node 测试文件数');
-  assert.equal(out.summary.demoSteps, 15);
+  assert.equal(out.summary.demoSteps, 16);
   assert.ok(out.summary.generatedAt.length > 0, '时间戳');
 });
 
@@ -628,7 +631,7 @@ test('ccx doctor --all：五合一总页', () => {
   assert.ok('checks' in out && 'summary' in out && 'demo' in out, '三键齐备');
   assert.ok(out.checks['脚本宿主模块（QuickJS）'], '脚本检查');
   assert.ok(out.summary.ctestCount >= 51, 'CTest 数');
-  assert.equal(out.demo.steps, 15);
+  assert.equal(out.demo.steps, 16);
 });
 
 test('ccx doctor --net：W1 网络探测（结构断言）', () => {

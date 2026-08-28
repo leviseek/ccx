@@ -486,7 +486,24 @@ async function main() {
         writeFileSync(outGif, buildGif(frameResults, { delayCs: 25 }));
         push('frame.gif', { frames: frameResults.length, ok: true });
       }
-      // 7) contact.gif：碰撞时序动画（--contacts 自动高亮）
+      // 7) frame.wgpu：真后端帧导出（GPU 数据面）
+      tick('frame.wgpu');
+      {
+        const dumpExe3 = resolve(join(here, '..', '..', '..', 'build', 'local', 'engine', 'tests', 'ccx_frame_dump.exe'));
+        const outW = resolve(join(here, '..', '..', '..', 'build', 'local', 'demo-wgpu.ppm'));
+        let okW = false;
+        let sizeW = 0;
+        if (existsSync(dumpExe3)) {
+          const frw = spawnSync(dumpExe3, [fixture, outW, '160', '90', '0', '', '1', '1', 'wgpu'],
+                                { encoding: 'utf8' });
+          if (frw.status === 0 && existsSync(outW)) {
+            sizeW = statSync(outW).size;
+            okW = sizeW > 1000;
+          }
+        }
+        push('frame.wgpu', { ok: okW, bytes: sizeW });
+      }
+      // 8) contact.gif：碰撞时序动画（--contacts 自动高亮）
       tick('contact.gif');
       {
         const collideScene = resolve(join(here, '..', '..', '..', 'build', 'local', 'demo-collide.scene.json'));
@@ -1164,7 +1181,7 @@ async function main() {
         engineModules: mods,
         ctestCount: countAddTestSync(root),
         nodeTestFiles: countTestFilesSync(root),
-        demoSteps: 15,
+        demoSteps: 16,
         generatedAt: new Date().toISOString(),
       },
     });
@@ -1289,10 +1306,10 @@ async function main() {
         engineModules: checksAll['引擎模块计数'],
         ctestCount: checksAll['CTest 数（本地）'],
         nodeTestFiles: checksAll['Node 测试文件数'],
-        demoSteps: 15,
+        demoSteps: 16,
         generatedAt: new Date().toISOString(),
       },
-      demo: { steps: 15, allOk: true,
+      demo: { steps: 16, allOk: true,
               note: '健康+性能见 cxx doctor --demo（两轮计时）' },
       hint: '五合一：环境(checks) + 规模(summary) + 交付链(demo=15 步)',
     });

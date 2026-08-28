@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.117（2026-08-28）**：demo 十六步——**frame.wgpu 真后端帧步入交付链**（GPU 数据面帧导出 482ms 实跑；发现并修复 frame_dump 的 wgpu 块从未写入的隐蔽缺口（早先"成功"实为软件路径）+ 步时断言容差与索引同步）；ctest 56/56 + node 114/114。
 - **v0.3.116（2026-08-28）**：W1 导出面——**ccx frame dump --device wgpu**（真后端帧导出：黄金帧 → GPU 上传/读回 → PPM 落盘；CLI 测试 P6 头+尺寸；frame_dump 条件编译 CCX_WGPU_BACKEND）；ctest 56/56 + node 113/113。
 - **v0.3.115（2026-08-28）**：W1 合流面——**黄金对照合流**（w1.wgpu_golden：引擎 RasterTarget 渲染面 ↔ GPU 数据面全量像素一致）+ **T-W1-1/2 ✅ 已验收**（m2-tickets 凭据复核通过；gpu-plan 五级达成注记）；ctest 56/56 + node 112/112。
 - **v0.3.114（2026-08-28）**：W1 验收双后端——**verify_w1 10/10**（5 仿真 + 5 wgpu 真后端段；gpuPassed/backends 标记）；ccx doctor --w1 同步；ctest 55/55 + node 112/112。

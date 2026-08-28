@@ -1389,7 +1389,7 @@ async function main() {
       ok: true,
       tool: 'ccx doctor --env',
       gpu: { ready: gpuReady, detail: gpuDetail },
-      device: { ready: deviceCount > 0, detail: deviceCount > 0 ? deviceCount + ' 台设备在线' + (deviceModel ? '（' + deviceModel + '）' : '') : '无真机（adb ' + (adbOut ? '无设备' : '不可用' + (adbExe ? '' : '；未找到 adb（scoop install adb）')) + '）' },
+      device: { ready: deviceCount > 0, detail: deviceCount > 0 ? deviceCount + ' 台设备在线' + (deviceModel ? '（' + deviceModel + '）' : '') + '（ccx device status/screenshot/push-frame）' : '无真机（adb ' + (adbOut ? '无设备' : '不可用' + (adbExe ? '' : '；未找到 adb（scoop install adb）')) + '）' },
       actions: { ready: actions, detail: actions ? 'CI 环境' : '本地环境（push 后 Actions 真跑）' },
       network: { ready: webgpu, detail: webgpu ? 'webgpu.h 可达' : 'webgpu.h 不可达（待复测）' },
       note: '每项 ready=false 对应 m2-tickets ⏳/⬜ 与 ci-push-checklist 环境项',

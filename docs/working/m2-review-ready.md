@@ -16,11 +16,12 @@
 | 引擎+服务+脚本 | 51 CTest / 106 node / 182 守护 | ctest / node --test |
 | 首批 9 票 | ✅ 已验收（13s） | node ci/verify_m2_batch1.mjs |
 | W1 五级（仿真） | ✅ 5/5 | ccx doctor --w1 |
-| 门禁 | layered 76 文件 + vendor 5 包全绿 | node ci/gates/*.mjs |
+| 门禁 | layered 76 文件 + vendor 6 包全绿 | node ci/gates/*.mjs |
 | 环境依赖 | GPU/网络/Actions/真机如实待办 | ci-push-checklist / doctor --net |
 
 ## 评审结论栏
 
 - 结论：☐ 批准 ☐ 待补（列项） ☐ 退回（列项）
 - 评审人：＿＿＿＿＿ 日期：＿＿＿＿＿
+
 

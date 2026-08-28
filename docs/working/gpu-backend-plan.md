@@ -71,3 +71,11 @@
 - 剩余缺口：wgpu-native 库与 webgpu.h 头（需网络获取或 cargo 构建；webgpu.h 网络待复测）。
 - 验证入口：ccx doctor --env（gpu.ready=true 即此状态）。
 
+
+
+## wgpu-native 获取评估（2026-08-28）
+
+- cargo 1.95/rustc/rustup 全可用（系统级）→ **wgpu-native 可本地构建**。
+- 浅克隆成功（52 文件）；release 构建后台进行中。
+- 构建完成后：webgpu.h + wgpu-native dll + 真 GPU → 五级验收真后端段启动条件齐备。
+

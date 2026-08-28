@@ -806,6 +806,26 @@ test('ccx spine_dump --wgpu：骨骼帧 GPU 数据面冒烟', () => {
   }
 });
 
+test('ccx device status/screenshot：W6 真机交互面', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ccx-dev-'));
+  try {
+    const r = runCli(['device', 'status', '--json'], dir);
+    assert.equal(r.status, 0, r.err + r.out);
+    const out = JSON.parse(r.out);
+    if (out.deviceCount === 0) return;  // 无设备环境跳过
+    assert.equal(out.ok, true);
+    assert.ok(out.device.id, '设备 id');
+    const sc = runCli(['device', 'screenshot', join(dir, 's.png'), '--json'], dir);
+    assert.equal(sc.status, 0, sc.err + sc.out);
+    const scOut = JSON.parse(sc.out);
+    assert.equal(scOut.ok, true);
+    assert.equal(scOut.png, true, 'PNG 头');
+    assert.ok(scOut.bytes > 1000, '截图落盘');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('scene apply：非法命令拒绝且不写坏文件', () => {
   const dir = mkdtempSync(join(tmpdir(), 'ccx-apply-bad-'));
   try {

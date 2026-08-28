@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.141（2026-08-28）**：W6 交互面——**ccx device status/screenshot**（adb 探测 → 设备列表/型号；screencap 截图落盘（PNG 头校验）；模拟器实跑 status（emulator-5556/ALN-AL00）+ 截图 8MB 级——W6 设备交互链路打通）；ctest 62/62 + node 118/118。
 - **v0.3.140（2026-08-28）★ W6 环境突破 ★**——**Android 设备在线**（emulator-5556 / ALN-AL00；adb 经代理手动安装 platform-tools 37.0.1）；doctor --env device **ready=true + 型号识别**——W6 真机验证设备就绪；ctest 62/62 + node 117/117。
 - **v0.3.139（2026-08-28）**：profiler 预算面——**帧总耗时预算**（demo profiler.frames 步 budgetMs=2000/budgetOk（实跑 763ms 达标）——与脚本预算同治理面）；ctest 62/62 + node 117/117。
 - **v0.3.138（2026-08-28）**：M1 收口 2——**18 步/117/199 四件全同步**（summary/completion/launch/ready）；ctest 62/62 + node 117/117。

@@ -1146,6 +1146,48 @@ async function main() {
     }
   }
 
+  // —— device status / screenshot <out.png>：W6 真机交互面（adb）——
+  if (sub === 'device') {
+    const adbCands = [
+      'adb.exe',
+      join(process.env.USERPROFILE || 'C:\\Users\\x', 'Android', 'platform-tools', 'adb.exe'),
+      join(process.env.USERPROFILE || 'C:\\Users\\x', 'scoop', 'shims', 'adb.exe'),
+    ];
+    let adbExe = null;
+    for (const cand of adbCands) {
+      const ok = cand === 'adb.exe'
+        ? spawnSync(cand, ['version'], { encoding: 'utf8', timeout: 8000 }).status === 0
+        : existsSync(cand);
+      if (ok) { adbExe = cand; break; }
+    }
+    if (!adbExe) {
+      return emit({ ok: false, error: '未找到 adb（安装 platform-tools 或 scoop install adb）' });
+    }
+    const devices = spawnSync(adbExe, ['devices'], { encoding: 'utf8', timeout: 8000 });
+    const devId = devices.status === 0 && /^([^\s]+)\s+device/m.exec(devices.stdout || '');
+    if (positional[1] === 'screenshot') {
+      const out = positional[2] || 'device.png';
+      if (!devId) return emit({ ok: false, error: '无在线设备' });
+      const sc = spawnSync(adbExe, ['-s', devId[1], 'exec-out', 'screencap', '-p'],
+                           { encoding: 'buffer', maxBuffer: 64 * 1024 * 1024 });
+      if (sc.status !== 0 || !sc.stdout || sc.stdout.length < 1000) {
+        return emit({ ok: false, error: 'screencap 失败' });
+      }
+      writeFileSync(out, sc.stdout);
+      return emit({ ok: true, device: devId[1], out, bytes: sc.stdout.length,
+                    png: sc.stdout[0] === 0x89 && sc.stdout[1] === 0x50 });
+    }
+    // status
+    let model = null;
+    if (devId) {
+      const m = spawnSync(adbExe, ['-s', devId[1], 'shell', 'getprop', 'ro.product.model'],
+                          { encoding: 'utf8', timeout: 8000 });
+      if (m.status === 0 && m.stdout.trim()) model = m.stdout.trim();
+    }
+    return emit({ ok: true, adb: adbExe, deviceCount: devId ? 1 : 0,
+                  device: devId ? { id: devId[1], model } : null });
+  }
+
   // —— mcp tools / mcp call <name> [json]：MCP 工具面 CLI 入口（services-spec §7）——
   if (sub === 'mcp') {
     const daemonEntry = resolve(join(here, '..', '..', 'service-core', 'bin', 'daemon.mjs'));

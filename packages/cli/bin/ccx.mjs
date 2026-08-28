@@ -753,7 +753,18 @@ async function main() {
         if (r2.artifact.parts.every((x) => x.ok !== false)) cookOk += 1;
       }
       push('cook', { scanned: scanned.length, cookOk, ok: true });
-      return emit({ ok: steps.every((s) => s.ok), steps, note: 'demo-all 端到端串起 open/apply/save/build/cook' });
+      // 11) plugin：插件市场安装/列举（M4 上线面）
+      tick('plugin.market');
+      const plugDir = resolve(join(here, '..', '..', '..', 'build', 'local', 'demo-plugin'));
+      mkdirSync(plugDir, { recursive: true });
+      writeFileSync(join(plugDir, 'ccx-plugin.json'),
+        JSON.stringify({ name: 'demo-toon', version: '1.0.0', type: 'builder', platform: 'web-desktop' }));
+      const plugInst = await client.request('plugin.install', { dir: plugDir });
+      const plugList = await client.request('plugin.list');
+      const plugOk = plugInst.ok === true &&
+        (plugList.plugins ?? []).some((p) => p.name === 'demo-toon');
+      push('plugin.market', { installed: plugInst.ok === true, plugins: (plugList.plugins ?? []).map((p) => p.name), ok: plugOk });
+      return emit({ ok: steps.every((s) => s.ok), steps, note: 'demo-all 端到端串起 open/apply/save/build/cook/plugin' });
     } finally {
       client.close();
     }

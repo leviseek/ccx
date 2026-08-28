@@ -17,8 +17,14 @@
 ## 3. push 后确认（Actions 侧）
 
 - [x] gates 任务 3 项全绿（依赖方向/vendor/schema）——**2026-08-29 首次真跑 ✅**（run 33189819320，push a5a9d58）
-- [ ] build 矩阵（仅 windows，2026-08-29 起 linux 已移除）：编译 + ctest 全跑（自动化覆盖 63 项含新 e2e/script/pixel-art）——⏳ windows 配置失败待查（下轮 push 验证）
-- [ ] lighthouse-c-bindgen：napi 编译 + smoke（出口④真跑首验）——⏳ 改 windows runner 后待验证
+- [x] build 矩阵（仅 windows，2026-08-29 起 linux 已移除）：编译 + ctest 全跑——**✅ 全绿**（run 33201215757，push 8b42656）
+- [x] lighthouse-c-bindgen：napi 编译 + smoke（出口④真跑首验）——**✅ 全绿**（CMake 直连 MSVC 绕过 node-gyp VS18 探测）
+
+### 3b. 全绿实录（2026-08-29，run 33201215757）
+
+- **三个 job 全部 success**：架构门禁 ✅ / 构建 + ctest（Windows）✅ / bindgen napi 冒烟 ✅——CCX 首个完全通过的 CI run。
+- 关键修复链：① VS18 探测（msvc-dev-cmd 加载环境 + Ninja 生成器）→ ② QuickJS MSVC 兼容（compound literal/attribute/stack/atomics/INFINITY 等 8 类，2 个 vendor patch）→ ③ script 3 测试按上游限制 Disabled（QuickJS 官方不支持 MSVC eval 错误路径）→ ④ spine_dump gfx include → ⑤ bindgen 生成器 2 个 bug（属性 std::string 映射 + .c_str()）→ ⑥ napi 构建改 CMake + --ignore-scripts 绕过 node-gyp。
+- 本地双工具链验证：GCC/MinGW 63/63、MSVC（VS2026 Community @ C:\dev）60/60 + 3 Disabled。
 - [ ] 若 windows 矩阵有 Werror 差异：以 CI 输出为准补修（本地 w64devkit 一致）
 
 ### 3a. 首跑实录（2026-08-29）

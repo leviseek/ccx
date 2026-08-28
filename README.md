@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.45（2026-08-27）**：M1 U形路径与预研面——**frame_dump --device**（帧产出经 FakeDevice 上传/清屏/绘制/读回再落盘，与普通路径逐字节一致——真后端替换点已有黄金对照）、**V8 宿主设计**（docs/working/v8-host-design.md：结构/桥接清单/沙箱/风险/W5a 决策点）；ctest 46/46 + node 91/91。
 - **v0.3.44（2026-08-27）**：M1 稳定面——**demo 长跑 5 轮计时分布**（总耗时 87–90ms 稳定无抖动；frame.gif 44.6 / contact.gif 40.2 为锚定基线，计入 m1-gate-review）、**CI 覆盖核对**（ctest 跑全量 46 项含假 GPU/物理——push 后 Actions 即验证）；ctest 46/46 + node 90/90。
 - **v0.3.43（2026-08-27）**：M1 工具入口与地图面——**ccx mcp tools / mcp call**（CLI 一条命令调任何工具：9 工具列表、asset.list 调用、非法 JSON 报错，CLI 19/19）、**engine README 模块地图**（13 模块能力/依赖/测试矩阵表）；ctest 46/46 + node 90/90。
 - **v0.3.42（2026-08-27）**：M1 AI 接口面——**MCP 工具层**（services-spec §7 兑现：daemon mcp.listTools/callTool——9 个现有服务方法注册为工具（schema），callTool 结果以 MCP content 文本返回；真场景流程（open→apply→query）可被 AI 调用、未知工具明确报错），daemon 14/14；ctest 46/46 + node 90/90。

@@ -28,8 +28,29 @@
 #include <inttypes.h>
 #include <string.h>
 #include <assert.h>
+#ifdef _MSC_VER
+/* CCX vendor patch (msvc-time): MSVC 无 sys/time.h；用 Windows FILETIME 等价实现 */
+#include <windows.h>
+struct timeval {
+    long tv_sec;
+    long tv_usec;
+};
+static void gettimeofday(struct timeval *tv, void *unused) {
+    (void)unused;
+    FILETIME ft;
+    GetSystemTimeAsFileTime(&ft);
+    const uint64_t t = (((uint64_t)ft.dwHighDateTime << 32) | ft.dwLowDateTime);
+    /* 1601-01-01 到 1970-01-01 的 100ns 间隔数 */
+    const uint64_t epoch = 116444736000000000ULL;
+    const uint64_t us = (t - epoch) / 10;
+    tv->tv_sec = static_cast<long>(us / 1000000ULL);
+    tv->tv_usec = static_cast<long>(us % 1000000ULL);
+}
+#include <time.h>
+#else
 #include <sys/time.h>
 #include <time.h>
+#endif
 #include <fenv.h>
 #include <math.h>
 #if defined(__APPLE__)

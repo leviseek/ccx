@@ -27,9 +27,9 @@ target_include_directories(ccx_script PRIVATE ${QUICKJS_DIR})
 target_link_libraries(ccx_script PUBLIC ccx_foundation ccx_scene)
 target_compile_features(ccx_script PUBLIC cxx_std_20)
 
-# 严格标志只作用于自有源码；vendor C 源豁免（上游风格差异）+ CONFIG_VERSION 兜底
+# 严格标志只作用于自有源码（GCC/MSVC 各自方言）；vendor C 源豁免（上游风格差异）+ CONFIG_VERSION 兜底
 set_source_files_properties(src/host.cpp PROPERTIES
-  COMPILE_OPTIONS "-Wall;-Wextra;-Werror;-pedantic;-Wno-error=pedantic;-Wno-error=unused-parameter")
+  COMPILE_OPTIONS "$<$<CXX_COMPILER_ID:MSVC>:/W4;/WX;$<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall;-Wextra;-Werror;-pedantic;-Wno-error=pedantic;-Wno-error=unused-parameter>>")
 set_source_files_properties(
   ${QUICKJS_DIR}/quickjs.c
   ${QUICKJS_DIR}/cutils.c

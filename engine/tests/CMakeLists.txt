@@ -5,6 +5,11 @@ add_executable(ccx_foundation_tests roundtrip_test.cpp)
 target_link_libraries(ccx_foundation_tests PRIVATE ccx_foundation)
 add_test(NAME foundation.roundtrip COMMAND ccx_foundation_tests)
 
+# M1 gate 基准（engine-spec §3.7 / ADR-001 §5）：实体创建/10 万查询/空 tick/精灵帧推进
+add_executable(ccx_ecs_bench_test ecs_bench_test.cpp)
+target_link_libraries(ccx_ecs_bench_test PRIVATE ccx_ecs ccx_foundation)
+add_test(NAME ecs.bench_gate COMMAND ccx_ecs_bench_test)
+
 # 灯塔任务 D：SpriteBatch 合批模型（renderer-spec §5，逻辑在 render::batcher）
 add_executable(ccx_batch_prototype_test batch_prototype_test.cpp)
 target_link_libraries(ccx_batch_prototype_test PRIVATE ccx_render)

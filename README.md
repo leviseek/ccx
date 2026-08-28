@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.144（2026-08-28）**：W6 传输面——**ccx device push-frame**（引擎帧 PPM→BMP→adb push→设备侧校验（/sdcard/ccx-frame.bmp，12342 字节实跑）——exit4 输入面传输链打通；修复 parsePpm Buffer 传参与 tmpdir 路径）；ctest 62/62 + node 119/119。
 - **v0.3.143（2026-08-28）**：M2 彩排终版——**双就绪环境重演**（自检 18.9s + demo 18 步 2.6s + W1 10/10 2.7s + 设备在线——机器段 ≈24s，评审随时可举行；仅 Actions 待 push）；ctest 62/62 + node 118/118。
 - **v0.3.142（2026-08-28）**：M2 评审环境面——**设备 ✅ 入评审文档**（就绪页/发起声明：GPU+设备双就绪，仅 Actions 待办；数字 118/200）；ctest 62/62 + node 118/118。
 - **v0.3.141（2026-08-28）**：W6 交互面——**ccx device status/screenshot**（adb 探测 → 设备列表/型号；screencap 截图落盘（PNG 头校验）；模拟器实跑 status（emulator-5556/ALN-AL00）+ 截图 8MB 级——W6 设备交互链路打通）；ctest 62/62 + node 118/118。

@@ -826,6 +826,28 @@ test('ccx device status/screenshot：W6 真机交互面', () => {
   }
 });
 
+test('ccx device push-frame：引擎帧到设备传输链', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ccx-pf-'));
+  try {
+    const st = runCli(['device', 'status', '--json'], dir);
+    const stOut = JSON.parse(st.out);
+    if (!stOut.ok || stOut.deviceCount === 0) return;  // 无设备跳过
+    // 造一个 P6 PPM（8x8 红）
+    const ppm = join(dir, 'f.ppm');
+    const w = 8, h = 8;
+    const header = 'P6\n' + w + ' ' + h + '\n255\n';
+    const body = Buffer.alloc(w * h * 3, 0xFF);
+    writeFileSync(ppm, Buffer.concat([Buffer.from(header), body]));
+    const r = runCli(['device', 'push-frame', ppm, '--json'], dir);
+    assert.equal(r.status, 0, r.err + r.out);
+    const out = JSON.parse(r.out);
+    assert.equal(out.ok, true, '设备侧文件存在');
+    assert.ok(out.bytes > 100, '帧字节');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('scene apply：非法命令拒绝且不写坏文件', () => {
   const dir = mkdtempSync(join(tmpdir(), 'ccx-apply-bad-'));
   try {

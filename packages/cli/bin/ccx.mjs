@@ -2,6 +2,7 @@
 // ccx-cli（M1：create / scene new 落地；doctor/version 保留）
 // 约定：--json 机器可读；--no-interactive 适配 CI。
 import { spawn, spawnSync } from 'node:child_process';
+import { tmpdir } from 'node:os';
 import { createWriteStream } from 'node:fs';
 import { closeSync, cpSync, existsSync, mkdirSync, openSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { buildAtlasFromDir } from '../../asset-service/src/atlas_builder.mjs';
@@ -1165,6 +1166,29 @@ async function main() {
     }
     const devices = spawnSync(adbExe, ['devices'], { encoding: 'utf8', timeout: 8000 });
     const devId = devices.status === 0 && /^([^\s]+)\s+device/m.exec(devices.stdout || '');
+    if (positional[1] === 'push-frame') {
+      const ppmPath = positional[2];
+      if (!ppmPath || !existsSync(ppmPath)) {
+        return emit({ ok: false, error: '用法: ccx device push-frame <frame.ppm>' });
+      }
+      if (!devId) return emit({ ok: false, error: '无在线设备' });
+      // PPM -> BMP（复用预览转换）-> adb push -> 设备侧校验
+      const bmp = ppmToBmp(readFileSync(ppmPath));
+      if (!bmp) return emit({ ok: false, error: 'PPM 转换失败（需 P6 三通道）' });
+      const tmpBmp = join(tmpdir(), 'ccx-device-frame-' + process.pid + '.bmp');
+      writeFileSync(tmpBmp, bmp);
+      const remote = '/sdcard/ccx-frame.bmp';
+      const p = spawnSync(adbExe, ['-s', devId[1], 'push', tmpBmp, remote],
+                          { encoding: 'utf8', timeout: 20000 });
+      let remoteOk = false;
+      if (p.status === 0) {
+        const ls = spawnSync(adbExe, ['-s', devId[1], 'shell', 'ls', '-l', remote],
+                             { encoding: 'utf8', timeout: 10000 });
+        remoteOk = ls.status === 0 && /ccx-frame\.bmp/.test(ls.stdout || '');
+      }
+      return emit({ ok: remoteOk, device: devId[1], remote,
+                    bytes: bmp.length, note: '引擎帧 -> 设备传输链（exit4 输入面）' });
+    }
     if (positional[1] === 'screenshot') {
       const out = positional[2] || 'device.png';
       if (!devId) return emit({ ok: false, error: '无在线设备' });

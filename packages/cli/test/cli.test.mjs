@@ -480,7 +480,7 @@ test('ccx doctor --summary：状态汇总（机器可消费）', () => {
   assert.ok(out.summary.engineModules >= 13, '引擎模块数');
   assert.ok(out.summary.ctestCount >= 46, 'CTest 计数');
   assert.ok(out.summary.nodeTestFiles >= 23, 'Node 测试文件数');
-  assert.equal(out.summary.demoSteps, 11);
+  assert.equal(out.summary.demoSteps, 12);
   assert.ok(out.summary.generatedAt.length > 0, '时间戳');
 });
 

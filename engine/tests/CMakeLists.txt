@@ -245,3 +245,8 @@ add_executable(ccx_fake_gpu_runtime_test fake_gpu_runtime_test.cpp)
 target_link_libraries(ccx_fake_gpu_runtime_test PRIVATE
   ccx_gfx ccx_render ccx_scene ccx_ecs ccx_game ccx_foundation)
 add_test(NAME e2e.fake_gpu_runtime COMMAND ccx_fake_gpu_runtime_test)
+
+# M1（W5a）：QuickJS 脚本宿主嵌入（eval/错误/状态保真）
+add_executable(ccx_script_host_test script_host_test.cpp)
+target_link_libraries(ccx_script_host_test PRIVATE ccx_script)
+add_test(NAME script.host COMMAND ccx_script_host_test)

@@ -1,8 +1,13 @@
 # QuickJS（vendor 记录，ADR-005 §4/§7）
 
 - 来源：https://github.com/bellard/quickjs（master @ 2026-08-28 Raw 下载）
-- 用途：脚本引擎（W5a QuickJS 主选；v8-host-design / script-engine-decision 决策）
-- 文件：quickjs.c / quickjs.h / cutils.h / list.h（大小校验：2033048 / 47259 / 11162 / 3089）
-- 许可：MIT（quickjs.c 头部版权声明副本见 LICENSE.txt）
-- 本地变更：无（原始快照）；任何改动必须经 patches/ 并本文件记录
-- 注意：快速集成路径（单文件引擎）；绑定由 tools/bindgen quickjs 目标生成
+- 用途：脚本引擎（W5a QuickJS 主选；嵌入编译冒烟已通过——engine/script + script.host 测试）
+- 文件（大小校验，bytes）：
+  - quickjs.c 2033048 / quickjs.h 47259 / cutils.{c,h} 17798+11162
+  - libregexp.{c,h} 113209+2737 / libregexp-opcode.h 2887
+  - libunicode.{c,h} 63617+5979 / libunicode-table.h 252492
+  - dtoa.{c,h} 44875+3306 / list.h 3089
+  - 生成头：quickjs-atom.h 8295 / quickjs-opcode.h 15801
+- 许可：MIT（文本副本 LICENSE.txt）
+- 本地变更：无（原始快照）；CONFIG_VERSION 由构建定义 |"1.0.0"| 兜底（无 config.h 时）
+- 注意：任何改动必须经 patches/ 并本文件记录

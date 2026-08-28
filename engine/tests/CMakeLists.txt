@@ -10,6 +10,11 @@ add_executable(ccx_ecs_bench_test ecs_bench_test.cpp)
 target_link_libraries(ccx_ecs_bench_test PRIVATE ccx_ecs ccx_render ccx_foundation)
 add_test(NAME ecs.bench_gate COMMAND ccx_ecs_bench_test)
 
+# v1.0 基准4（roadmap §8.2）：10 万实体场景 round-trip 全等
+add_executable(ccx_scene_big_roundtrip_test scene_big_roundtrip_test.cpp)
+target_link_libraries(ccx_scene_big_roundtrip_test PRIVATE ccx_scene ccx_foundation)
+add_test(NAME scene.big_roundtrip COMMAND ccx_scene_big_roundtrip_test)
+
 # 灯塔任务 D：SpriteBatch 合批模型（renderer-spec §5，逻辑在 render::batcher）
 add_executable(ccx_batch_prototype_test batch_prototype_test.cpp)
 target_link_libraries(ccx_batch_prototype_test PRIVATE ccx_render)

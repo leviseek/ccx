@@ -1,5 +1,6 @@
 // Spine 帧导出工具（demo 链用）：spine.json -> 采样 -> 光栅 -> PPM
 // 用法：ccx_spine_dump <spine.json> <out.ppm> [width height]
+#include <algorithm>
 #include <cstdio>
 #include <fstream>
 #include <sstream>
@@ -8,6 +9,10 @@
 
 #include "ccx/animation/spine_loader.h"
 #include "ccx/foundation/serialization/json.h"
+#include "ccx/gfx/rhi.h"
+#ifdef CCX_WGPU_BACKEND
+#include "ccx/gfx/rhi_wgpu.h"
+#endif
 #include "ccx/render/raster.h"
 #include "ccx/render/skeleton_render.h"
 
@@ -46,11 +51,33 @@ int main(int argc, char** argv) {
             }
         }
     }
+#ifdef CCX_WGPU_BACKEND
+    if (argc >= 6 && std::string(argv[5]) == "wgpu") {
+        // GPU 数据面承载骨骼帧（W1×W7 合流）：上传 -> 读回
+        gfx::WgpuDevice dev;
+        const gfx::Handle tex = dev.createTexture(
+            {gfx::TextureDesc::Rgba8, static_cast<uint32_t>(W), static_cast<uint32_t>(H)});
+        if (!dev.uploadTexture(tex, target.pixels.data(), target.pixels.size() * 4)) {
+            std::fprintf(stderr, "upload failed\n");
+            return 1;
+        }
+        std::vector<uint32_t> back(target.pixels.size(), 0);
+        if (!dev.readback(tex, back.data(), back.size() * 4)) {
+            std::fprintf(stderr, "readback failed\n");
+            return 1;
+        }
+        std::copy(back.begin(), back.end(), target.pixels.begin());
+    }
+#endif
     if (!render::writePpm(target, argv[2])) {
         std::fprintf(stderr, "write failed\n");
         return 1;
     }
+    std::string ppmJson(argv[2]);
+    for (char& cj : ppmJson) {
+        if (cj == '\\') cj = '/';
+    }
     std::printf("{\"bones\":%zu,\"width\":%d,\"height\":%d,\"ppm\":\"%s\"}\n",
-                items.size(), W, H, argv[2]);
+                items.size(), W, H, ppmJson.c_str());
     return 0;
 }

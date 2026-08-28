@@ -779,6 +779,28 @@ test('ccx frame dump --device wgpu：真后端帧导出', () => {
   }
 });
 
+test('ccx spine_dump --wgpu：骨骼帧 GPU 数据面冒烟', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ccx-spwcli-'));
+  try {
+    const dump = join(import.meta.dirname, '..', '..', '..', 'build', 'local', 'engine', 'tests', 'ccx_spine_dump.exe');
+    if (!existsSync(dump)) return;  // 未构建则跳过
+    const spineJson = join(dir, 'spine.json');
+    writeFileSync(spineJson, JSON.stringify({
+      bones: [{ name: 'root' }],
+      animations: { walk: { bones: { root: { translate: [[0, 0, 0], [1, 30, 0]] } } } },
+    }));
+    const out = join(dir, 's.ppm');
+    const r = spawnSync(dump, [spineJson, out, '64', '64', 'wgpu'], { encoding: 'utf8' });
+    assert.equal(r.status, 0, r.stderr + r.stdout);
+    const meta = JSON.parse(r.stdout.trim());
+    assert.equal(meta.bones, 1);
+    assert.ok(readFileSync(out).length > 1000, 'PPM 落盘');
+    assert.equal(readFileSync(out, 'utf8').slice(0, 2), 'P6');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('scene apply：非法命令拒绝且不写坏文件', () => {
   const dir = mkdtempSync(join(tmpdir(), 'ccx-apply-bad-'));
   try {

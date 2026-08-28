@@ -230,7 +230,7 @@ export function generateNapi(ir) {
     for (const p of cls.props) {
       L.push('  napi_value pv_' + p.name + ';');
       if (p.type === 'string') {
-        L.push('  napi_create_string_utf8(env, ' + mod + '::' + p.name + '_value, NAPI_AUTO_LENGTH, &pv_' + p.name + ');');
+        L.push('  napi_create_string_utf8(env, ' + mod + '::' + p.name + '_value.c_str(), NAPI_AUTO_LENGTH, &pv_' + p.name + ');');
       } else {
         L.push('  napi_create_double(env, ' + mod + '::' + p.name + '_value, &pv_' + p.name + ');');
       }

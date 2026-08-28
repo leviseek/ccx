@@ -34,6 +34,7 @@
 
 ## W6 补充（2026-08-28）
 
-- 壳 App 在 Android 模拟器运行（CCX 显示实证）；帧循环 + 引擎光栅上屏。
+- 壳 App 在 Android 模拟器运行（CCX 显示实证）；帧循环 + 引擎光栅上屏 + QuickJS 脚本驱动 + 帧统计上报（ccx device stats）。
 - 环境绑定项收敛：仅 Actions CI 真跑（push 后）与签名发布待办。
+
 

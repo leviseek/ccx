@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.114（2026-08-28）**：W1 验收双后端——**verify_w1 10/10**（5 仿真 + 5 wgpu 真后端段；gpuPassed/backends 标记）；ccx doctor --w1 同步；ctest 55/55 + node 112/112。
 - **v0.3.113（2026-08-28）★★ W1 五级里程碑 5/5 真后端全达成 ★★**——**L4 全场景帧**（3 精灵场景帧经 GPU 数据面像素一致）+ **L5 帧统计**（frames/uploads/bytesUploaded 入 profiler 面）；真后端全链：L1 设备缓冲 / L2 清屏 / L3 黄金对照 / L4 场景帧 / L5 统计（RTX 4070 各 0.5s）——**exit1（首帧像素对照）真后端侧全部达成**；ctest 55/55 + node 111/111。
 - **v0.3.112（2026-08-28）★ W1 L3 里程碑**——**黄金帧数据面**（uploadTexture 接口（Fake+Wgpu 双实现）：软件光栅精灵像素 → GPU 纹理 → 读回逐像素一致；对齐布局填充（row*7+32）排障）；**L1/L2/L3 真后端三连全绿**（RTX 4070）；ctest 53/53 + node 111/111。
 - **v0.3.111（2026-08-28）★ W1 里程碑**——**真后端首帧达成**（ccx_gfx_wgpu：WgpuDevice（wgpu-native Vulkan）L1 设备/缓冲/上传 + L2 清屏 readback 全像素断言，RTX 4070 实跑 0.49s）；构建链九连排障（CallbackInfo 新 API/userdata×2/TexelCopy 改名/256 行对齐/映射 size/MinGW ABI/dlltool-gendef 完整导出/-lgcc_eh 别名/系统库）；ctest 52/52 + node 111/111。

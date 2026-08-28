@@ -13,9 +13,11 @@ test('W1 五级验收（仿真侧）：5 级全过', () => {
   });
   assert.equal(r.status, 0, r.stderr + r.stdout);
   const out = JSON.parse(r.stdout);
-  assert.equal(out.tool, 'verify-w1-sim');
+  assert.equal(out.tool, 'verify-w1');
   assert.equal(out.levels.length, 5);
   assert.equal(out.allPassed, true);
+  assert.equal(out.gpu.length, 5, '真后端段 5 级');
+  assert.equal(out.gpuPassed, true, '真后端全过');
   assert.deepEqual(out.levels.map((l) => l.level), [1, 2, 3, 4, 5]);
-  assert.ok(out.environment.gpu === 'not-available', '环境标记');
+  assert.ok(out.environment.backends.includes('wgpu'), '双后端标记');
 });

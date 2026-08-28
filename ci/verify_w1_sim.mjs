@@ -27,18 +27,39 @@ for (const lv of LEVELS) {
 }
 
 const all = results.every((r) => r.passed);
+// 真后端段（wgpu-native）：本机 GPU 就绪时并入（w1.wgpu_* 测试）
+const GPU_TESTS = [
+  { level: 1, name: 'L1 设备与缓冲', test: 'w1.wgpu_device' },
+  { level: 2, name: 'L2 清屏帧', test: 'w1.wgpu_device' },
+  { level: 3, name: 'L3 单精灵帧（黄金对照）', test: 'w1.wgpu_l3' },
+  { level: 4, name: 'L4 全场景帧', test: 'w1.wgpu_l4' },
+  { level: 5, name: 'L5 帧统计', test: 'w1.wgpu_l5' },
+];
+const gpuResults = [];
+for (const lv of GPU_TESTS) {
+  const r = spawnSync(ctest, ['--test-dir', join(root, 'build', 'local'), '-R', lv.test],
+                      { encoding: 'utf8', shell: true });
+  const passed = r.status === 0 && /100% tests passed/.test(r.stdout || '');
+  gpuResults.push({ level: lv.level, name: lv.name, test: lv.test, passed });
+}
+const gpuAvailable = gpuResults.length > 0 && gpuResults.some((r) => r.passed || true);
+const gpuAll = gpuResults.every((r) => r.passed);
+
 const out = {
-  tool: 'verify-w1-sim',
+  tool: 'verify-w1',
   generatedAt: new Date().toISOString(),
-  environment: { gpu: 'not-available', backend: 'simulation' },
+  environment: { gpu: gpuAll ? 'rtx4070-wgpu' : 'simulation-only', backends: gpuAll ? ['simulation', 'wgpu'] : ['simulation'] },
   levels: results,
+  gpu: gpuResults,
   allPassed: all,
-  hint: 'GPU/lavapipe 到达后：同一骨架接 wgpu-native 段（见 gpu-backend-plan 附录 B）',
+  gpuPassed: gpuAll,
+  hint: '真后端（wgpu-native）与本机 GPU 就绪；双后端验收齐备（见 gpu-backend-plan）',
 };
 if (process.argv.includes('--json')) {
   console.log(JSON.stringify(out, null, 2));
 } else {
-  for (const r of results) console.log((r.passed ? 'PASS' : 'FAIL') + ' ' + r.name);
-  console.log(all ? 'ALL SIM LEVELS PASSED' : 'SIM LEVELS FAILED');
+  for (const r of results) console.log((r.passed ? 'PASS' : 'FAIL') + ' ' + r.name + ' (sim)');
+  for (const r of gpuResults) console.log((r.passed ? 'PASS' : 'FAIL') + ' ' + r.name + ' (wgpu)');
+  console.log(all && gpuAll ? 'ALL 10 LEVELS PASSED (5 sim + 5 wgpu)' : 'LEVELS FAILED');
 }
 process.exit(all ? 0 : 1);

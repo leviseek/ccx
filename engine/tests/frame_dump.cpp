@@ -52,6 +52,9 @@ int main(int argc, char** argv) {
     const int H = std::atoi(argv[4]);
     if (W <= 0 || H <= 0) return 2;
 
+    // 可选时间参数：ccx.CurveAnim 组件（线性轨 pos.x：{t0,v0,t1,v1}）驱动位置
+    const float animTime = argc >= 6 ? std::atof(argv[5]) : 0.0f;
+
     std::vector<RenderItem> items;
     for (const EntityId id : scene.renderOrder()) {
         const json::Value* spr = scene.component(id, "ccx.Sprite");
@@ -60,6 +63,20 @@ int main(int argc, char** argv) {
         it.atlas = static_cast<uint32_t>(spr->find("atlas")->asNumber());
         it.material = static_cast<uint32_t>(spr->find("material")->asNumber());
         it.pos = scene.worldTransform(id).pos;
+        const json::Value* curve = scene.component(id, "ccx.CurveAnim");
+        if (curve != nullptr) {
+            const json::Value* t0 = curve->find("t0");
+            const json::Value* v0 = curve->find("v0");
+            const json::Value* t1 = curve->find("t1");
+            const json::Value* v1 = curve->find("v1");
+            if (t0 && v0 && t1 && v1) {
+                const float a = t0->asNumber();
+                const float b = t1->asNumber();
+                const float u = (b > a) ? ((animTime - a) / (b - a)) : 0.0f;
+                const float clamped = u < 0.0f ? 0.0f : (u > 1.0f ? 1.0f : u);
+                it.pos.x += v0->asNumber() + clamped * (v1->asNumber() - v0->asNumber());
+            }
+        }
         it.size = 64.0f;
         it.tint = colorFor(it.atlas);
         items.push_back(it);

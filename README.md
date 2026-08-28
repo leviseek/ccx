@@ -131,6 +131,7 @@
 
 ## 变更记录
 
+- **v0.3.21（2026-08-27）**：M1 动态帧面——**frame_dump 时间参数 + 曲线动画采样**（ccx.CurveAnim 线性轨 pos.x：u 钳位插值）、**两帧像素质心差异断言**（t0/t1/t2 红像素质心单调位移 160→224→288，帧 diff 测试——"会动"的像素验证；途中修正视口外幅度的测试设计）；ctest 35/35 + node 73/73。
 - **v0.3.20（2026-08-27）**：M1 帧可视面——**虚拟帧导出工具**（ccx_frame_dump：场景→渲染项（atlas 映射色）→光栅→PPM 落盘 + Node 像素对拍（P6 头/尺寸/红与金 quad 像素存在/面积合理）——"看到第一帧"；途中修复 JSON 反斜杠路径转义、Transform position 组件格式、清除色字节序三处真实问题）；ctest 35/35 + node 72/72。
 - **v0.3.19（2026-08-27）**：M1 像素与审计面——**软件光栅**（render::RasterTarget + rasterizeQuads：虚拟帧缓冲像素断言）、**daemon 审计记录**（铁律 12 服务化：scene.apply 统一留痕 {at,op,ok,detail}，失败也记录；audit.recent/clear RPC，上限 512）、**demo all 六步**（+profiler.snapshot）；ctest 35/35 + node 71/71。
 - **v0.3.18（2026-08-27）**：M1 屏幕链与采集面——**屏幕帧全链**（资产 byteSize→渲染项→packer→OrthoCamera→屏幕像素坐标，(0,0)→(368,257)/(432,193) 与平移后坐标断言）、**C++ PNG 头尺寸解析**（assets::parsePngSize：签名/IHDR/大端宽高；坏签名/短数据拒绝；IHDR→byteSize→渲染边长 E2E）、**`ccx profiler snapshot`**（临时 daemon record→snapshot→schema ccx.profile/1 输出）；ctest 34/34 + node 70/70。

@@ -6,12 +6,16 @@
 #include <vector>
 
 // quickjs.h 的 inline 函数在严格标志下触发 unused-parameter 警告：隔离
+#ifdef __GNUC__
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
 extern "C" {
 #include "quickjs.h"
 }
+#ifdef __GNUC__
 #pragma GCC diagnostic pop
+#endif
 
 namespace ccx::script {
 

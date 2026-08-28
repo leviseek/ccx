@@ -29,13 +29,18 @@ target_compile_features(ccx_script PUBLIC cxx_std_20)
 
 # 严格标志只作用于自有源码（GCC/MSVC 各自方言）；vendor C 源豁免（上游风格差异）+ CONFIG_VERSION 兜底
 set_source_files_properties(src/host.cpp PROPERTIES
-  COMPILE_OPTIONS "$<$<CXX_COMPILER_ID:MSVC>:/W4;/WX;$<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall;-Wextra;-Werror;-pedantic;-Wno-error=pedantic;-Wno-error=unused-parameter>>")
+  COMPILE_OPTIONS "$<$<CXX_COMPILER_ID:MSVC>:/W4;/WX;/wd4100;/wd4244;;$<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wall;-Wextra;-Werror;-pedantic;-Wno-error=pedantic;-Wno-error=unused-parameter>>")
 set_source_files_properties(
   ${QUICKJS_DIR}/quickjs.c
   ${QUICKJS_DIR}/cutils.c
   ${QUICKJS_DIR}/libregexp.c
   ${QUICKJS_DIR}/libunicode.c
   ${QUICKJS_DIR}/dtoa.c
-  PROPERTIES COMPILE_OPTIONS "-w;-DCONFIG_VERSION=\"1.0.0\""
+  PROPERTIES COMPILE_OPTIONS "-w;-DCONFIG_VERSION=\"1.0.0\";$<$<C_COMPILER_ID:MSVC>:;-Oi->"
 )
+
+
+
+
+
 

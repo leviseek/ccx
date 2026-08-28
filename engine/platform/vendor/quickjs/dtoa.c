@@ -28,7 +28,10 @@
 #include <string.h>
 #include <assert.h>
 #include <ctype.h>
+/* CCX vendor patch (msvc-time): MSVC 无 sys/time.h（dtoa.c 未使用其符号，直接跳过） */
+#ifndef _MSC_VER
 #include <sys/time.h>
+#endif
 #include <math.h>
 #include <setjmp.h>
 

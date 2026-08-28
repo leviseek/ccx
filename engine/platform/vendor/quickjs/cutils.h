@@ -30,6 +30,7 @@
 #define CCX_PACKED_STRUCT(name) __pragma(pack(push, 1)) struct name __pragma(pack(pop))
 /* CCX vendor patch (msvc-attrs): MSVC 无 __attribute__ 语法，整体置空（format/aligned/warn_unused_result 等） */
 #define __attribute__(x)
+#define __attribute(x)  /* 上游个别处写 __attribute((unused))（单下划线） */
 #else
 #define CCX_PACKED_STRUCT(name) struct __attribute__((packed)) name
 #endif
@@ -153,6 +154,7 @@ static inline int64_t min_int64(int64_t a, int64_t b)
         return b;
 }
 
+#ifndef _MSC_VER
 /* WARNING: undefined if a = 0 */
 static inline int clz32(unsigned int a)
 {
@@ -176,6 +178,7 @@ static inline int ctz64(uint64_t a)
 {
     return __builtin_ctzll(a);
 }
+#endif /* !_MSC_VER */
 
 CCX_PACKED_STRUCT(packed_u64) {
     uint64_t v;

@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.148（2026-08-28）**：M2 材料终版——**设备显示验证入评审包**（就绪页四链标注）；ctest 62/62 + node 119/119。
 - **v0.3.147（2026-08-28）**：W6 显示面——**设备显示链路验证**（push-frame 后 am start VIEW → 设备弹出文件打开菜单（screencap OCR 实证）——引擎帧被 Android 系统识别；真实 app 渲染属发布链后续）；ctest 62/62 + node 119/119。
 - **v0.3.146（2026-08-28）**：push 终核——**清单终核记录**（树 0 entries/171 commits/vendor 纪律保持/全量绿——push 就绪；仅 Actions 真跑待 push 后确认）；ctest 62/62 + node 119/119。
 - **v0.3.145（2026-08-28）**：W6 材料面——**设备链入评审**（就绪页/发起声明：status/screenshot/push-frame 三命令；doctor --env device 段列交互面）；ctest 62/62 + node 119/119。

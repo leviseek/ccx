@@ -11,7 +11,7 @@ const engineRoot = path.join(root, 'engine');
 const ALLOWED = {
   foundation: [],
   ecs: ['foundation'],
-  scene: ['ecs', 'foundation'],
+  scene: ['ecs', 'foundation', 'physics'],
   gfx: ['platform', 'foundation'],
   render: ['scene', 'ecs', 'gfx', 'foundation'],
   animation: ['scene', 'ecs', 'foundation'],
@@ -20,6 +20,10 @@ const ALLOWED = {
   ui: ['render', 'scene', 'ecs', 'foundation'],
   input: ['platform', 'foundation'],
   asset: ['foundation'],
+  assets: ['foundation'],          // 仓库目录名（asset-spec）
+  game: ['foundation', 'ecs'],     // 帧循环（game-spec）
+  particle: ['foundation'],        // 粒子（engine-spec §7）
+  script: ['scene', 'ecs', 'foundation'],  // 脚本宿主（W5a QuickJS）
   scripting: ['ecs', 'foundation'],
   network: ['foundation'],
   platform: ['foundation'],

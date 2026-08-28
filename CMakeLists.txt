@@ -26,6 +26,7 @@ option(CCX_BUILD_GAME "Build game module" ON)
 option(CCX_BUILD_ASSETS "Build assets module" ON)
 option(CCX_BUILD_AUDIO "Build audio module" ON)
 option(CCX_BUILD_PHYSICS "Build physics module" ON)
+option(CCX_BUILD_NETWORK "Build network module (M4 sync channel)" ON)
 option(CCX_BUILD_SCRIPT "Build script module (QuickJS)" ON)
 
 # 后续模块占位（M1+ 按 roadmap 打开）

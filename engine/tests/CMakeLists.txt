@@ -20,6 +20,13 @@ add_executable(ccx_crash_reporter_test crash_reporter_test.cpp)
 target_link_libraries(ccx_crash_reporter_test PRIVATE ccx_foundation)
 add_test(NAME platform.crash_reporter COMMAND ccx_crash_reporter_test)
 
+# M4：net sync delta 通道（encode/decode round-trip）
+if(TARGET ccx_network)
+  add_executable(ccx_sync_channel_test sync_channel_test.cpp)
+  target_link_libraries(ccx_sync_channel_test PRIVATE ccx_network)
+  add_test(NAME network.sync_channel COMMAND ccx_sync_channel_test)
+endif()
+
 # 灯塔任务 D：SpriteBatch 合批模型（renderer-spec §5，逻辑在 render::batcher）
 add_executable(ccx_batch_prototype_test batch_prototype_test.cpp)
 target_link_libraries(ccx_batch_prototype_test PRIVATE ccx_render)

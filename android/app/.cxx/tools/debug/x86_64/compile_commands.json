@@ -1,0 +1,7 @@
+[
+{
+  "directory": "D:/engine/ai-ccc/android/app/.cxx/Debug/3o342o5t/x86_64",
+  "command": "C:\\Users\\levi\\AppData\\Local\\Android\\Sdk\\ndk\\26.1.10909125\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=x86_64-none-linux-android24 --sysroot=C:/Users/levi/AppData/Local/Android/Sdk/ndk/26.1.10909125/toolchains/llvm/prebuilt/windows-x86_64/sysroot -Dccx_shell_EXPORTS -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -Wformat -Werror=format-security   -fno-limit-debug-info  -fPIC -std=gnu++20 -o CMakeFiles\\ccx_shell.dir\\shell.cpp.o -c D:\\engine\\ai-ccc\\android\\app\\src\\main\\cpp\\shell.cpp",
+  "file": "D:\\engine\\ai-ccc\\android\\app\\src\\main\\cpp\\shell.cpp"
+}
+]

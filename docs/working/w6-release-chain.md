@@ -22,3 +22,10 @@
 - Gradle/maven 下载需网络（本地代理 7897 可用）。
 - JNI 壳开发量：小（surface 渲染 + 引擎 tick 桥）。
 - 结论：**环境侧 100% 就绪**（2026-08-28 gradle 到位）——缺口仅 JNI 壳工程（小量开发），W6-1 可排期。
+
+## 壳工程首建（2026-08-28）
+
+- **APK 构建链验证成功**：gradle assembleDebug BUILD SUCCESSFUL（42KB app-debug.apk）；adb install Success；am start 触发。
+- 待 debug：MainActivity 启动后 Shutdown 时 SIGSEGV（logcat Fatal signal 11）——JNI 壳生命周期问题，列入壳工程开发。
+- 工程：android/（KTS + Kotlin 壳 + shell.cpp JNI）。
+

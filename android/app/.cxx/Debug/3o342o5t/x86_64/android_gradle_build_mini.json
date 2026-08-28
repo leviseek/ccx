@@ -1,0 +1,27 @@
+{
+  "buildFiles": [
+    "D:\\engine\\ai-ccc\\android\\app\\src\\main\\cpp\\CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "C:\\Users\\levi\\AppData\\Local\\Android\\Sdk\\cmake\\3.22.1\\bin\\ninja.exe",
+      "-C",
+      "D:\\engine\\ai-ccc\\android\\app\\.cxx\\Debug\\3o342o5t\\x86_64",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "C:\\Users\\levi\\AppData\\Local\\Android\\Sdk\\cmake\\3.22.1\\bin\\ninja.exe",
+    "-C",
+    "D:\\engine\\ai-ccc\\android\\app\\.cxx\\Debug\\3o342o5t\\x86_64",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "ccx_shell::@6890427a1f51a3e7e1df": {
+      "artifactName": "ccx_shell",
+      "abi": "x86_64",
+      "output": "D:\\engine\\ai-ccc\\android\\app\\build\\intermediates\\cxx\\Debug\\3o342o5t\\obj\\x86_64\\libccx_shell.so",
+      "runtimeFiles": []
+    }
+  }
+}

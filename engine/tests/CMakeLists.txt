@@ -224,3 +224,8 @@ add_test(NAME physics.collider_component COMMAND ccx_collider_component_test)
 add_executable(ccx_integrated_animation_test integrated_animation_test.cpp)
 target_link_libraries(ccx_integrated_animation_test PRIVATE ccx_animation ccx_ecs ccx_scene)
 add_test(NAME e2e.integrated_animation COMMAND ccx_integrated_animation_test)
+
+# M1：Collider 组件 ADR-003 往返（保存/重载 -> collectBodies 一致）
+add_executable(ccx_collider_roundtrip_test collider_roundtrip_test.cpp)
+target_link_libraries(ccx_collider_roundtrip_test PRIVATE ccx_physics ccx_scene)
+add_test(NAME physics.collider_roundtrip COMMAND ccx_collider_roundtrip_test)

@@ -331,7 +331,52 @@ async function main() {
         writeFileSync(outGif, buildGif(frameResults, { delayCs: 25 }));
         push('frame.gif', { frames: frameResults.length, ok: true });
       }
-      // 7) cook（本地）
+      // 7) contact.gif：碰撞时序动画（--contacts 自动高亮）
+      {
+        const collideScene = resolve(join(here, '..', '..', '..', 'build', 'local', 'demo-collide.scene.json'));
+        writeFileSync(collideScene, JSON.stringify({
+          schema: 'ccx.scene/1', meta: {}, systems: [],
+          entities: [
+            { id: 1, name: 'hero', parent: null,
+              components: [
+                { type: 'ccx.Sprite', data: { atlas: 1, material: 1 } },
+                { type: 'ccx.Collider', data: { hx: 25, hy: 25, layer: 1, mask: 2 } },
+                { type: 'ccx.CurveAnim', data: { t0: 0, v0: 0, t1: 2, v1: 140 } },
+              ] },
+            { id: 2, name: 'pillar', parent: null,
+              components: [
+                { type: 'ccx.Transform', data: { position: [100, 0] } },
+                { type: 'ccx.Sprite', data: { atlas: 2, material: 1 } },
+                { type: 'ccx.Collider', data: { hx: 25, hy: 25, layer: 2, mask: 3 } },
+              ] },
+          ],
+        }, null, 2) + '\n');
+        const dumpExe2 = resolve(join(here, '..', '..', '..', 'build', 'local', 'engine', 'tests', 'ccx_frame_dump.exe'));
+        const outGif2 = resolve(join(here, '..', '..', '..', 'build', 'local', 'demo-contact.gif'));
+        const ppmDir2 = resolve(join(here, '..', '..', '..', 'build', 'local'));
+        const cFrames = [];
+        for (const t of ['0', '0.7', '1.4']) {
+          const ppm = join(ppmDir2, 'contact-' + t.replace('.', '_') + '.ppm');
+          const fr = spawnSync(dumpExe2, [collideScene, ppm, '160', '90', t, '', '1'],
+                               { encoding: 'utf8' });
+          if (fr.status !== 0) {
+            push('contact.gif', { ok: false, error: '帧 t=' + t + ' 失败' });
+            return emit({ ok: false, steps });
+          }
+          const { w, h, data } = parsePpm(readFileSync(ppm));
+          const pixels = new Uint8Array(w * h * 4);
+          for (let i = 0; i < w * h; ++i) {
+            pixels[i * 4] = data[i * 3];
+            pixels[i * 4 + 1] = data[i * 3 + 1];
+            pixels[i * 4 + 2] = data[i * 3 + 2];
+            pixels[i * 4 + 3] = 255;
+          }
+          cFrames.push({ w, h, pixels });
+        }
+        writeFileSync(outGif2, buildGif(cFrames, { delayCs: 25 }));
+        push('contact.gif', { frames: cFrames.length, ok: true });
+      }
+      // 8) cook（本地）
       const assetsDir = resolve(join(here, '..', '..', '..', 'build', 'local', 'demo-assets'));
       mkdirSync(assetsDir, { recursive: true });
       writeFileSync(join(assetsDir, 'hero.png'), 'png');

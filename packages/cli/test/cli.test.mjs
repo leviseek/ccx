@@ -118,11 +118,12 @@ test('ccx demo all：端到端编排（open/apply/save/build/cook）', () => {
   const names = out.steps.map((s) => s.name);
   assert.deepEqual(names,
     ['scene.open', 'scene.apply', 'scene.save', 'build.run',
-     'profiler.snapshot', 'frame.gif', 'cook']);
+     'profiler.snapshot', 'frame.gif', 'contact.gif', 'cook']);
   assert.ok(out.steps.every((s) => s.ok), '每步 ok');
   assert.ok(out.steps[3].trace >= 5, 'hooks 走完');
   assert.equal(out.steps[4].frames, 1, 'profiler 帧快照');
   assert.equal(out.steps[5].frames, 3, 'GIF 三帧');
+  assert.equal(out.steps[6].frames, 3, '接触 GIF 三帧');
 });
 
 test('ccx service start/status/stop：常驻生命周期', async () => {
@@ -338,6 +339,33 @@ test('ccx editor preview --gif：动画序列嵌入', () => {
     const html = readFileSync(out, 'utf8');
     assert.ok(html.includes('data:image/gif;base64,'), 'GIF data URL 在页面');
     assert.ok(html.includes('anim-view'), '动画视图节点');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('scene apply：Collider 校验错误透传 CLI', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ccx-collider-cli-'));
+  try {
+    const sceneFile = join(dir, 's.scene.json');
+    writeFileSync(sceneFile, JSON.stringify({
+      schema: 'ccx.scene/1', meta: {},
+      entities: [{ id: 1, name: 'hero', parent: null, components: [] }],
+      systems: [],
+    }));
+    // 合法 Collider 通过
+    let r = runCli(['scene', 'apply', sceneFile, '--json',
+                    '--cmd', JSON.stringify({ op: 'add_component', id: 1, type: 'ccx.Collider',
+                                              data: { hx: 25, hy: 20, layer: 1, mask: 2 } })], dir);
+    assert.equal(r.status, 0, r.err + r.out);
+    // 非法（负尺寸）报清晰错误（服务端校验透传）
+    r = runCli(['scene', 'apply', sceneFile, '--json',
+                '--cmd', JSON.stringify({ op: 'add_component', id: 1, type: 'ccx.Collider',
+                                          data: { hx: -5, hy: 20 } })], dir);
+    assert.equal(r.status, 1);
+    const out = JSON.parse(r.out);
+    assert.equal(out.ok, false);
+    assert.ok(out.error.includes('非负数字'), '错误信息源自服务端校验: ' + out.error);
   } finally {
     rmSync(dir, { recursive: true, force: true });
   }

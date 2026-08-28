@@ -42,3 +42,7 @@
 
 - 自检 19s + demo 18 步 2.6s + W1 10/10 2.7s + 设备截图 0.8s——机器段 ≈25.1s
 - 环境：GPU + 设备（壳全链）+ vendor；仅 Actions CI 真跑待 push。
+## 终版彩排 5（2026-08-28，v0.3.176，含统计上报）
+
+- 自检 18.9s + demo 2.6s + 设备 stats 0.1s——机器段 ≈21.6s（W1 另 2.7s）
+- 设备统计上报链路（logcat CCX_STATS → ccx device stats）纳入评审路径。

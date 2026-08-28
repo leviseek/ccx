@@ -151,7 +151,8 @@ test('ccx demo all：端到端编排（open/apply/save/build/cook）', () => {
   assert.deepEqual(names,
     ['scene.open', 'scene.apply', 'scene.save', 'build.run',
      'profiler.snapshot', 'frame.gif', 'contact.gif', 'mcp.tools', 'mcp.call',
-     'session.demo', 'script.run', 'status.summary', 'build.web', 'cook']);
+     'session.demo', 'script.run', 'script.engine', 'status.summary', 'build.web',
+     'cook']);
   assert.ok(out.steps.every((s) => s.ok), '每步 ok');
   assert.ok(out.steps[3].trace >= 5, 'hooks 走完');
   assert.equal(out.steps[4].frames, 1, 'profiler 帧快照');
@@ -162,9 +163,10 @@ test('ccx demo all：端到端编排（open/apply/save/build/cook）', () => {
   assert.ok(out.steps[9].undoWorked && out.steps[9].redoWorked, '会话 undo/redo 演示');
   assert.equal(out.steps[10].commands, 3, '脚本命令步三命令');
   assert.ok(out.steps[10].ok, '脚本驱动场景 ok');
-  assert.ok(out.steps[11].ctest >= 46, '守护规模汇总（CTest）');
-  assert.equal(out.steps[12].assets, 1, 'Web 站点资产清单');
-  assert.equal(out.steps[12].index, true, 'index.html 已生成');
+  assert.ok(out.steps[11].ok, '引擎执行器 ok');
+  assert.ok(out.steps[12].ctest >= 46, '守护规模汇总（CTest）');
+  assert.equal(out.steps[13].assets, 1, 'Web 站点资产清单');
+  assert.equal(out.steps[13].index, true, 'index.html 已生成');
   // 性能回归：各步耗时宽松基线（动画步本地 ~40ms，上限防回归）
   for (const s of out.steps) {
     assert.ok(s.ms !== undefined && s.ms < 500,
@@ -424,7 +426,7 @@ test('ccx doctor --demo：一键 e2e 健康', () => {
   assert.equal(r.status, 0, r.err + r.out);
   const out = JSON.parse(r.out);
   assert.equal(out.ok, true);
-  assert.equal(out.demo.steps, 14);
+  assert.equal(out.demo.steps, 15);
   assert.equal(out.demo.allOk, true);
   assert.ok(out.demo.totalMs > 0, '总耗时已测');
   assert.ok(out.demo.slowest.length > 0, '最慢步已标注');
@@ -489,7 +491,7 @@ test('ccx doctor --summary：状态汇总（机器可消费）', () => {
   assert.ok(out.summary.engineModules >= 13, '引擎模块数');
   assert.ok(out.summary.ctestCount >= 46, 'CTest 计数');
   assert.ok(out.summary.nodeTestFiles >= 23, 'Node 测试文件数');
-  assert.equal(out.summary.demoSteps, 14);
+  assert.equal(out.summary.demoSteps, 15);
   assert.ok(out.summary.generatedAt.length > 0, '时间戳');
 });
 

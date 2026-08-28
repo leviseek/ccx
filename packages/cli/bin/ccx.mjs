@@ -562,7 +562,33 @@ async function main() {
         }
         push('script.run', { commands: cmds.length, ok });
       }
-      // 11) status.summary：守护规模汇总
+      // 11) script.engine：QuickJS 引擎执行器路径
+      tick('script.engine');
+      {
+        const runner = resolve(join(here, '..', '..', '..', 'build', 'local', 'engine', 'tests', 'ccx_script_runner.exe'));
+        const scriptIn = join(buildDirName(), 'demo-engine.ccx.js');
+        const scriptOut = resolve(join(here, '..', '..', '..', 'build', 'local', 'demo-engine.scene.json'));
+        if (!existsSync(runner)) {
+          push('script.engine', { commands: 0, entities: 0, ok: false, error: 'runner 未构建' });
+        } else {
+          writeFileSync(scriptIn, '{"op":"create_entity","name":"hero"}\n{"op":"create_entity","name":"npc"}\n');
+          const re = spawnSync(runner, [scriptIn, scriptOut], { encoding: 'utf8' });
+          let meta = {};
+          if (re.status === 0) {
+            try {
+              meta = JSON.parse(re.stdout.trim());
+            } catch {
+              /* noop */
+            }
+          }
+          push('script.engine', {
+            commands: meta.commands ?? 0,
+            entities: meta.entities ?? 0,
+            ok: re.status === 0 && (meta.entities ?? 0) === 2,
+          });
+        }
+      }
+      // 12) status.summary：守护规模汇总
       tick('status.summary');
       {
         const root = resolve(join(here, '..', '..', '..'));
@@ -1111,7 +1137,7 @@ async function main() {
         engineModules: mods,
         ctestCount: countAddTestSync(root),
         nodeTestFiles: countTestFilesSync(root),
-        demoSteps: 14,
+        demoSteps: 15,
         generatedAt: new Date().toISOString(),
       },
     });
@@ -1233,5 +1259,6 @@ main().catch((e) => {
   console.error(e);
   process.exit(1);
 });
+
 
 

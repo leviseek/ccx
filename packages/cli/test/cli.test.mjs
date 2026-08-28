@@ -653,7 +653,8 @@ test('ccx doctor --w1：五级验收（仿真侧）', () => {
   assert.equal(out.ok, true);
   assert.equal(out.w1.levels.length, 5);
   assert.equal(out.w1.allPassed, true);
-  assert.equal(out.w1.environment.gpu, 'not-available');
+  assert.equal(out.w1.gpuPassed, true, '真后端段全过');
+  assert.equal(out.w1.gpu.length, 5, '真后端 5 级');
 });
 
 test('ccx doctor --all --verify：验收总键（W1+首批）', () => {

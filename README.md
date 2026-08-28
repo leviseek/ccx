@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.89（2026-08-28）**：M2 评审预检——**评审包自检脚本**（ci/verify_review_package.mjs：10 件材料存在性 + 3 条一键复核命令实跑（--all --verify/--all/demo all）→ READY 判定；评审前 30 秒自检）；ctest 51/51 + node 106/106。
 - **v0.3.88（2026-08-28）**：M2 评审包——**立项评审包索引**（m2-review-package.md：8 件材料顺序+一键复核命令（doctor --all --verify / demo all）+ 签名栏——评审人照着走）；链终态：109 commits/19 文档；ctest 51/51 + node 105/105。
 - **v0.3.87（2026-08-28）**：M2 状态回流——**首批 9 张 ticket 标记 ✅ 已验收**（m2-tickets.md：凭据自动复核通过 + 日期；验收方法段更新为 verify 脚本/doctor 命令）；ctest 51/51 + node 105/105。
 - **v0.3.86（2026-08-28）**：M1 总页面——**ccx doctor --all --verify**（验收总键：W1 五级 + M2 首批 9 票一页输出；修复 cmd 引号拆词（pattern 无空格）+ 子进程超时治理（120s）；batch 复核从 55s 提速到 13s）；ctest 51/51 + node 105/105。

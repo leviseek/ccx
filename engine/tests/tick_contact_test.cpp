@@ -7,7 +7,7 @@
 #include "ccx/ecs/scheduler.h"
 #include "ccx/ecs/world.h"
 #include "ccx/physics/collision.h"
-#include "ccx/physics/contact.h"
+#include "ccx/scene/collision.h"
 #include "ccx/scene/scene.h"
 
 using namespace ccx;
@@ -30,14 +30,17 @@ int main() {
     constexpr float kHalf = 25.0f;
     Scene scene;
     const EntityId hero = scene.createNode("hero");
+    scene.setComponent(hero, "ccx.Collider",
+                       json::parse("{\"hx\":25,\"hy\":25,\"layer\":1,\"mask\":2}"));
     const EntityId pillar = scene.createNode("pillar");
     scene.setLocalTransform(pillar, {{100.0f, 0.0f}, 0, {1, 1}});
+    scene.setComponent(pillar, "ccx.Collider",
+                       json::parse("{\"hx\":25,\"hy\":25,\"layer\":2,\"mask\":3}"));
 
     World world;
     float heroX = 0.0f;
     AudioBus audio;
     SpatialGrid grid(32.0f, 8, 8);
-    std::map<uint32_t, Aabb> boxes;
     std::vector<std::pair<uint32_t, uint32_t>> prevContacts;
 
     Scheduler sched;
@@ -48,15 +51,8 @@ int main() {
                }});
     sched.add({"collision", Stage::PostAnimation, {}, {},
                [&](World&, float) {
-                   // 重建宽相
-                   grid.clear();
-                   boxes.clear();
-                   for (const EntityId id : scene.renderOrder()) {
-                       const auto p = scene.worldTransform(id).pos;
-                       boxes[id.index] = Aabb::fromCenter(p, {kHalf, kHalf});
-                       grid.insert(id.index, boxes[id.index]);
-                   }
-                   const auto contacts = resolveContacts(grid, boxes);
+                   // 正式碰撞系统：组件体 -> 宽相 + 层窄相
+                   const auto contacts = runCollisionSim(scene, grid);
                    // 场景组件暴露 + 新接触触发音效
                    for (const ContactEvent& c : contacts) {
                        scene.setComponent(hero, "ccx.Contact",

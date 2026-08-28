@@ -72,7 +72,10 @@ int main(int argc, char** argv) {
         it.atlas = static_cast<uint32_t>(spr->find("atlas")->asNumber());
         it.material = static_cast<uint32_t>(spr->find("material")->asNumber());
         it.pos = scene.worldTransform(id).pos;
-        // 精灵帧动画：ccx.SpriteAnimator {cols,rows,frameCount,fps,startFrame} -> 帧号 -> 色块
+        // 高亮（接触可视化）：--highlight <idx>,<idx>...（实体索引）
+    const bool highlighted = argc >= 7 && std::string(argv[6]).find(
+                                 std::to_string(id.index)) != std::string::npos;
+    // 精灵帧动画：ccx.SpriteAnimator {cols,rows,frameCount,fps,startFrame} -> 帧号 -> 色块
     const json::Value* anim = scene.component(id, "ccx.SpriteAnimator");
     if (anim != nullptr && anim->find("frameCount") != nullptr) {
         const float fps = anim->find("fps") ? anim->find("fps")->asNumber() : 10.0f;
@@ -87,6 +90,7 @@ int main(int argc, char** argv) {
     } else {
         it.tint = colorFor(it.atlas);
     }
+    if (highlighted) it.tint = {1.0f, 1.0f, 1.0f, 1.0f};  // 接触高亮：白
     const json::Value* curve = scene.component(id, "ccx.CurveAnim");
         if (curve != nullptr) {
             const json::Value* t0 = curve->find("t0");

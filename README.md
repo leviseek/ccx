@@ -131,6 +131,7 @@
 
 ## 变更记录
 
+- **v0.3.31（2026-08-27）**：M1 接触可视面——**tick_contact 迁移正式碰撞系统**（Scheduler 内调 scene::runCollisionSim（组件体+层窄相），音频触发语义保留）、**frame_dump --highlight**（接触对实体白块叠加：无高亮零白像素、高亮后 >500px 白，一次通过）；ctest 42/42 + node 83/83。
 - **v0.3.30（2026-08-27）**：M1 正式化面——**场景碰撞集成 API**（scene::collectBodies + runCollisionSim 进 ccx_scene（scene 依赖 physics 合规），Collider 测试改用正式接口）、**M2 立项刷新**（m2-kickoff §6：七工作包前置实况表——W1 只差 GPU 上传/绘制，W2 有可消费产物）；ctest 42/42 + node 82/82。
 - **v0.3.29（2026-08-27）**：M1 组件化面——**ccx.Collider 组件->物理体**（组件 {hx,hy,layer,mask} -> Body -> 宽相+层窄相：英雄移动帧3 起接触，掩码不含对方层时 AABB 重叠也零接触，一次通过）、**doctor 引擎模块计数**（读 engine/*/CMakeLists 如实上报，+物理/音频检查）；ctest 42/42 + node 82/82。
 - **v0.3.28（2026-08-27）**：M1 层与叙事面——**碰撞层/掩码**（engine/physics body：Body{box,layer,mask} + canCollide 双向判定 + narrowPhaseLayered 层+AABB 双重过滤；玩家/环境/子弹三层场景下两对接触、玩家-子弹被过滤，一次通过）、**demo all 七步**（+frame.gif：三时间点帧→GIF 动画文件落盘）；ctest 41/41 + node 82/82。

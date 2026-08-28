@@ -169,6 +169,25 @@ test('ccx service start/status/stop：常驻生命周期', async () => {
   }
 });
 
+test('ccx editor preview：自包含预览页', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ccx-preview-'));
+  try {
+    const fixture = join(import.meta.dirname, '..', '..', '..', 'examples', 'scenes',
+                         'render_plan.scene.json');
+    const out = join(dir, 'preview.html');
+    const r = runCli(['editor', 'preview', fixture, '--out', out], dir);
+    assert.equal(r.status, 0, r.err + r.out);
+    assert.equal(JSON.parse(r.out).ok, true);
+    const html = readFileSync(out, 'utf8');
+    assert.ok(html.includes('window.__SCENE'), '内联场景数据');
+    assert.ok(html.includes('data-entity="1"'), '实体节点');
+    assert.ok(html.includes('data-panel="hierarchy"'), '面板');
+    assert.ok(html.includes('addEventListener("click"'), '基础交互 JS');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('scene apply：非法命令拒绝且不写坏文件', () => {
   const dir = mkdtempSync(join(tmpdir(), 'ccx-apply-bad-'));
   try {

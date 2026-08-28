@@ -131,6 +131,7 @@
 
 ## 变更记录
 
+- **v0.3.13（2026-08-27）**：M1 内容与交互面——**2D 粒子数据面**（engine/particle：确定性 LCG、固定池、发射/重力/拖拽/淡出/稳态 rate×life，测试 4 组一次修正后全绿）、**输入归一化模型**（engine/input：边沿 pressed/released、多键独立、指针按下/拖拽/抬起，测试 3 组一次通过；Vec2 补 operator*=）、**`ccx editor preview`**（自包含预览页：buildView→HTML+内联场景+点击交互 JS；途中修理 preview_page 语法崩坏导致 CLI 全停的问题）；ctest 25/25 + node 63/63。
 - **v0.3.12（2026-08-27）**：M1 编辑器渲染与运维面——**最小 HTML 渲染器**（renderViewHtml：buildView→HTML 字符串产物，实体/组件/选中/命令/转义，M2 实 DOM 起点）、**M2 立项材料**（docs/working/m2-kickoff.md：7 工作包/5 exit 标准/依赖风险/Owner）、**`ccx service start/status/stop` 常驻模式**（detached+pid 文件+日志流；阶段复现并修复三个真问题：worker fork 不支持 stdio 路径、detached 下 stdin 为 ignore 事件循环空、常驻需心跳保持）；ctest 23/23 + node 62/62。
 - **v0.3.11（2026-08-27）**：M1 编辑器与差分面——**编辑器视图模型**（buildView：panel 分区/命令/快捷键/选中/场景实体组件/undo-redo 状态的无头快照，M2 Web UI 渲染层消费）、**结构化场景 diff**（diffScenes：实体/组件/字段三类变更、稳定顺序；`ccx scene diff a b` 可读摘要 + --json 机器输出——兑现 ADR-003 'Git 友好'承诺）；ctest 23/23 + node 60/60。
 - **v0.3.10（2026-08-27）**：M1 资产闭环与运维面——**atlas pack→scene atlas→render plan 闭环**（png 目录→ccx.atlas/1→Sprite 场景→1 批渲染计划，'从像素到渲染计划'单链）、**daemon EOF 优雅退出**（stdlib readline close→清理→exit 0，自终止诊断定位挂起根因：测试失败路径未 kill 残留 daemon，修复后套件 10/10）、**M1 交接清单**（docs/working/m1-handoff.md：基线 + 7 项硬缺口与归属）；ctest 23/23 + node 56/56。

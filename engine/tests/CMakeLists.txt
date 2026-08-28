@@ -120,6 +120,16 @@ add_executable(ccx_tick_sprite_anim_test tick_sprite_anim_test.cpp)
 target_link_libraries(ccx_tick_sprite_anim_test PRIVATE ccx_animation ccx_ecs ccx_scene)
 add_test(NAME e2e.sprite_anim_tick COMMAND ccx_tick_sprite_anim_test)
 
+# M1：2D 粒子数据面（发射/更新/回收/稳态）
+add_executable(ccx_particle_test particle_test.cpp)
+target_link_libraries(ccx_particle_test PRIVATE ccx_particle)
+add_test(NAME particle.emitter COMMAND ccx_particle_test)
+
+# M1：输入归一化（边沿/多键/指针）
+add_executable(ccx_input_test input_test.cpp)
+target_link_libraries(ccx_input_test PRIVATE ccx_input)
+add_test(NAME input.state COMMAND ccx_input_test)
+
 # M1：动画整合（状态机选 clip -> 精灵帧采样 -> 帧循环）
 add_executable(ccx_integrated_animation_test integrated_animation_test.cpp)
 target_link_libraries(ccx_integrated_animation_test PRIVATE ccx_animation ccx_ecs ccx_scene)

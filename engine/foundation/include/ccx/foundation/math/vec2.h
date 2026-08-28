@@ -15,6 +15,7 @@ struct Vec2 {
     constexpr Vec2 operator-(const Vec2& o) const { return {x - o.x, y - o.y}; }
     constexpr Vec2 operator*(float s) const { return {x * s, y * s}; }
     constexpr Vec2& operator+=(const Vec2& o) { x += o.x; y += o.y; return *this; }
+    constexpr Vec2& operator*=(float s) { x *= s; y *= s; return *this; }
 
     constexpr float dot(const Vec2& o) const { return x * o.x + y * o.y; }
     float length() const { return std::sqrt(x * x + y * y); }

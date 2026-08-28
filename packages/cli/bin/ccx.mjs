@@ -9,6 +9,9 @@ import { cookWithCompression } from '../../asset-service/src/cook.mjs';
 import { createBundleManifest } from '../../build-service/src/bundle.mjs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { buildView } from '../../editor-shell/src/viewmodel.mjs';
+import { EditorShell } from '../../editor-shell/src/shell.mjs';
+import { renderPreviewPage } from '../../editor-shell/src/preview_page.mjs';
 import { CommandBus } from '../../scene-service/src/commands.mjs';
 import { diffScenes } from '../../scene-service/src/diff.mjs';
 import { renderPlan } from '../../scene-service/src/render_plan.mjs';
@@ -187,6 +190,31 @@ async function main() {
       batches: plan.batches.map((b) =>
         'atlas=' + b.atlas + ' mat=' + b.material + ' x' + b.count + '@' + b.first).join(' | '),
     });
+  }
+
+  // —— editor preview <scene.json> [--out preview.html]：自包含预览页 ——
+  if (sub === 'editor' && positional[1] === 'preview') {
+    const sceneFile = positional[2];
+    if (!sceneFile || !existsSync(sceneFile)) {
+      return emit({ ok: false, error: '用法: ccx editor preview <scene.json> [--out <html>]' });
+    }
+    let doc;
+    try {
+      doc = JSON.parse(readFileSync(sceneFile, 'utf8'));
+    } catch {
+      return emit({ ok: false, error: '场景文件解析失败' });
+    }
+    const bus = CommandBus.fromSceneFile(doc);
+    const shell = new EditorShell({ bus });
+    shell.addPanel('hierarchy', 'left', 0);
+    shell.addPanel('scene', 'center', 0);
+    shell.addPanel('inspector', 'right', 10);
+    shell.registerCommand('scene.save', '保存场景', () => {});
+    const view = buildView(shell, bus);
+    const html = renderPreviewPage(view, doc);
+    const out = flags.out ? resolve(flags.out) : resolve('preview.html');
+    writeFileSync(out, html);
+    return emit({ ok: true, out, entities: view.scene.entityCount });
   }
 
   // —— demo all：端到端编排（open -> apply -> save -> build -> cook）——

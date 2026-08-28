@@ -205,6 +205,11 @@ add_executable(ccx_narrow_phase_test narrow_phase_test.cpp)
 target_link_libraries(ccx_narrow_phase_test PRIVATE ccx_physics)
 add_test(NAME physics.narrow_phase COMMAND ccx_narrow_phase_test)
 
+# M1：接触驱动（碰撞 -> 场景组件 + 新接触音效）
+add_executable(ccx_tick_contact_test tick_contact_test.cpp)
+target_link_libraries(ccx_tick_contact_test PRIVATE ccx_physics ccx_ecs ccx_scene ccx_audio)
+add_test(NAME e2e.contact_driven COMMAND ccx_tick_contact_test)
+
 # M1：动画整合（状态机选 clip -> 精灵帧采样 -> 帧循环）
 add_executable(ccx_integrated_animation_test integrated_animation_test.cpp)
 target_link_libraries(ccx_integrated_animation_test PRIVATE ccx_animation ccx_ecs ccx_scene)

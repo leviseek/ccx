@@ -131,6 +131,7 @@
 
 ## 变更记录
 
+- **v0.3.27（2026-08-27）**：M1 接触驱动面——**接触→组件+音效组合**（tick 中碰撞系统：宽相重建→窄相→ccx.Contact 组件写回 + 新接触唯一触发 PlayEvent（AudioBus）——物理/场景/音频三系统一帧联动，一次通过）；ctest 40/40 + node 82/82。
 - **v0.3.26（2026-08-27）**：M1 接触与可视化面——**窄相**（engine/physics contact：宽相候选→AABB 精确接触事件，误报过滤/链式三对/排序稳定，一次通过）、**editor preview --gif**（GIF data URL 嵌入 anim-view——动画序列进编辑器页面）；ctest 39/39 + node 82/82。
 - **v0.3.25（2026-08-27）**：M1 动画文件与物理循环面——**ccx frame gif CLI**（--times 多时间点→frame_dump→GIF 动画文件；途中修 buildDir mkdir 与 flags 解析）、**碰撞宽相接入帧循环**（tick 中每帧重建 SpatialGrid→候选对时序：接触期（帧3 起）必有对、宽相 cell 级语义澄清）；ctest 38/38 + node 81/81。
 - **v0.3.24（2026-08-27）**：M1 碰撞与动画文件面——**2D 碰撞数据面**（engine/physics：AABB 相交/接触/包含 + 空间网格宽相（跨 cell 插入、潜在对去重、越界忽略），测试一次修正预期后全绿）、**GIF89a 打包器**（gif.mjs：教科书 LZW 编解码 + 调色板量化 + 双帧结构 GCE/图像描述符/像素解码 roundtrip；调试判定编码 add 时机与解码定址两处结构性错位）；引擎模块增至 16 个；ctest 37/37 + node 80/80。

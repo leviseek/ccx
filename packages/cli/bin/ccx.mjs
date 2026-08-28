@@ -52,6 +52,7 @@ function countTestFilesSync(cwd) {
   };
   try {
     walk(join(cwd, 'packages'));
+    walk(join(cwd, 'tools', 'bindgen', 'test'));
   } catch {
     /* noop */
   }

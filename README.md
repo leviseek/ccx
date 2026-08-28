@@ -131,6 +131,7 @@
 
 ## 变更记录
 
+- **v0.3.34（2026-08-27）**：M1 碰撞时序面——**frame_dump --contacts 自动接触高亮**（曲线应用到节点变换→正式 runCollisionSim→接触对白块；vs 手动列表）、**碰撞时序动画断言**（hero 曲线 x0→140 撞 pillar：t0 零白、t2 白块>400px，GIF 同源可生成）；ctest 43/43 + node 85/85。
 - **v0.3.33（2026-08-27）**：M1 写路径校验面——**component 数据校验**（CommandBus.validateComponentData：Collider hx/hy 非负数字、layer/mask 整数范围内；非法即拒，未知组件原样放行，测试 7/7 全过）、**frame gif --highlight 透传**（接触高亮进入多帧动画序列）；ctest 43/43 + node 84/84。
 - **v0.3.32（2026-08-27）**：M1 组件往返面——**Collider 组件 ADR-003 往返**（文件→loadSceneFile→collectBodies→saveSceneFile→重载→物理体字段逐项一致；文件数据驱动接触：移动 hero 后 runCollisionSim 命中 1 对——物理数据完整走场景文件生命周期）；ctest 43/43 + node 83/83。
 - **v0.3.31（2026-08-27）**：M1 接触可视面——**tick_contact 迁移正式碰撞系统**（Scheduler 内调 scene::runCollisionSim（组件体+层窄相），音频触发语义保留）、**frame_dump --highlight**（接触对实体白块叠加：无高亮零白像素、高亮后 >500px 白，一次通过）；ctest 42/42 + node 83/83。

@@ -1175,6 +1175,8 @@ async function main() {
       '资产注册表模块': existsSync(join(cwd, 'engine', 'assets', 'include')),
       '物理模块': existsSync(join(cwd, 'engine', 'physics', 'include')),
       '音频模块': existsSync(join(cwd, 'engine', 'audio', 'include')),
+      '脚本宿主模块（QuickJS）': existsSync(join(cwd, 'engine', 'script', 'include')),
+      'QuickJS vendor': existsSync(join(cwd, 'engine', 'platform', 'vendor', 'quickjs', 'quickjs.c')),
       '外部压缩器配置': process.env.CCX_EXTERNAL_COMPRESSOR
         ? '已配置（' + process.env.CCX_EXTERNAL_COMPRESSOR.split('=')[0] + '）'
         : '未配置（可选：pngquant/astcenc 等经 CCX_EXTERNAL_COMPRESSOR 接入）',

@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.68（2026-08-28）**：M1 闭环面——**脚本→引擎消费闭环**（脚本创作（2 实体+组件+transform）→ ADR-003 保存 → 装载 → packer 渲染帧等价（8 顶点/2 批/位置一致）——脚本场景可被渲染管线直接消费，一次通过）、**doctor 脚本宿主/QuickJS vendor 自检**；ctest 51/51 + node 97/97。
 - **v0.3.67（2026-08-28）**：M1 脚本链面——**demo all 十四步**（+script.run：命令脚本驱动场景入交付链）；summary/断言同步 14；ctest 50/50 + node 97/97。
 - **v0.3.66（2026-08-28）**：M1 正式化面——**脚本命令桥升级正式场景数据面**（script::applySceneCommand 直通 scene::Scene：create_entity/add_component/set_transform/destroy_entity/snapshot 五操作真实生效；测试 6 组（组件数据在场/世界变换更新/销毁/快照/未知拒绝）；途中澄清 EntityId 索引 0 起语义）；ctest 50/50 + node 97/97。
 - **v0.3.65（2026-08-28）**：M1 脚本入口面——**ccx script run**（命令脚本文件（每行 JSON 命令 + # 注释）→ daemon 同序执行 → 场景文件落盘；非法命令行明确报错——exit3 的用户侧命令面）；CLI 25/25；ctest 49/49 + node 97/97。

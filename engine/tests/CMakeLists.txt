@@ -259,6 +259,10 @@ add_test(NAME script.game_loop COMMAND ccx_script_game_loop_test)
 add_executable(ccx_script_scene_api_test script_scene_api_test.cpp)
 target_link_libraries(ccx_script_scene_api_test PRIVATE ccx_script)
 add_test(NAME script.scene_api COMMAND ccx_script_scene_api_test)
+add_executable(ccx_script_to_frame_test script_to_frame_test.cpp)
+target_link_libraries(ccx_script_to_frame_test PRIVATE ccx_script ccx_render)
+add_test(NAME e2e.script_to_frame COMMAND ccx_script_to_frame_test)
+
 
 
 

@@ -31,7 +31,8 @@ Thumbs.db
 build/
 
 # Android 构建产物
-android/.cxx/
+**/.cxx/
 android/app/build/
 android/.gradle/
+
 

@@ -155,6 +155,45 @@ async function main() {
     }
   }
 
+  // —— build --platform <p> [--project <name>]：经 daemon 走 Builder RPC ——
+  if (sub === 'build') {
+    const platform = flags.platform ?? positional[1];
+    if (!platform) {
+      return emit({ ok: false, error: '用法: ccx build --platform <p> [--project <name>]' });
+    }
+    const daemonEntry = resolve(join(here, '..', '..', 'service-core', 'bin', 'daemon.mjs'));
+    const client = new RpcClient(process.execPath, [daemonEntry]);
+    try {
+      await new Promise((resolve, reject) => {
+        const off = client.onEvent((m) => {
+          if (m.method === 'system.ready') {
+            off();
+            resolve();
+          }
+        });
+        setTimeout(() => reject(new Error('daemon 未就绪')), 2500);
+      });
+      const cfg = await client.request('build.configure', { platform });
+      if (!cfg.ok) return emit({ ok: false, error: '构建失败: ' + cfg.error });
+      const run = await client.request('build.run', {
+        platform,
+        project: flags.project ?? 'demo',
+      });
+      if (!run.ok) {
+        const errStep = run.trace?.find((t) => t.status === 'error');
+        return emit({ ok: false, error: '构建失败: ' + (errStep?.error ?? 'hooks 出错') });
+      }
+      return emit({
+        ok: true,
+        platform,
+        traceSteps: run.trace.filter((t) => t.status === 'ok').length,
+        buildId: run.manifest?.buildId ?? null,
+      });
+    } finally {
+      client.close();
+    }
+  }
+
   // —— doctor / version ——
   if (sub === 'version') return emit({ ok: true, name: '@ccx/cli', version: '0.1.0', milestone: 'M1' });
   if (sub === 'doctor') {

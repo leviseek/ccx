@@ -2,8 +2,10 @@
 #include <string>
 #include <vector>
 
+#include <map>
 #include "ccx/foundation/serialization/json.h"
 #include "ccx/render/render_graph.h"
+#include "ccx/render/shader.h"
 
 namespace ccx::render {
 
@@ -39,6 +41,9 @@ bool parsePipeline(const json::Value& doc, PipelineDef& out, std::string& err);
 
 // 编译：enable pass + 资源声明 -> RenderGraph -> compile（含 minFeatures 降级门槛）
 // caps：可用能力集合（renderer-spec §2.4 / platform-spec）；缺失 required 项返回错误
-CompileResult compilePipeline(const PipelineDef& def, const std::vector<std::string>& caps);
+// shaderRegistry（可选）：提供时校验每个启用 pass 的 shader 引用必须已声明
+CompileResult compilePipeline(
+    const PipelineDef& def, const std::vector<std::string>& caps,
+    const std::map<std::string, ShaderDef>* shaderRegistry = nullptr);
 
 }  // namespace ccx::render

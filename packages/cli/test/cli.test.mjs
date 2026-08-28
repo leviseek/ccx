@@ -74,6 +74,22 @@ test('scene apply：命令总线写场景文件', () => {
   }
 });
 
+
+test('ccx build：经 daemon 的 Builder RPC', async () => {
+  const r = runCli(['build', '--platform', 'web-desktop', '--project', 'MyGame', '--json'],
+                   join(import.meta.dirname, '..'));
+  assert.equal(r.status, 0, r.err + r.out);
+  const out = JSON.parse(r.out);
+  assert.equal(out.ok, true);
+  assert.equal(out.platform, 'web-desktop');
+  assert.ok(out.traceSteps >= 5, 'hooks 已走');
+  // 未知平台 -> 明确错误
+  const bad = runCli(['build', '--platform', 'ps5', '--json'], join(import.meta.dirname, '..'));
+  assert.equal(bad.status, 1);
+  const out2 = JSON.parse(bad.out);
+  assert.equal(out2.ok, false);
+});
+
 test('scene apply：非法命令拒绝且不写坏文件', () => {
   const dir = mkdtempSync(join(tmpdir(), 'ccx-apply-bad-'));
   try {

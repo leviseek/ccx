@@ -131,6 +131,7 @@
 
 ## 变更记录
 
+- **v0.3.6（2026-08-27）**：M1 交付与组装面——**CLI `ccx build` 接入 daemon**（Builder RPC 全链：configure→run→bundle 清单/trace，未知平台明确报错）、**Pipeline pass.shader 引用一致性**（compilePipeline 可选 shaderRegistry，缺失资产指名拒绝）、**帧循环组装测试**（Scheduler(Animation)→Scene 变换→SceneBridge 同步→FrameMetrics 记录，3 帧 x=3 线性断言 + ECS 镜像一致）；ctest 20/20 + node 50/50。
 - **v0.3.5（2026-08-27）**：M1 一致性与异步面——**跨语言对拍**（C++ render_plan_dump 与 Node renderPlan 对同一 fixture 逐项一致，消灭双实现漂移）、**daemon 异步化 + build RPC**（dispatch/handle 支持 async 方法；build.platforms/configure/run 走真 Builder 管线；修复 bin 同步调用 Promise 序列化成 {} 的挂起 bug）、**Cook 压缩器插件接口**（注册/调用/缺省报错；M2 由原生 worker 实现）；ctest 19/19 + node 49/49。
 - **v0.3.4（2026-08-27）**：M1 服务与桥面——**daemon 真实服务**（scene.open/query/apply/save 接 CommandBus 真写路径 + asset.scan 真目录扫描，真进程 RPC 编排持久化测试）、**BuildService 骨架**（Builder 注册表对齐 contributes.builder + bundle 清单确定性哈希 + hooks 状态机错误中断）、**场景↔ECS 桥**（SceneBridge：节点↔实体双向映射 + Transform 数值镜像 + 全量重建；反射特化移入头文件解决跨 TU 可见性）；ctest 19/19 + node 42/42。
 - **v0.3.3（2026-08-27）**：M1 组装面——**动画→渲染 E2E**（状态机驱动变换→场景→批结构稳定）、**daemon 事件推送实装**（asset.subscribe：真实 fs 变更→assetChanged 推送，真进程测试）、**编辑器 Shell 最小集**（editor-shell：命令注册表/快捷键归一化/选择集/面板布局模型，与 CommandBus 绑定驱动写路径）；ctest 18/18 + node 37/37。

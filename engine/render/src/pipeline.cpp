@@ -65,8 +65,9 @@ bool parsePipeline(const json::Value& doc, PipelineDef& out, std::string& err) {
     return true;
 }
 
-CompileResult compilePipeline(const PipelineDef& def,
-                              const std::vector<std::string>& caps) {
+CompileResult compilePipeline(
+    const PipelineDef& def, const std::vector<std::string>& caps,
+    const std::map<std::string, ShaderDef>* shaderRegistry) {
     CompileResult out;
     // 0) minFeatures 降级门槛（renderer-spec §2.4/§5）
     for (const std::string& f : def.minFeatures) {
@@ -74,6 +75,18 @@ CompileResult compilePipeline(const PipelineDef& def,
             out.ok = false;
             out.error = "pipeline 缺少能力: " + f;
             return out;
+        }
+    }
+    // 0.5) pass.shader 引用一致性（registry 提供时校验）
+    if (shaderRegistry != nullptr) {
+        for (const PipelinePass& p : def.passes) {
+            if (!p.enable || p.shader.empty()) continue;
+            if (shaderRegistry->find(p.shader) == shaderRegistry->end()) {
+                out.ok = false;
+                out.error = "pass 引用了未声明的 shader 资产: " + p.shader +
+                            "（pass: " + p.id + "）";
+                return out;
+            }
         }
     }
 

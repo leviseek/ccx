@@ -102,6 +102,35 @@ int main() {
         check(!r.ok, "无启用 pass 被拒");
     }
 
+
+    {
+        // 6) pass.shader 引用一致性（registry 提供时校验；启用 pass 全部声明则通过）
+        PipelineDef def;
+        std::string err;
+        check(parsePipeline(json::parse(kPipelineJson), def, err), "解析成功");
+        std::map<std::string, ShaderDef> registry;
+        for (const char* n : {"builtin/sprite", "builtin/tilemap", "builtin/ui"}) {
+            ShaderDef s;
+            s.name = n;
+            registry.emplace(n, s);
+        }
+        const auto okR = compilePipeline(def, {"instancing"}, &registry);
+        check(okR.ok, "引用已声明 shader 编译通过");
+    }
+    {
+        // 6b) 缺失 shader 资产（registry 不含 tilemap）
+        PipelineDef def;
+        std::string err;
+        check(parsePipeline(json::parse(kPipelineJson), def, err), "解析成功");
+        std::map<std::string, ShaderDef> registry;
+        ShaderDef spriteShader;
+        spriteShader.name = "builtin/sprite";
+        registry.emplace("builtin/sprite", spriteShader);
+        const auto missing = compilePipeline(def, {"instancing"}, &registry);
+        check(!missing.ok, "缺失 shader 资产被拒");
+        check(missing.error.find("tilemap") != std::string::npos, "错误指名缺失 shader");
+    }
+
     if (g_failures == 0) {
         std::printf("ALL TESTS PASSED (pipeline)\n");
         return 0;

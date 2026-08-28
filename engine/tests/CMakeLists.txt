@@ -102,3 +102,8 @@ add_test(NAME scene.bridge COMMAND ccx_bridge_test)
 # 跨语言对拍工具（非 CTest；Node 测试 spawn 后与 renderPlan 对拍）
 add_executable(ccx_render_plan_dump render_plan_dump.cpp)
 target_link_libraries(ccx_render_plan_dump PRIVATE ccx_render ccx_scene)
+
+# M1：帧循环组装（Scheduler -> Scene -> Bridge -> Metrics 一体 tick）
+add_executable(ccx_tick_test tick_test.cpp)
+target_link_libraries(ccx_tick_test PRIVATE ccx_animation ccx_ecs ccx_scene ccx_foundation)
+add_test(NAME e2e.frame_tick COMMAND ccx_tick_test)

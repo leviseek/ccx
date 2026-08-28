@@ -3,6 +3,7 @@
 // 约定：--json 机器可读；--no-interactive 适配 CI。
 import { spawnSync } from 'node:child_process';
 import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
+import { buildAtlasFromDir } from '../../asset-service/src/atlas_builder.mjs';
 import { cookWithCompression } from '../../asset-service/src/cook.mjs';
 import { createBundleManifest } from '../../build-service/src/bundle.mjs';
 import { dirname, join, resolve } from 'node:path';
@@ -219,6 +220,49 @@ async function main() {
     } finally {
       client.close();
     }
+  }
+
+  // —— atlas pack --root <dir> --out <atlas.json>：png 目录 -> ccx.atlas/1 ——
+  if (sub === 'atlas' && positional[1] === 'pack') {
+    const rootDir = flags.root ?? positional[2];
+    const out = flags.out ? resolve(flags.out) : resolve('atlas.json');
+    if (!rootDir || !existsSync(rootDir)) {
+      return emit({ ok: false, error: '用法: ccx atlas pack --root <dir> [--out <atlas.json>]' });
+    }
+    const atlas = buildAtlasFromDir(rootDir);
+    if (!atlas) return emit({ ok: false, error: '没有可打包的 png（或图集装不下）' });
+    mkdirSync(dirname(out), { recursive: true });
+    writeFileSync(out, JSON.stringify(atlas, null, 2) + '\n');
+    return emit({ ok: true, items: atlas.items.length, width: atlas.width, height: atlas.height, out });
+  }
+  // —— scene atlas <atlas.json> --out <scene.json>：图集 -> Sprite 场景 ——
+  if (sub === 'scene' && positional[1] === 'atlas') {
+    const atlasFile = positional[2];
+    if (!atlasFile || !existsSync(atlasFile)) {
+      return emit({ ok: false, error: '用法: ccx scene atlas <atlas.json> [--out <scene.json>]' });
+    }
+    let atlas;
+    try {
+      atlas = JSON.parse(readFileSync(atlasFile, 'utf8'));
+    } catch {
+      return emit({ ok: false, error: 'atlas 文件解析失败' });
+    }
+    const out = flags.out ? resolve(flags.out) : resolve('scenes/atlas.scene.json');
+    mkdirSync(dirname(out), { recursive: true });
+    const entities = atlas.items.map((it, i) => ({
+      id: i + 1,
+      name: it.name,
+      parent: null,
+      components: [{ type: 'ccx.Sprite', data: { atlas: 1, material: 1 } }],
+    }));
+    const sceneDoc = {
+      schema: 'ccx.scene/1',
+      meta: { name: 'AtlasScene', generator: 'ccx-cli scene atlas', atlas: atlasFile },
+      entities,
+      systems: [],
+    };
+    writeFileSync(out, JSON.stringify(sceneDoc, null, 2) + '\n');
+    return emit({ ok: true, entities: entities.length, out, from: atlasFile });
   }
 
   // —— cook --root <dir> [--platform <p>]：资产扫描 -> Cook -> bundle 一步 ——

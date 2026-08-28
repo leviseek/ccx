@@ -53,6 +53,22 @@ test('daemon: notification produces no response', async () => {
   }
 });
 
+test('daemon: EOF 优雅退出（spawn -> stdin.end -> exit 0）', async () => {
+  // 不依赖 ready：EOF 语义与就绪通知无关（readline close -> 清理 -> exit 0）
+  const client = new RpcClient(process.execPath, [daemonEntry]);
+  const exitCode = new Promise((resolve) => {
+    client.proc.on('exit', (code) => resolve(code));
+  });
+  try {
+    client.proc.stdin.end();
+    const code = await Promise.race(
+      [exitCode, new Promise((r) => setTimeout(() => r('timeout'), 5000))]);
+    assert.equal(code, 0, 'EOF 后 daemon 以 0 退出');
+  } finally {
+    client.proc.kill();  // 兜底（防测试失败残留）
+  }
+});
+
 test('daemon: closed connection rejects requests', async () => {
   const client = new RpcClient(process.execPath, [daemonEntry]);
   await client.request('asset.scan');

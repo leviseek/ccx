@@ -164,6 +164,12 @@ rl.on('line', async (line) => {
   const out = await daemon.handle(line);
   if (out) process.stdout.write(JSON.stringify(out) + '\n');
 });
+// EOF 优雅退出：先关 watchers 再 exit 0
+rl.on('close', () => {
+  for (const w of watchers) w.close();
+  watchers.length = 0;
+  process.exit(0);
+});
 
 process.stdout.write(JSON.stringify({
   jsonrpc: '2.0',

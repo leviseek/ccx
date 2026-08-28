@@ -52,6 +52,8 @@ export function runStdioDaemon(services) {
     const out = await daemon.handle(line);
     if (out) process.stdout.write(JSON.stringify(out) + '\n');
   });
+  // EOF 优雅退出（客户端 close -> exit 0）
+  rl.on('close', () => process.exit(0));
   // 就绪通知（客户端等待）
   process.stdout.write(JSON.stringify({
     jsonrpc: '2.0',

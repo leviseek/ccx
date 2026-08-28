@@ -131,6 +131,7 @@
 
 ## 变更记录
 
+- **v0.3.10（2026-08-27）**：M1 资产闭环与运维面——**atlas pack→scene atlas→render plan 闭环**（png 目录→ccx.atlas/1→Sprite 场景→1 批渲染计划，'从像素到渲染计划'单链）、**daemon EOF 优雅退出**（stdlib readline close→清理→exit 0，自终止诊断定位挂起根因：测试失败路径未 kill 残留 daemon，修复后套件 10/10）、**M1 交接清单**（docs/working/m1-handoff.md：基线 + 7 项硬缺口与归属）；ctest 23/23 + node 56/56。
 - **v0.3.9（2026-08-27）**：M1 整合与诊断面——**动画整合**（状态机选 clip→精灵帧采样→帧循环：AnimState 新增可选 sprite 字段，idle(2帧4fps)→walk(6帧10fps) 切换序列 0,0,1,1,0..5,0 断言）、**`ccx doctor` 环境体检**（11 项检查：骨架/规格/门禁/示例场景/vendor 纪律/构建产物，含修复提示）、**render plan `--out` 产物**（ccx.renderplan/1 JSON 落盘；flags 解析补齐五键）；ctest 23/23 + node 55/55。
 - **v0.3.8（2026-08-27）**：M1 循环与编排面——**精灵帧动画接入帧循环**（Scheduler 系统帧首采样→SpriteSampler→场景组件写回，0..5→回绕 0..1 断言；非循环钳末帧）、**`ccx demo all` 端到端编排**（一命令串起 daemon：open(7)→apply(+1)→save→build(5 hooks)→cook，5 步全 ok 输出）；ctest 22/22 + node 52/52。
 - **v0.3.7（2026-08-27）**：M1 全链面——**CLI `ccx cook`**（资产扫描→Cook→bundle 一步，压缩器未注册时产物标记 fail 不阻塞 bundle）、**资产全链组装测试**（场景装载→Sprite 收集→material↔shader 校验→pipeline 编译(registry)→渲染计划，一条链路 6 层）；ctest 21/21 + node 51/51。

@@ -181,6 +181,10 @@ add_executable(ccx_raster_test raster_test.cpp)
 target_link_libraries(ccx_raster_test PRIVATE ccx_render)
 add_test(NAME render.raster COMMAND ccx_raster_test)
 
+# 虚拟帧导出工具（非 CTest；Node 测试 spawn 后解析 PPM）
+add_executable(ccx_frame_dump frame_dump.cpp)
+target_link_libraries(ccx_frame_dump PRIVATE ccx_render ccx_scene)
+
 # M1：动画整合（状态机选 clip -> 精灵帧采样 -> 帧循环）
 add_executable(ccx_integrated_animation_test integrated_animation_test.cpp)
 target_link_libraries(ccx_integrated_animation_test PRIVATE ccx_animation ccx_ecs ccx_scene)

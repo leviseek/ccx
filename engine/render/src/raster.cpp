@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstdio>
 
 namespace ccx::render {
 
@@ -48,6 +49,22 @@ void rasterizeQuads(const PackResult& pk, RasterTarget& target, const OrthoCamer
             }
         }
     }
+}
+
+bool writePpm(const RasterTarget& target, const char* path) {
+    FILE* f = std::fopen(path, "wb");
+    if (!f) return false;
+    std::fprintf(f, "P6\n%d %d\n255\n", target.width, target.height);
+    for (uint32_t p : target.pixels) {
+        const unsigned char rgb[3] = {
+            static_cast<unsigned char>((p >> 24) & 0xFF),
+            static_cast<unsigned char>((p >> 16) & 0xFF),
+            static_cast<unsigned char>((p >> 8) & 0xFF),
+        };
+        std::fwrite(rgb, 1, 3, f);
+    }
+    std::fclose(f);
+    return true;
 }
 
 }  // namespace ccx::render

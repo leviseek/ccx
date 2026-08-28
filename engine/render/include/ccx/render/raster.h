@@ -25,4 +25,7 @@ struct RasterTarget {
 // rotZ != 0 的项跳过（v1 限制，M2 GPU 路径不受限）
 void rasterizeQuads(const PackResult& pk, RasterTarget& target, const OrthoCamera& cam);
 
+// 帧导出：PPM（P6 二进制，三通道）落盘 —— "看到第一帧"的最小途径
+bool writePpm(const RasterTarget& target, const char* path);
+
 }  // namespace ccx::render

@@ -1,7 +1,10 @@
 # gfx — CCX RHI（renderer-spec §2。M1 先交付 CPU 可测面：描述校验 + 句柄池；
 # GPU 后端（WebGPU/Vulkan/Metal/GLES）在 M2 挂载）
 
-add_library(ccx_gfx STATIC src/gfx.cpp)
+add_library(ccx_gfx STATIC
+  src/gfx.cpp
+  src/rhi_fake.cpp
+)
 
 target_include_directories(ccx_gfx PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(ccx_gfx PUBLIC ccx_foundation)

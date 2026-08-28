@@ -229,3 +229,8 @@ add_test(NAME e2e.integrated_animation COMMAND ccx_integrated_animation_test)
 add_executable(ccx_collider_roundtrip_test collider_roundtrip_test.cpp)
 target_link_libraries(ccx_collider_roundtrip_test PRIVATE ccx_physics ccx_scene)
 add_test(NAME physics.collider_roundtrip COMMAND ccx_collider_roundtrip_test)
+
+# M1：RHI 抽象接口契约（FakeDevice：无 GPU 可验）
+add_executable(ccx_rhi_fake_test rhi_fake_test.cpp)
+target_link_libraries(ccx_rhi_fake_test PRIVATE ccx_gfx)
+add_test(NAME gfx.rhi_fake COMMAND ccx_rhi_fake_test)

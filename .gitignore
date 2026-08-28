@@ -29,3 +29,9 @@ Thumbs.db
 
 # any-level build dirs
 build/
+
+# Android 构建产物
+android/.cxx/
+android/app/build/
+android/.gradle/
+

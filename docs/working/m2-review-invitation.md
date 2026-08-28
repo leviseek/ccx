@@ -31,3 +31,11 @@
 4. 评审人签字：＿＿＿＿＿ 日期：＿＿＿＿＿
 
 > 会后：结论与决议回写 m2-tickets.md（状态更新）与 m2-review-ready.md（评审记录）。
+
+
+## 终核注记（2026-08-28）
+
+- 环境：GPU ✅（RTX 4070 双后端 10/10）、网络待复测、Actions/真机待办。
+- 首批 ✅ 11 张 + W7 ✅；待环境：W6 系 2 张。
+- 就绪自检：node ci/verify_review_package.mjs → READY。
+

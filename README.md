@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.124（2026-08-28）**：M2 终核面——**T-W7-1 ✅ 已验收**（凭据：spine 3 测试+W1 渲染路径；m2-tickets 仅剩 W6 待环境）、**评审发起终核注记**（GPU ✅/首批 11+W7 ✅/就绪 READY）；ctest 60/60 + node 114/114。
 - **v0.3.123（2026-08-28）**：W7 运行时闭环——**骨骼动画帧循环驱动**（e2e.spine_tick：GameLoop 固定步累计时间 → Spine JSON → 采样 → RenderItem（t=1.5 末端保持语义澄清）；W7 数据面→加载→渲染→帧循环全链）；ctest 60/60 + node 114/114。
 - **v0.3.122（2026-08-28）**：W7 解析面——**Spine JSON 加载器**（spine_loader：3.8 格式（bones/animations.bones translate/rotate 合并轨）→ Skeleton；w7.spine_loader 测试 5 组（加载/双轨/中点/末端/空文档拒绝）；json ObjectEntries 线性查找适配）；ctest 59/59 + node 114/114。
 - **v0.3.121（2026-08-28）**：W7 渲染消费——**骨骼→渲染桥**（render::skeletonToRenderItems：姿态采样 → RenderItem（根偏移+骨骼位置/rotZ/atlas/size）；w7.skeleton_render 测试 4 组（v0.1 语义：骨骼独立于根偏移，层级链留 v0.2）；gate render 加 animation）；ctest 58/58 + node 114/114。

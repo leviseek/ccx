@@ -266,3 +266,5 @@ add_test(NAME e2e.script_to_frame COMMAND ccx_script_to_frame_test)
 
 
 
+add_executable(ccx_script_runner script_runner.cpp)
+target_link_libraries(ccx_script_runner PRIVATE ccx_script ccx_scene)

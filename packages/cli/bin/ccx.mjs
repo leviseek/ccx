@@ -9,6 +9,7 @@ import { createBundleManifest } from '../../build-service/src/bundle.mjs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { CommandBus } from '../../scene-service/src/commands.mjs';
+import { diffScenes } from '../../scene-service/src/diff.mjs';
 import { renderPlan } from '../../scene-service/src/render_plan.mjs';
 import { RpcClient } from '../../service-core/src/client.mjs';
 
@@ -115,6 +116,37 @@ async function main() {
       applied,
       entityCount: out.entities.length,
       note: 'undo/redo 属会话内能力（SceneService），CLI 一次性提交',
+    });
+  }
+
+  // —— scene diff <a> <b>：结构化差异（ADR-003 §4.3）——
+  if (sub === 'scene' && positional[1] === 'diff') {
+    const fa = positional[2];
+    const fb = positional[3];
+    if (!fa || !fb || !existsSync(fa) || !existsSync(fb)) {
+      return emit({ ok: false, error: '用法: ccx scene diff <a.scene.json> <b.scene.json>' });
+    }
+    let ja;
+    let jb;
+    try {
+      ja = JSON.parse(readFileSync(fa, 'utf8'));
+      jb = JSON.parse(readFileSync(fb, 'utf8'));
+    } catch {
+      return emit({ ok: false, error: '场景文件解析失败' });
+    }
+    const changes = diffScenes(ja, jb);
+    if (jsonMode) return emit({ ok: true, changes });
+    if (changes.length === 0) return emit({ ok: true, changes: [], summary: '无差异' });
+    return emit({
+      ok: true,
+      changes: changes.length,
+      summary: changes.map((c) => {
+        const head = c.kind === 'entity'
+          ? c.op + ' ' + c.name
+          : c.id + '.' + (c.path ? c.path.join('.') : c.componentType);
+        return (c.op === 'set' ? '~ ' : c.op === 'add' ? '+ ' : '- ') + head +
+               (c.value !== undefined ? ' = ' + JSON.stringify(c.value) : '');
+      }).join('\n'),
     });
   }
 

@@ -30,9 +30,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: 工具版本
-        run: |
-          cmake --version
-          cl 2>&1 | Select-Object -First 1
+        run: cmake --version
       - name: 配置（VS2022 x64）
         run: cmake -S . -B build/ci-windows -G "Visual Studio 17 2022" -A x64 -DCCX_BUILD_TESTS=ON
       - name: 构建

@@ -296,7 +296,12 @@ async function main() {
   // —— demo all：端到端编排（open -> apply -> save -> build -> cook）——
   if (sub === 'demo' && positional[1] === 'all') {
     const steps = [];
-    const push = (name, data) => steps.push({ name, ...data, ok: !!data.ok });
+    const stepStart = {};
+    const push = (name, data) => {
+      const ms = stepStart[name] ? Date.now() - stepStart[name] : 0;
+      steps.push({ name, ...data, ok: !!data.ok, ms });
+    };
+    const tick = (name) => { stepStart[name] = Date.now(); };
     const daemonEntry = resolve(join(here, '..', '..', 'service-core', 'bin', 'daemon.mjs'));
     const client = new RpcClient(process.execPath, [daemonEntry]);
     try {
@@ -310,26 +315,32 @@ async function main() {
         setTimeout(() => reject(new Error('daemon 未就绪')), 2500);
       });
       // 1) open
+      tick('scene.open');
       const fixture = resolve(join(here, '..', '..', '..', 'examples', 'scenes', 'render_plan.scene.json'));
       const open = await client.request('scene.open', { path: fixture });
       push('scene.open', { entities: open.entities, ok: open.ok });
       if (!open.ok) return emit({ ok: false, steps });
       // 2) apply
+      tick('scene.apply');
       const a1 = await client.request('scene.apply', { command: { op: 'create_entity', name: 'npc', parent: 1 } });
       const a2 = await client.request('scene.apply', { command: { op: 'add_component', id: 2, type: 'game.Health', data: { max: 80 } } });
       push('scene.apply', { entities: a2.entities, ok: a2.ok });
       // 3) save
+      tick('scene.save');
       const savePath = resolve(join(here, '..', '..', '..', 'build', 'local', 'demo-all.scene.json'));
       const saved = await client.request('scene.save', { path: savePath });
       push('scene.save', { entities: saved.ok ? (await client.request('scene.query')).entities.length : -1, ok: saved.ok });
       // 4) build
+      tick('build.run');
       const run = await client.request('build.run', { platform: 'web-desktop', project: 'demo-all' });
       push('build.run', { trace: run.trace ? run.trace.filter((t) => t.status === 'ok').length : 0, ok: run.ok });
       // 5) profiler：记录 1 演示帧 + 快照
+      tick('profiler.snapshot');
       await client.request('profiler.record', { frame: 1, frameTimeMs: 16.6, entities: 8 });
       const prof = await client.request('profiler.snapshot', { count: 5 });
       push('profiler.snapshot', { schema: prof.schema, frames: prof.frames.length, ok: true });
       // 6) frame gif（渲染帧动画序列）
+      tick('frame.gif');
       {
         const fixture = resolve(join(here, '..', '..', '..', 'examples', 'scenes', 'render_plan.scene.json'));
         const dumpExe = resolve(join(here, '..', '..', '..', 'build', 'local', 'engine', 'tests', 'ccx_frame_dump.exe'));
@@ -361,6 +372,7 @@ async function main() {
         push('frame.gif', { frames: frameResults.length, ok: true });
       }
       // 7) contact.gif：碰撞时序动画（--contacts 自动高亮）
+      tick('contact.gif');
       {
         const collideScene = resolve(join(here, '..', '..', '..', 'build', 'local', 'demo-collide.scene.json'));
         writeFileSync(collideScene, JSON.stringify({
@@ -406,6 +418,7 @@ async function main() {
         push('contact.gif', { frames: cFrames.length, ok: true });
       }
       // 8) cook（本地）
+      tick('cook');
       const assetsDir = resolve(join(here, '..', '..', '..', 'build', 'local', 'demo-assets'));
       mkdirSync(assetsDir, { recursive: true });
       writeFileSync(join(assetsDir, 'hero.png'), 'png');

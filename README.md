@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.139（2026-08-28）**：profiler 预算面——**帧总耗时预算**（demo profiler.frames 步 budgetMs=2000/budgetOk（实跑 763ms 达标）——与脚本预算同治理面）；ctest 62/62 + node 117/117。
 - **v0.3.138（2026-08-28）**：M1 收口 2——**18 步/117/199 四件全同步**（summary/completion/launch/ready）；ctest 62/62 + node 117/117。
 - **v0.3.137（2026-08-28）**：W6 预备——**device 探测深化**（doctor --env：adb 多路径探测（PATH/scoop/SDK）+ 设备计数；安装尝试如实记录（dl.google.com DNS 不可达，待网络））；ctest 62/62 + node 117/117。
 - **v0.3.136（2026-08-28）**：demo 十八步——**profiler.frames 三源汇总**（仿真 GIF/真 GPU/骨骼帧耗时合流（217/482/50ms→749ms）——帧开销统一可见）；ctest 62/62 + node 117/117。

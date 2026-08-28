@@ -684,11 +684,14 @@ async function main() {
         const gifMs = findMs('frame.gif');
         const wgpuMs = findMs('frame.wgpu');
         const spineMs = findMs('spine.frame');
+        const totalMs = gifMs + wgpuMs + spineMs;
         push('profiler.frames', {
           frameGifMs: gifMs,
           frameWgpuMs: wgpuMs,
           spineMs,
-          totalMs: gifMs + wgpuMs + spineMs,
+          totalMs,
+          budgetMs: 2000,  // 帧总耗时预算（三源）
+          budgetOk: totalMs < 2000,
           ok: gifMs > 0 && wgpuMs > 0 && spineMs > 0,
         });
       }

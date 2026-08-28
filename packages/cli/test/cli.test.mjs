@@ -177,6 +177,7 @@ test('ccx demo all：端到端编排（open/apply/save/build/cook）', () => {
   assert.ok(pfs && pfs.ok, '三源帧耗时汇总');
   assert.ok(pfs.totalMs > 0, '总耗时 >0');
   assert.equal(pfs.frameGifMs > 0 && pfs.frameWgpuMs > 0 && pfs.spineMs > 0, true, '三源各有耗时');
+  assert.equal(pfs.budgetOk, true, '帧总耗时在预算内');
   assert.ok(out.steps[15].ctest >= 46, '守护规模汇总（CTest）');
   assert.equal(out.steps[16].assets, 1, 'Web 站点资产清单');
   assert.equal(out.steps[16].index, true, 'index.html 已生成');

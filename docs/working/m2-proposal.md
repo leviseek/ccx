@@ -39,3 +39,10 @@
 第一帧像素对照 / 编辑器 15 步无手改 JSON 内测 / 脚本 10 命令场景 diff 可核 / 真机首帧截图+帧统计 / 压缩产物 magic 校验。
 
 > 本建议书为立项评审输入；批准后 W 包拆 ticket 挂 owner。
+
+## 6. 首批进度（v0.3.55 实况）
+
+- **W3 会话**：daemon undo/redo/status RPC ✅ + 会话版本化 + session.save/load ✅ + CLI 流程内 --undo/--redo ✅ —— **首批可交付项完成**。
+- **W4 压缩**：registerCompressor 插件 + externalCompressor（spawn 任意工具）✅ + CCX_EXTERNAL_COMPRESSOR 环境变量配置接入 CLI cook ✅ —— 接 pngquant/astcenc 仅差指名工具。
+- **W5a 宿主**：v8-host-design 文档 ✅（决策点：v8 vs QuickJS 未决）—— 待决策后嵌入。
+- 剩余依赖：真 GPU（W1/W7）、渠道（W6）、编辑器 DOM 层（W2，依赖 W1 预览）。

@@ -1065,7 +1065,8 @@ async function main() {
     });
   }
   if (sub === 'doctor') {
-    const cwd = process.cwd();
+    const root = resolve(join(here, '..', '..', '..'));  // 仓库根（不随调用 cwd）
+    const cwd = root;
     const git = spawnSync('git', ['--version'], { encoding: 'utf8' });
     const checks = {
       node: process.version,
@@ -1086,6 +1087,9 @@ async function main() {
       '资产注册表模块': existsSync(join(cwd, 'engine', 'assets', 'include')),
       '物理模块': existsSync(join(cwd, 'engine', 'physics', 'include')),
       '音频模块': existsSync(join(cwd, 'engine', 'audio', 'include')),
+      '外部压缩器配置': process.env.CCX_EXTERNAL_COMPRESSOR
+        ? '已配置（' + process.env.CCX_EXTERNAL_COMPRESSOR.split('=')[0] + '）'
+        : '未配置（可选：pngquant/astcenc 等经 CCX_EXTERNAL_COMPRESSOR 接入）',
       '引擎模块计数': readdirSync(join(cwd, 'engine'))
         .filter((n) => existsSync(join(cwd, 'engine', n, 'CMakeLists.txt'))).length,
       'Node 测试文件数': countTestFilesSync(cwd),

@@ -46,7 +46,11 @@ test('scene new：ADR-003 v1 空场景', () => {
   }
 });
 
-test('doctor/version 冒烟', () => {
+test('doctor/version 冒烟（含外部压缩器配置位）', () => {
+  const r = runCli(['doctor', '--json'], join(import.meta.dirname, '..'));
+  assert.equal(r.status, 0, r.err + r.out);
+  const out = JSON.parse(r.out);
+  assert.ok('外部压缩器配置' in out.checks, '外部压缩器配置键存在');
   const v = runCli(['version', '--json'], join(import.meta.dirname, '..'));
   assert.equal(v.status, 0);
   assert.ok(JSON.parse(v.out).milestone === 'M1');

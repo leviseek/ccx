@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.155（2026-08-28）**：W6 帧循环——**动态帧上屏**（nativeFrameAt(t) 红块圆路径 + 16ms 重绘；两间隔截图 OCR 红块位移——设备动画验证通过）；ctest 62/62 + node 120/120。
 - **v0.3.154（2026-08-28）★★ W6 里程碑：真机首帧达成 ★★**——**引擎帧显示在 Android 设备屏幕**（nativeFrame 三精灵块 → Bitmap → Canvas；截图 OCR 实证；exit4 真机首帧截图达成）——W6 设备链全通；ctest 62/62 + node 120/120。
 - **v0.3.153（2026-08-28）★ W6 里程碑 ★**——**壳 App 在 Android 设备上运行**（Kotlin→Java 壳修复 ClassNotFound/SIGSEGV；截图 OCR 实证 "CCX" 显示；无 FATAL）——exit4 真机首帧的壳侧就绪；ctest 62/62 + node 120/120。
 - **v0.3.152（2026-08-28）**：W6 壳工程首建——**APK 构建链全通**（gradle assembleDebug 成功（42KB）/install Success/am start 触发；Kotlin 壳 + JNI shell.cpp）；待 debug：Shutdown SIGSEGV（JNI 生命周期——壳开发项）；ctest 62/62 + node 120/120。

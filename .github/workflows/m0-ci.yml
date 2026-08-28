@@ -63,8 +63,8 @@ jobs:
         run: |
           mkdir gen
           copy ..\out\ccx_hello_bindings.cpp gen\
-          npm install --no-audit --no-fund
-          # node-gyp install 在 VS18 下失败（find VS 探测限制）；headers 下载实际已成功（200），失败仅因探测
+          # --ignore-scripts：gypfile:true 会触发 node-gyp rebuild（VS18 探测失败）；CMake 接管编译
+          npm install --no-audit --no-fund --ignore-scripts
           npx node-gyp install 2>&1 | Out-Null
           if (-not (Test-Path "$env:LOCALAPPDATA\node-gyp\Cache")) {
             Write-Error 'node-gyp headers 缓存缺失'

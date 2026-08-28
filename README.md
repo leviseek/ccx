@@ -126,6 +126,14 @@
 | ECS 最小实现（M0 工作包） | ✅ **实现并测试全绿** | engine/ecs：World/Entity(版本)/Archetype(SoA+自动扩容)/Query/CommandBuffer；ctest 3/3（含 1000 实体跨 chunk 扩容用例） |
 | M0 出口①（场景 JSON+diff） | ✅ **补齐** | examples/scenes/sample.scene.json + scene_sample_test（golden/反读/幂等）；git diff 演示见评审材料 §3 |
 | M0 出口④（bindgen napi） | 🟡 **基础设施补齐，待真 CI** | napi/binding.gyp + smoke + CI 任务 lighthouse-c-bindgen；本机 5/5+tsc 通过 |
+| **M1 引擎（13 构建模块）** | ✅ 本地全绿 | foundation/ecs/scene/render/gfx/animation/particle/input/game/assets/audio/physics + CTest 43 项 |
+| **M1 服务三形态** | ✅ 真进程守护 | stdio daemon（scene/asset/audit/profiler/build RPC + EOF 优雅退出 + detached 常驻）、CommandBus、CLI 17 子命令 |
+| **M1 交付链** | ✅ 单命令八步 | `ccx demo all`：open→apply→save→build→profiler→frame.gif→contact.gif→cook |
+| **M1 物理面** | ✅ 全链 | 宽相（SpatialGrid）→窄相→层掩码→ccx.Collider 组件→接触事件→组件/音效联动→时序动画断言 |
+| **M1 动画/渲染面** | ✅ 全链 | 曲线/精灵帧/状态机合流↔渲染项↔packer↔相机↔软件光栅像素断言（PPM/BMP/GIF 可视） |
+| **M1 编辑器面** | ✅ 模型+视图 | EditorShell + buildView + renderViewHtml + preview（--frame/--gif 嵌入）——M2 Web UI 的完备前端产物 |
+| **M1 工具与一致性** | ✅ 持续守护 | 跨语言对拍（render plan）、场景 diff（ADR-003）、CLI cook/atlas/doctor 环境体检（模块/测试计数） |
+| **M1 剩余硬缺口** | 🟡 环境依赖 | GPU 首帧（缓冲上传/绘制= M2 W1）、V8 脚本宿主（CI 待跑）、Web 构建目标——见 m1-handoff §2 |
 
 构建复现（本地）：`mise install` 后 `cmake -S . -B build/local -G Ninja -DCMAKE_CXX_COMPILER=<g++>` → `cmake --build build/local` → `ctest --test-dir build/local`。
 

@@ -34,3 +34,7 @@
 - W1 双后端 10/10：2.7s
 - 设备：ALN-AL00 在线（ccx device status）
 - **机器段合计 ≈24.2s**——评审全程仍可在 20 分钟内完成；环境矩阵仅剩 Actions CI 真跑（push 后确认）。
+## 终版彩排 3（2026-08-28，v0.3.160，全链含设备）
+
+- 自检 READY 19s + demo 18 步 2.6s + W1 双后端 2.7s + device status 0.1s + screenshot 0.2s
+- **机器段合计 ≈24.6s**——评审随时可举行；环境矩阵仅剩 Actions CI 真跑（push 后）。

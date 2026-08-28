@@ -4,8 +4,8 @@
 
 ## 数字（本机实测）
 
-- CTest 51/51；node --test 108/108；引擎构建模块 14；Node 测试文件 32；demo all **15 步**全 ok
-- 守护合计 ≈ 184 项；vendor 包 5（pal/audio/storage/main/quickjs）
+- CTest 56/56；node --test 114/114；引擎构建模块 14；Node 测试文件 32；demo all **16 步**全 ok（含真后端帧）
+- 守护合计 ≈ 194 项；vendor 包 6（pal/audio/storage/main/quickjs/webgpu-headers）
 - demo 基线：frame.gif 44ms / contact.gif 40ms；总耗 ~90ms
 
 ## 能力清单（一条命令可验证）
@@ -32,5 +32,6 @@
 - layered_imports：76 文件合规（铁律 1/6）
 - vendor_check：5 包合规（ADR-005）
 - 双门禁纳入每轮全量验证（此前曾遗漏 layered，已修复并固化）
+
 
 

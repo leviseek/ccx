@@ -32,6 +32,7 @@ import { CommandBus } from '../../scene-service/src/commands.mjs';
 import { diffScenes } from '../../scene-service/src/diff.mjs';
 import { renderPlan } from '../../scene-service/src/render_plan.mjs';
 import { RpcClient } from '../../service-core/src/client.mjs';
+import { migrateCreatorScene } from '../src/creator_migrator.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 
@@ -1317,6 +1318,25 @@ async function main() {
     } finally {
       client.close();
     }
+  }
+
+  // —— migrate <creator.scene> [--out <scene.json>]：Creator 2D 场景迁移器（M5）——
+  if (sub === 'migrate') {
+    const src = positional[1];
+    if (!src || !existsSync(src)) {
+      return emit({ ok: false, error: '用法: ccx migrate <creator.scene> [--out <scene.json>]' });
+    }
+    let doc;
+    try {
+      doc = JSON.parse(readFileSync(src, 'utf8'));
+    } catch {
+      return emit({ ok: false, error: 'Creator .scene 解析失败' });
+    }
+    const out = migrateCreatorScene(doc);
+    if (out.error) return emit({ ok: false, error: out.error });
+    const outPath = flags.out ? resolve(flags.out) : resolve('migrated.scene.json');
+    writeFileSync(outPath, JSON.stringify(out, null, 2));
+    return emit({ ok: true, out: outPath, entities: out.entities.length });
   }
 
   // —— doctor / version ——

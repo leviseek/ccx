@@ -1,0 +1,7 @@
+{
+  "name": "@ccx/profiler-service",
+  "version": "0.1.0",
+  "private": true,
+  "description": "帧统计采集（profiler）：与 C++ FrameStats 同构的 Node 侧环形缓冲（engine-spec §3.7 -> services）",
+  "type": "module"
+}

@@ -156,6 +156,16 @@ add_executable(ccx_asset_registry_test asset_registry_test.cpp)
 target_link_libraries(ccx_asset_registry_test PRIVATE ccx_assets)
 add_test(NAME assets.registry COMMAND ccx_asset_registry_test)
 
+# M1：正交相机/视口（world -> NDC -> screen）
+add_executable(ccx_camera_test camera_test.cpp)
+target_link_libraries(ccx_camera_test PRIVATE ccx_render)
+add_test(NAME render.camera COMMAND ccx_camera_test)
+
+# M1：资产注册表驱动渲染尺寸（asset-driven rendering）
+add_executable(ccx_asset_driven_frame_test asset_driven_frame_test.cpp)
+target_link_libraries(ccx_asset_driven_frame_test PRIVATE ccx_assets ccx_render)
+add_test(NAME assets.driven_render COMMAND ccx_asset_driven_frame_test)
+
 # M1：动画整合（状态机选 clip -> 精灵帧采样 -> 帧循环）
 add_executable(ccx_integrated_animation_test integrated_animation_test.cpp)
 target_link_libraries(ccx_integrated_animation_test PRIVATE ccx_animation ccx_ecs ccx_scene)

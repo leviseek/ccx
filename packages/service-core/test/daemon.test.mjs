@@ -180,6 +180,28 @@ test('daemon: asset.scan real directory', async () => {
   }
 });
 
+test('daemon: profiler.record/snapshot RPC', async () => {
+  const client = new RpcClient(process.execPath, [daemonEntry]);
+  try {
+    await new Promise((resolve) => {
+      const off = client.onEvent((m) => {
+        if (m.method === 'system.ready') { off(); resolve(); }
+      });
+      setTimeout(() => resolve(), 2000);
+    });
+    const r1 = await client.request('profiler.record', { frame: 1, frameTimeMs: 16.6, entities: 3 });
+    const r2 = await client.request('profiler.record', { frame: 2, frameTimeMs: 17.1, entities: 3 });
+    assert.equal(r1.recorded, 1);
+    assert.equal(r2.recorded, 2);
+    const snap = await client.request('profiler.snapshot', { count: 5 });
+    assert.equal(snap.schema, 'ccx.profile/1');
+    assert.equal(snap.frames.length, 2);
+    assert.equal(snap.frames[1].frameTimeMs, 17.1);
+  } finally {
+    client.close();
+  }
+});
+
 test('daemon: asset.subscribe -> assetChanged push (real fs change)', async () => {
   const dir = mkdtempSync(join(tmpdir(), 'ccx-daemon-watch-'));
   const client = new RpcClient(process.execPath, [daemonEntry]);

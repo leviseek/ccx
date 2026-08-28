@@ -19,7 +19,10 @@ function listBuildersSafe() {
   }
 }
 import { runBuild } from '../../build-service/src/pipeline.mjs';
+import { FrameProfile } from '../../profiler-service/src/adapter.mjs';
 import { createDaemon } from '../src/daemon.mjs';
+
+const profile = new FrameProfile();
 
 // 平台 Builder 内置注册（contributes.builder 对齐）
 const builtinBuilder = {
@@ -59,6 +62,10 @@ function scanDir(root) {
 }
 
 const services = {
+  profiler: {
+    record: (params = {}) => ({ ok: true, recorded: profile.recordFrameStats(params).frame }),
+    snapshot: (params = {}) => profile.snapshotJson(params.count ?? 10),
+  },
   asset: {
     scan: ({ root } = {}) => (root ? scanDir(root) : { assets: [], error: 'need root' }),
     list: (params = {}) => ({

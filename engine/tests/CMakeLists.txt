@@ -19,6 +19,13 @@ add_executable(ccx_ecs_bench_test ecs_bench_test.cpp)
 target_link_libraries(ccx_ecs_bench_test PRIVATE ccx_ecs ccx_render ccx_foundation)
 add_test(NAME ecs.bench_gate COMMAND ccx_ecs_bench_test)
 
+# M3：GLES3 全档降级表（renderer-spec §2.4 能力位）
+if(TARGET ccx_gfx)
+  add_executable(ccx_render_caps_test render_caps_test.cpp)
+  target_link_libraries(ccx_render_caps_test PRIVATE ccx_gfx)
+  add_test(NAME render.caps COMMAND ccx_render_caps_test)
+endif()
+
 # v1.0 基准4（roadmap §8.2）：10 万实体场景 round-trip 全等
 add_executable(ccx_scene_big_roundtrip_test scene_big_roundtrip_test.cpp)
 target_link_libraries(ccx_scene_big_roundtrip_test PRIVATE ccx_scene ccx_foundation)

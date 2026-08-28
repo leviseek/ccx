@@ -26,3 +26,6 @@ tools/bindgen/out/
 .idea/
 .DS_Store
 Thumbs.db
+
+# any-level build dirs
+build/

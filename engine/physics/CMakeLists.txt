@@ -1,6 +1,9 @@
 # physics — 2D 碰撞数据面（AABB + 空间网格宽相；engine-spec §1 物理起点，解算在 M2）
 
-add_library(ccx_physics STATIC src/collision.cpp)
+add_library(ccx_physics STATIC
+  src/collision.cpp
+  src/contact.cpp
+)
 
 target_include_directories(ccx_physics PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_link_libraries(ccx_physics PUBLIC ccx_foundation)

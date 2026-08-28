@@ -200,6 +200,11 @@ add_executable(ccx_tick_collision_test tick_collision_test.cpp)
 target_link_libraries(ccx_tick_collision_test PRIVATE ccx_physics ccx_ecs ccx_scene)
 add_test(NAME e2e.tick_collision COMMAND ccx_tick_collision_test)
 
+# M1：窄相（宽相候选 -> AABB 精确接触事件）
+add_executable(ccx_narrow_phase_test narrow_phase_test.cpp)
+target_link_libraries(ccx_narrow_phase_test PRIVATE ccx_physics)
+add_test(NAME physics.narrow_phase COMMAND ccx_narrow_phase_test)
+
 # M1：动画整合（状态机选 clip -> 精灵帧采样 -> 帧循环）
 add_executable(ccx_integrated_animation_test integrated_animation_test.cpp)
 target_link_libraries(ccx_integrated_animation_test PRIVATE ccx_animation ccx_ecs ccx_scene)

@@ -52,6 +52,7 @@ async function main() {
     if (args[i] === '--frame') flags.frame = args[++i];
     if (args[i] === '--times') flags.times = args[++i];
     if (args[i] === '--delay') flags.delay = args[++i];
+    if (args[i] === '--gif') flags.gif = args[++i];
   }
   const sub = positional[0] ?? 'doctor';
 
@@ -245,6 +246,14 @@ async function main() {
       const dataUrl = 'data:image/bmp;base64,' + bmp.toString('base64');
       html = html.replace('</footer>',
         '<section id="frame-view"><img alt="render frame" src="' + dataUrl +
+        '" style="image-rendering:pixelated;border:1px solid #333;max-width:100%"></section>' +
+        '</footer>');
+    }
+    // --gif <file>：动画序列嵌入（GIF data URL）
+    if (flags.gif && existsSync(flags.gif)) {
+      const gifUrl = 'data:image/gif;base64,' + readFileSync(flags.gif).toString('base64');
+      html = html.replace('</footer>',
+        '<section id="anim-view"><img alt="frame animation" src="' + gifUrl +
         '" style="image-rendering:pixelated;border:1px solid #333;max-width:100%"></section>' +
         '</footer>');
     }

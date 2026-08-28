@@ -318,6 +318,27 @@ test('ccx frame gif：多时间点 -> GIF 动画文件', () => {
   }
 });
 
+test('ccx editor preview --gif：动画序列嵌入', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ccx-prev-gif-'));
+  try {
+    const fixture = join(import.meta.dirname, '..', '..', '..', 'examples', 'scenes',
+                         'render_plan.scene.json');
+    const gif8 = Buffer.from(
+      'GIF89a' + Buffer.from([1, 0, 1, 0, 0x80, 0, 0]).toString() +
+      Buffer.from([255, 0, 0, 0, 255, 0]).toString() + '\x3B', 'binary');
+    const gifFile = join(dir, 'a.gif');
+    writeFileSync(gifFile, gif8);
+    const out = join(dir, 'preview.html');
+    const r = runCli(['editor', 'preview', fixture, '--out', out, '--gif', gifFile], dir);
+    assert.equal(r.status, 0, r.err + r.out);
+    const html = readFileSync(out, 'utf8');
+    assert.ok(html.includes('data:image/gif;base64,'), 'GIF data URL 在页面');
+    assert.ok(html.includes('anim-view'), '动画视图节点');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('scene apply：非法命令拒绝且不写坏文件', () => {
   const dir = mkdtempSync(join(tmpdir(), 'ccx-apply-bad-'));
   try {

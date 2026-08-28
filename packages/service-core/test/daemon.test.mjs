@@ -207,6 +207,36 @@ test('daemon: 审计记录（apply 统一留痕，铁律 12）', async () => {
   }
 });
 
+test('daemon: 场景会话 undo/redo/status（W3 会话首批）', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ccx-sess-'));
+  const client = new RpcClient(process.execPath, [daemonEntry]);
+  try {
+    const sceneFile = join(dir, 's.json');
+    writeFileSync(sceneFile, JSON.stringify({
+      schema: 'ccx.scene/1', meta: {},
+      entities: [{ id: 1, name: 'root', parent: null, components: [] }],
+      systems: [],
+    }));
+    await client.request('scene.open', { path: sceneFile });
+    await client.request('scene.apply', { command: { op: 'create_entity', name: 'a' } });
+    await client.request('scene.apply', { command: { op: 'create_entity', name: 'b' } });
+    const st = await client.request('scene.status');
+    assert.equal(st.undo, 2);
+    assert.equal(st.redo, 0);
+    assert.equal(st.entities, 3);
+    const u = await client.request('scene.undo');
+    assert.equal(u.entities, 2);
+    assert.equal(u.undo, 1);
+    assert.equal(u.redo, 1);
+    const r = await client.request('scene.redo');
+    assert.equal(r.entities, 3);
+    assert.equal(r.redo, 0);
+  } finally {
+    client.close();
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('daemon: MCP 工具面（listTools/callTool）', async () => {
   const client = new RpcClient(process.execPath, [daemonEntry]);
   const dir = mkdtempSync(join(tmpdir(), 'ccx-mcp-'));  // try 外声明：finally 恒可见

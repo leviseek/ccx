@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.52（2026-08-28）**：M1 会话面——**daemon 场景会话 undo/redo/status RPC**（W3 首批：undo 计数/redo 计数/实体数可查可回滚）、**undo 语义 v2（全量快照）**（create/destroy/属性全部可逆——修复 create 不可逆的 v1 缺口；scene+daemon 22/22）；ctest 46/46 + node 92/92。
 - **v0.3.51（2026-08-28）**：M1 汇总面——**doctor --summary**（机器可消费状态：milestone/模块 13/CTest 46/测试文件 25/11 步/时间戳）、**M2 立项建议书**（docs/working/m2-proposal.md：背景/工作包状态/交付节奏三批/资源/验收）；ctest 46/46 + node 92/92。
 - **v0.3.50（2026-08-27）**：M1 性能面——**doctor --demo 两轮计时统计**（runs 2 / totalMs 88 / slowest frame.gif / fastest mcp.tools——健康+性能四合一输出）；ctest 46/46 + node 92/92。
 - **v0.3.49（2026-08-27）**：M1 入口面——**game.js 运行时入口骨架**（window.CCX.boot：loadIndex（fetch 资产索引）+ ready 回调 + 平台注入——Web 目标的可解释入口形态）、**demo build.web 步产物经校验器回读**（indexValidated: true，校验入交付链）；ctest 46/46 + node 92/92。

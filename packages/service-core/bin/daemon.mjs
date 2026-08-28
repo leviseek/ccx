@@ -186,6 +186,23 @@ const services = {
       }
       return { ok: true, entities: scene.scene.entities.size };
     },
+    undo: () => {
+      if (!scene) return { ok: false, error: '未打开场景' };
+      scene.undo();
+      return { ok: true, entities: scene.scene.entities.size,
+               undo: scene.undoStack.length, redo: scene.redoStack.length };
+    },
+    redo: () => {
+      if (!scene) return { ok: false, error: '未打开场景' };
+      scene.redo();
+      return { ok: true, entities: scene.scene.entities.size,
+               undo: scene.undoStack.length, redo: scene.redoStack.length };
+    },
+    status: () => {
+      if (!scene) return { ok: false, error: '未打开场景' };
+      return { ok: true, entities: scene.scene.entities.size,
+               undo: scene.undoStack.length, redo: scene.redoStack.length };
+    },
     save: ({ path } = {}) => {
       if (!scene) return { ok: false, error: '未打开场景' };
       try {

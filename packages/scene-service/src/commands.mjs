@@ -64,8 +64,24 @@ export class CommandBus {
     this.redoStack = [];
   }
 
+  // 全量快照（undo/redo v2 正确性：create/destroy/属性全部可逆）
+  snapshotAll() {
+    return {
+      entities: [...this.scene.entities].map(([id, e]) => [
+        id,
+        { id: e.id, name: e.name, parent: e.parent, components: clone(e.components) },
+      ]),
+      nextId: this.scene.nextId,
+    };
+  }
+
+  restoreAll(snap) {
+    this.scene.entities = new Map(snap.entities);
+    this.scene.nextId = snap.nextId;
+  }
+
   apply(cmd) {
-    const before = this.collectBefore(cmd);
+    const before = this.snapshotAll();
     this.execute(cmd);
     this.undoStack.push({ cmd, before });
     this.redoStack.length = 0;
@@ -74,7 +90,7 @@ export class CommandBus {
   undo() {
     const top = this.undoStack.pop();
     if (!top) return false;
-    this.scene.restore(top.before);
+    this.restoreAll(top.before);
     this.redoStack.push(top);
     return true;
   }
@@ -82,8 +98,7 @@ export class CommandBus {
   redo() {
     const top = this.redoStack.pop();
     if (!top) return false;
-    // 重放命令（重新收集快照后执行；undo 栈可见）
-    const before = this.collectBefore(top.cmd);
+    const before = this.snapshotAll();
     this.execute(top.cmd);
     this.undoStack.push({ cmd: top.cmd, before });
     return true;

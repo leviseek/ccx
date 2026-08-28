@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { spawnSync } from 'node:child_process';
@@ -434,6 +434,34 @@ test('ccx mcp：工具列表与工具调用', () => {
   const bad = runCli(['mcp', 'call', 'asset.list', '{nope', '--json'], join(import.meta.dirname, '..'));
   assert.equal(JSON.parse(bad.out).ok, false);
   assert.ok(JSON.parse(bad.out).error.includes('JSON'));
+});
+
+test('ccx editor preview --site：Web 产物游戏壳视图', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ccx-siteview-'));
+  try {
+    const fixture = join(import.meta.dirname, '..', '..', '..', 'examples', 'scenes',
+                         'render_plan.scene.json');
+    const siteDir = join(dir, 'site');
+    mkdirSync(siteDir);
+    writeFileSync(join(siteDir, 'assets.json'), JSON.stringify({
+      schema: 'ccx.assets.index/1', platform: 'web-desktop',
+      assets: [{ uuid: 'a-1', path: 'assets/hero.png' }],
+    }));
+    const out = join(dir, 'preview.html');
+    const r = runCli(['editor', 'preview', fixture, '--out', out, '--site', siteDir], dir);
+    assert.equal(r.status, 0, r.err + r.out);
+    const html = readFileSync(out, 'utf8');
+    assert.ok(html.includes('site-view'), '站点视图节点');
+    assert.ok(html.includes('web-desktop'), '平台展示');
+    assert.ok(html.includes('assets/hero.png'), '资产列表');
+    // 缺 indices 时优雅降级（无 site-view）
+    const out2 = join(dir, 'preview2.html');
+    const r2 = runCli(['editor', 'preview', fixture, '--out', out2, '--site', join(dir, 'nope')], dir);
+    assert.equal(r2.status, 0);
+    assert.ok(!readFileSync(out2, 'utf8').includes('site-view'), '无产物不渲染站点视图');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
 });
 
 test('scene apply：非法命令拒绝且不写坏文件', () => {

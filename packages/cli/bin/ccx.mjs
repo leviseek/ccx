@@ -11,6 +11,7 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildView } from '../../editor-shell/src/viewmodel.mjs';
 import { EditorShell } from '../../editor-shell/src/shell.mjs';
+import { parseAssetsIndex } from '../../build-service/src/assets_index.mjs';
 import { buildGif } from '../../editor-shell/src/gif.mjs';
 import { parsePpm, ppmToBmp } from '../../editor-shell/src/ppm_to_bmp.mjs';
 import { renderPreviewPage } from '../../editor-shell/src/preview_page.mjs';
@@ -84,6 +85,7 @@ async function main() {
     if (args[i] === '--gif') flags.gif = args[++i];
     if (args[i] === '--highlight') flags.highlight = args[++i];
     if (args[i] === '--demo') flags.demo = true;
+    if (args[i] === '--site') flags.site = args[++i];
   }
   const sub = positional[0] ?? 'doctor';
 
@@ -287,6 +289,22 @@ async function main() {
         '<section id="anim-view"><img alt="frame animation" src="' + gifUrl +
         '" style="image-rendering:pixelated;border:1px solid #333;max-width:100%"></section>' +
         '</footer>');
+    }
+    // --site <dir>：Web 构建产物（assets.json）游戏壳视图
+    if (flags.site) {
+      const indexFile = join(resolve(flags.site), 'assets.json');
+      if (existsSync(indexFile)) {
+        try {
+          const idx = parseAssetsIndex(readFileSync(indexFile, 'utf8'));
+          const rows = idx.assets
+            .map((a) => '<li data-asset="' + a.uuid + '">' + a.path + '</li>').join('');
+          html = html.replace('</footer>',
+            '<section id="site-view"><h3>Web 站点：' + idx.platform + '</h3><ul>' +
+            rows + '</ul></section></footer>');
+        } catch {
+          /* 非法索引：跳过站点视图 */
+        }
+      }
     }
     const out = flags.out ? resolve(flags.out) : resolve('preview.html');
     writeFileSync(out, html);

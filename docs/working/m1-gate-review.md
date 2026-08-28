@@ -30,9 +30,10 @@
 
 ## 3. 数字
 
-- CTest 46/46；node --test 90/90；目标 152 项守护
-- demo all 十步全部 ok（frame.gif 44ms / contact.gif 40ms 基线）；**长跑 5 轮计时分布：总耗时 87–90ms（min/max）**，无抖动
+- CTest 46/46；node --test 92/92；目标 155 项守护
+- demo all **十一步**全部 ok（frame.gif 44ms / contact.gif 40ms 基线）；**长跑 5 轮计时分布：总耗时 87–90ms（min/max）**，无抖动
 - git 仓库树干净（build/ 任意层忽略）
 
 > 评审动作：对照 m1-handoff §1 基线 + §2 硬缺口确认；M2 开工前最后修订 m2-kickoff。
+
 

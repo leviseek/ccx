@@ -196,6 +196,11 @@ add_executable(ccx_pixel_art_test pixel_art_test.cpp)
 target_link_libraries(ccx_pixel_art_test PRIVATE ccx_render)
 add_test(NAME render.pixel_art COMMAND ccx_pixel_art_test)
 
+# M3：toon-2d 管线（水彩化 + 描边，renderer-spec §4）
+add_executable(ccx_toon_test toon_test.cpp)
+target_link_libraries(ccx_toon_test PRIVATE ccx_render)
+add_test(NAME render.toon COMMAND ccx_toon_test)
+
 # 虚拟帧导出工具（非 CTest；Node 测试 spawn 后解析 PPM）
 add_executable(ccx_frame_dump frame_dump.cpp)
 target_link_libraries(ccx_frame_dump PRIVATE ccx_gfx ccx_render ccx_scene)

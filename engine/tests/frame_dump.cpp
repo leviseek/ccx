@@ -219,6 +219,20 @@ int main(int argc, char** argv) {
             target = art;
         }
     }
+    // M3 toon-2d 后处理：argv[11] = "levels:threshold"（如 "6:48"）-> 水彩化 + 描边
+    if (argc >= 12) {
+        const std::string ta(argv[11]);
+        const std::size_t colon = ta.find(':');
+        const unsigned levels = static_cast<unsigned>(
+            std::atoi(ta.substr(0, colon).c_str()));
+        const float thresh = static_cast<float>(
+            std::atof(ta.substr(colon + 1).c_str()));
+        if (levels >= 2 && levels <= 64 && thresh > 0.0f) {
+            RasterTarget art;
+            toonChain(target, art, levels, thresh);
+            target = art;
+        }
+    }
     if (!writePpm(target, argv[2])) {
         std::fprintf(stderr, "write failed: %s\n", argv[2]);
         return 1;

@@ -126,4 +126,66 @@ void pixelArtChain(const RasterTarget& src, RasterTarget& out, unsigned scale, u
     ditherToDepth(scaled, out, bits);
 }
 
+// —— M3 toon-2d：水彩化（posterize 量化）——
+void watercolorToon(const RasterTarget& src, RasterTarget& out, unsigned levels) {
+    if (levels < 2) levels = 2;
+    if (levels > 64) levels = 64;
+    out = src;
+    const int q = 256 / static_cast<int>(levels);
+    auto quant = [q, levels](int c) -> int {
+        int idx = c / q;
+        if (idx >= static_cast<int>(levels)) idx = levels - 1;
+        return idx == static_cast<int>(levels) - 1 ? 255 : idx * q;
+    };
+    for (uint32_t y = 0; y < out.height; ++y) {
+        for (uint32_t x = 0; x < out.width; ++x) {
+            const uint32_t p = out.pixels[y * out.width + x];
+            const int r = quant(static_cast<int>((p >> 24) & 0xFF));
+            const int g = quant(static_cast<int>((p >> 16) & 0xFF));
+            const int b = quant(static_cast<int>((p >> 8) & 0xFF));
+            out.pixels[y * out.width + x] = (static_cast<uint32_t>(r) << 24) |
+                                             (static_cast<uint32_t>(g) << 16) |
+                                             (static_cast<uint32_t>(b) << 8) |
+                                             (p & 0xFFu);
+        }
+    }
+}
+
+// —— M3 toon-2d：描边（4-邻域亮度差边缘检测）——
+void outlineToon(const RasterTarget& src, RasterTarget& out, float threshold) {
+    out = src;
+    const uint32_t kBlack = 0x000000FFu;
+    auto lum = [](uint32_t p) -> int {
+        return static_cast<int>(((p >> 24) & 0xFF) * 3 +
+                               ((p >> 16) & 0xFF) * 6 +
+                               ((p >> 8) & 0xFF)) / 10;
+    };
+    for (uint32_t y = 0; y < out.height; ++y) {
+        for (uint32_t x = 0; x < out.width; ++x) {
+            const uint32_t p = src.get(x, y);
+            if ((p & 0xFFu) == 0) continue;  // 透明跳过
+            const int L = lum(p);
+            bool edge = false;
+            const int dx[4] = {1, -1, 0, 0};
+            const int dy[4] = {0, 0, 1, -1};
+            for (int i = 0; i < 4 && !edge; ++i) {
+                const int nx = static_cast<int>(x) + dx[i];
+                const int ny = static_cast<int>(y) + dy[i];
+                if (nx < 0 || ny < 0 || nx >= static_cast<int>(out.width) ||
+                    ny >= static_cast<int>(out.height)) { edge = true; continue; }
+                // 检测基于原始 src（避免已描黑像素级联）
+                const uint32_t np = src.get(nx, ny);
+                if (std::abs(L - lum(np)) > threshold) edge = true;
+            }
+            if (edge) out.pixels[y * out.width + x] = kBlack;
+        }
+    }
+}
+
+void toonChain(const RasterTarget& src, RasterTarget& out, unsigned levels, float threshold) {
+    RasterTarget water;
+    watercolorToon(src, water, levels);
+    outlineToon(water, out, threshold);
+}
+
 }  // namespace ccx::render

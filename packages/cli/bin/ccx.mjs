@@ -94,6 +94,7 @@ async function main() {
     if (args[i] === '--size') flags.size = args[++i];
     if (args[i] === '--time') flags.time = args[++i];
     if (args[i] === '--pixelart') flags.pixelart = args[++i];
+    if (args[i] === '--toon') flags.toon = args[++i];
     if (args[i] === '--count') flags.count = args[++i];
     if (args[i] === '--frame') flags.frame = args[++i];
     if (args[i] === '--times') flags.times = args[++i];
@@ -1021,7 +1022,9 @@ async function main() {
                       '', flags.contacts ? '1' : '0', flags.device === 'wgpu' ? '1' : '0',
                       flags.device === 'wgpu' ? 'wgpu' : ''];
     // M3 pixel-art 后处理：--pixelart <scale>:<bits>（如 3:2 = 整数缩放 3x + 2bit dither）
-    if (flags.pixelart && /^\d+:\d+$/.test(flags.pixelart)) argsDump.push(flags.pixelart);
+    argsDump.push(flags.pixelart && /^\d+:\d+$/.test(flags.pixelart) ? flags.pixelart : '');
+    // M3 toon-2d 后处理：--toon <levels>:<threshold>（如 6:48 = 水彩化 6 级 + 描边阈值 48）
+    argsDump.push(flags.toon && /^\d+:\d+(\.\d+)?$/.test(flags.toon) ? flags.toon : '');
     const r = spawnSync(dumpExe, argsDump, { encoding: 'utf8' });
     if (r.status !== 0) return emit({ ok: false, error: (r.stderr || 'frame dump 失败').trim() });
     let meta = {};

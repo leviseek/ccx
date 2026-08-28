@@ -39,4 +39,15 @@ void ditherToDepth(const RasterTarget& src, RasterTarget& out, unsigned bits);
 // 便捷链：pixelateNearest + ditherToDepth 一步完成（scale>=1, bits 1..8）
 void pixelArtChain(const RasterTarget& src, RasterTarget& out, unsigned scale, unsigned bits);
 
+// —— M3 toon-2d 管线（renderer-spec §4：描边 + 水彩化，插件）——
+// 描边：4-邻域亮度差 > threshold 的像素置为黑边（保留 alpha）
+// 输入 target -> 输出 out（尺寸不变）
+void outlineToon(const RasterTarget& src, RasterTarget& out, float threshold = 48.0f);
+
+// 水彩化：每通道 posterize 到 levels 级（类似 dither 但不抖动，直接量化）
+void watercolorToon(const RasterTarget& src, RasterTarget& out, unsigned levels = 6);
+
+// 便捷链：watercolorToon + outlineToon（水彩先，描边后）
+void toonChain(const RasterTarget& src, RasterTarget& out, unsigned levels, float threshold);
+
 }  // namespace ccx::render

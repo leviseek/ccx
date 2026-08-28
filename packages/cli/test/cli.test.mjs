@@ -346,6 +346,43 @@ test('ccx frame dump --pixelart：M3 pixel-art 管线（整数缩放 + dither）
     rmSync(dir, { recursive: true, force: true });
   }
 });
+test('ccx frame dump --toon：M3 toon-2d 管线（水彩化 + 描边）', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ccx-toon-'));
+  try {
+    const fixture = join(import.meta.dirname, '..', '..', '..', 'examples', 'scenes',
+                         'render_plan.scene.json');
+    const dumpExe = join(import.meta.dirname, '..', '..', '..', 'build', 'local',
+                         'engine', 'tests', 'ccx_frame_dump.exe');
+    if (!existsSync(dumpExe)) return;
+    const out = join(dir, 't.ppm');
+    const r = runCli(['frame', 'dump', fixture, '--out', out, '--size', '64x64',
+                      '--toon', '6:48'], dir);
+    assert.equal(r.status, 0, r.err + r.out);
+    const parsed = JSON.parse(r.out);
+    assert.equal(parsed.ok, true);
+    assert.equal(parsed.quads, 5);
+    assert.ok(existsSync(out), 'PPM 已生成');
+    // 水彩化 6 级：通道值落 42 网格或 255；描边产生黑像素（0,0,0）
+    const buf = readFileSync(out);
+    const off = 13;  // P6\n<w> <h>\n255\n = 13 字节
+    let inGrid = true;
+    let black = 0;
+    for (let i = off; i < buf.length; i += 3) {
+      let all0 = true;
+      for (let k = 0; k < 3; ++k) {
+        const v = buf[i + k];
+        if (v % 42 !== 0 && v !== 255) inGrid = false;
+        if (v !== 0) all0 = false;
+      }
+      if (all0) ++black;
+    }
+    assert.ok(inGrid, '水彩化 6 级网格');
+    assert.ok(black > 0, '描边黑像素存在（阈值边缘）');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 
 test('ccx editor preview --frame：渲染帧图嵌入', () => {
   const dir = mkdtempSync(join(tmpdir(), 'ccx-prev-frame-'));

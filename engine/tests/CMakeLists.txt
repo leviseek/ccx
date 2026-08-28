@@ -250,3 +250,7 @@ add_test(NAME e2e.fake_gpu_runtime COMMAND ccx_fake_gpu_runtime_test)
 add_executable(ccx_script_host_test script_host_test.cpp)
 target_link_libraries(ccx_script_host_test PRIVATE ccx_script)
 add_test(NAME script.host COMMAND ccx_script_host_test)
+add_executable(ccx_script_scene_bridge_test script_scene_bridge_test.cpp)
+target_link_libraries(ccx_script_scene_bridge_test PRIVATE ccx_script)
+add_test(NAME script.scene_bridge COMMAND ccx_script_scene_bridge_test)
+

@@ -20,6 +20,9 @@ public:
     using HostFn = double (*)(const double* args, int argc);
     // 注册后脚本可直接调用（如 hostScale(21) -> 42）；同名覆盖
     void setHostFunction(const std::string& name, HostFn fn);
+    // 通用 JSON 命令面（W5b 第二环）：脚本传 JSON 字符串 -> 引擎回调返回 JSON 结果
+    using JsonFn = const char* (*)(const char* jsonIn);
+    void setJsonFunction(const std::string& name, JsonFn fn);
 
 private:
     void* runtime_;  // JSRuntime*

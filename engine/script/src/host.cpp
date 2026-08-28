@@ -111,4 +111,28 @@ void ScriptHost::setHostFunction(const std::string& name, HostFn fn) {
     JS_FreeValue(ctx, g);
 }
 
-}  // namespace ccx::script
+
+// ---- 通用 JSON 命令面（W5b 第二环） ----
+namespace {
+std::vector<ScriptHost::JsonFn>& jsonFns() {
+    static std::vector<ScriptHost::JsonFn> fns;
+    return fns;
+}
+JSValue callJsonFn(JSContext* ctx, JSValueConst, int argc, JSValueConst* argv) {
+    if (jsonFns().empty() || argc < 1) return JS_UNDEFINED;
+    const char* jsonIn = argc > 0 && JS_IsString(argv[0]) ? JS_ToCString(ctx, argv[0]) : "{}";
+    const char* result = jsonFns()[0](jsonIn ? jsonIn : "{}");
+    if (jsonIn) JS_FreeCString(ctx, jsonIn);
+    return JS_NewString(ctx, result ? result : "{\"ok\":false}");
+}
+}  // namespace
+
+void ScriptHost::setJsonFunction(const std::string& name, JsonFn fn) {
+    if (jsonFns().size() >= 16) return;
+    jsonFns().push_back(fn);
+    JSContext* ctx = static_cast<JSContext*>(ctx_);
+    JSValue fnv = JS_NewCFunction(ctx, callJsonFn, name.c_str(), 1);
+    JSValue g = JS_GetGlobalObject(ctx);
+    JS_SetPropertyStr(ctx, g, name.c_str(), fnv);
+    JS_FreeValue(ctx, g);
+}}  // namespace ccx::script

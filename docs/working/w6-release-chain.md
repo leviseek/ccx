@@ -29,3 +29,11 @@
 - 待 debug：MainActivity 启动后 Shutdown 时 SIGSEGV（logcat Fatal signal 11）——JNI 壳生命周期问题，列入壳工程开发。
 - 工程：android/（KTS + Kotlin 壳 + shell.cpp JNI）。
 
+
+
+## 壳工程运行验证（2026-08-28）
+
+- **Java 壳修复 SIGSEGV/ClassNotFound**（Kotlin 缺插件 → 纯 Java 壳）。
+- **App 在模拟器上运行**：截图 OCR 显示 CCX（TextView 版本/编译器信息）；无 FATAL。
+- 下一步：surface 渲染引擎帧（帧循环桥）。
+

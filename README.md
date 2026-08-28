@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.59（2026-08-28）**：M1 vendor 与叙事面——**QuickJS 源码 vendor 落位**（engine/platform/vendor/quickjs：quickjs.c/h/cutils/list 四文件大小校验（2.03MB）+ UPSTREAM/LICENSE，遵循 ADR-005——W5a 嵌入的实现体就位）、**demo all 十三步**（+status.summary 守护规模汇总）；vendor gate 5/5；ctest 46/46 + node 96/96。
 - **v0.3.58（2026-08-28）**：M1 绑定面——**bindgen IDL→QuickJS C 绑定目标**（generateQuickjs：extern 声明（C 类型：string→const char*）+ JSValue 包装（ToCString/ToFloat64/ToBool + 返回值）+ JS_CFUNC_DEF 方法表 + 模块注册；CLI --quickjs 生成文件；两测试（结构/端到端）全过；途中修 C 类型映射与断言命名）；ctest 46/46 + node 96/96。
 - **v0.3.57（2026-08-28）**：M1 决策面——**脚本引擎决策评估**（docs/working/script-engine-decision.md：v8 vs QuickJS 八维对比 + 绑定衔接（IDL→quickjs 目标）+ 风险缓解 → **采纳 QuickJS 主选、v8 备选（接口不变双后端）**）、终评数字刷新（95/162/12 步）；ctest 46/46 + node 95/95。
 - **v0.3.56（2026-08-28）**：M1 配置可见面——**doctor 外部压缩器配置位**（CCX_EXTERNAL_COMPRESSOR 已配置/未配置提示；doctor 路径统一仓库根修复）、**M2 首批进度表**（W3 会话全交付 ✅ / W4 环境变量接入 ✅ / W5a 待决策点）；ctest 46/46 + node 95/95。

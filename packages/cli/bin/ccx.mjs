@@ -532,7 +532,19 @@ async function main() {
           ok: undone.entities === before.entities - 1 && after.entities === before.entities,
         });
       }
-      // 10) build.web：Web 目标静态站点装配
+      // 10) status.summary：守护规模汇总
+      tick('status.summary');
+      {
+        const root = resolve(join(here, '..', '..', '..'));
+        push('status.summary', {
+          modules: readdirSync(join(root, 'engine'))
+            .filter((n) => existsSync(join(root, 'engine', n, 'CMakeLists.txt'))).length,
+          ctest: countAddTestSync(root),
+          nodeFiles: countTestFilesSync(root),
+          ok: true,
+        });
+      }
+      // 11) build.web：Web 目标静态站点装配
       tick('build.web');
       {
         const siteDir = resolve(join(here, '..', '..', '..', 'build', 'local', 'demo-web'));

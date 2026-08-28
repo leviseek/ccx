@@ -237,6 +237,40 @@ test('daemon: 场景会话 undo/redo/status（W3 会话首批）', async () => {
   }
 });
 
+test('daemon: 会话版本化与 session.save/load（W3 续批）', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ccx-sess2-'));
+  const client = new RpcClient(process.execPath, [daemonEntry]);
+  try {
+    const sceneFile = join(dir, 's.json');
+    writeFileSync(sceneFile, JSON.stringify({
+      schema: 'ccx.scene/1', meta: {},
+      entities: [{ id: 1, name: 'root', parent: null, components: [] }],
+      systems: [],
+    }));
+    await client.request('scene.open', { path: sceneFile });
+    await client.request('scene.apply', { command: { op: 'create_entity', name: 'a' } });
+    const st2 = await client.request('scene.status');
+    assert.equal(st2.version, 1, 'apply 后版本 1');
+    await client.request('scene.apply', { command: { op: 'create_entity', name: 'b' } });
+    // 保存会话（version 2）
+    const snapFile = join(dir, 'session.json');
+    const saved = await client.request('scene.session.save', { path: snapFile });
+    assert.equal(saved.version, 2);
+    // 继续变更 -> 版本 3
+    await client.request('scene.apply', { command: { op: 'create_entity', name: 'c' } });
+    assert.equal((await client.request('scene.status')).version, 3);
+    // 恢复会话 -> 回到版本 2 状态
+    const loaded = await client.request('scene.session.load', { path: snapFile });
+    assert.equal(loaded.version, 2);
+    assert.equal(loaded.entities, 3, '恢复后实体数（root+a+b）');
+    const q = await client.request('scene.query');
+    assert.ok(!q.entities.some((e) => e.name === 'c'), 'c 不存在（快照语义）');
+  } finally {
+    client.close();
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('daemon: MCP 工具面（listTools/callTool）', async () => {
   const client = new RpcClient(process.execPath, [daemonEntry]);
   const dir = mkdtempSync(join(tmpdir(), 'ccx-mcp-'));  // try 外声明：finally 恒可见

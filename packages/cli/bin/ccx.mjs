@@ -446,7 +446,24 @@ async function main() {
         const text = c.content[0].text;
         push('mcp.call', { textLen: text.length, ok: text.includes('a-1') });
       }
-      // 9) build.web：Web 目标静态站点装配
+      // 9) session：undo/redo 会话演示（版本演进）
+      tick('session.demo');
+      {
+        const before = await client.request('scene.status');
+        await client.request('scene.undo');  // 撤销 add_component
+        await client.request('scene.undo');  // 撤销 create_entity（回 7 实体）
+        const undone = await client.request('scene.status');
+        await client.request('scene.redo');
+        await client.request('scene.redo');
+        const after = await client.request('scene.status');
+        push('session.demo', {
+          version: after.version,
+          undoWorked: undone.entities === before.entities - 1,
+          redoWorked: after.entities === before.entities,
+          ok: undone.entities === before.entities - 1 && after.entities === before.entities,
+        });
+      }
+      // 10) build.web：Web 目标静态站点装配
       tick('build.web');
       {
         const siteDir = resolve(join(here, '..', '..', '..', 'build', 'local', 'demo-web'));
@@ -912,7 +929,7 @@ async function main() {
         engineModules: mods,
         ctestCount: countAddTestSync(root),
         nodeTestFiles: countTestFilesSync(root),
-        demoSteps: 11,
+        demoSteps: 12,
         generatedAt: new Date().toISOString(),
       },
     });
@@ -1028,3 +1045,4 @@ main().catch((e) => {
   console.error(e);
   process.exit(1);
 });
+

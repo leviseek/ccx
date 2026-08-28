@@ -52,6 +52,7 @@ try {
 
 const watchers = [];
 let scene = null;          // 当前打开的 CommandBus
+let sessionVersion = 0;    // 会话版本（apply/undo/redo 递进；文档级）
 
 function scanDir(root) {
   let entries = [];
@@ -179,29 +180,60 @@ const services = {
       }
       try {
         scene.apply(command);
+        ++sessionVersion;
         recordAudit(command?.op ?? 'apply', true);
       } catch (e) {
         recordAudit(command?.op ?? 'apply', false, e.message);
         return { ok: false, error: e.message };
       }
-      return { ok: true, entities: scene.scene.entities.size };
+      return { ok: true, entities: scene.scene.entities.size, version: sessionVersion };
     },
     undo: () => {
       if (!scene) return { ok: false, error: '未打开场景' };
       scene.undo();
-      return { ok: true, entities: scene.scene.entities.size,
+      ++sessionVersion;
+      return { ok: true, entities: scene.scene.entities.size, version: sessionVersion,
                undo: scene.undoStack.length, redo: scene.redoStack.length };
     },
     redo: () => {
       if (!scene) return { ok: false, error: '未打开场景' };
       scene.redo();
-      return { ok: true, entities: scene.scene.entities.size,
+      ++sessionVersion;
+      return { ok: true, entities: scene.scene.entities.size, version: sessionVersion,
                undo: scene.undoStack.length, redo: scene.redoStack.length };
     },
     status: () => {
       if (!scene) return { ok: false, error: '未打开场景' };
-      return { ok: true, entities: scene.scene.entities.size,
+      return { ok: true, entities: scene.scene.entities.size, version: sessionVersion,
                undo: scene.undoStack.length, redo: scene.redoStack.length };
+    },
+    'session.save': ({ path } = {}) => {
+      if (!scene || !path) return { ok: false, error: '需要已打开场景与 path' };
+      const snap = {
+        schema: 'ccx.session/1',
+        version: sessionVersion,
+        doc: scene.toSceneFile(),
+      };
+      try {
+        writeFileSync(path, JSON.stringify(snap, null, 2) + '\n');
+      } catch (e) {
+        return { ok: false, error: 'session.save 失败: ' + e.message };
+      }
+      return { ok: true, path, version: sessionVersion };
+    },
+    'session.load': ({ path } = {}) => {
+      let snap;
+      try {
+        snap = JSON.parse(readFileSync(path, 'utf8'));
+      } catch (e) {
+        return { ok: false, error: 'session.load 失败: ' + e.message };
+      }
+      if (!snap || snap.schema !== 'ccx.session/1' || !snap.doc) {
+        return { ok: false, error: '非法会话快照' };
+      }
+      scene = CommandBus.fromSceneFile(snap.doc);
+      sessionVersion = snap.version ?? 0;
+      return { ok: true, entities: scene.scene.entities.size, version: sessionVersion };
     },
     save: ({ path } = {}) => {
       if (!scene) return { ok: false, error: '未打开场景' };

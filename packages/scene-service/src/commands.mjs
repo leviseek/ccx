@@ -117,6 +117,25 @@ export class CommandBus {
     }
   }
 
+  validateComponentData(type, data) {
+    // 已知组件的写路径校验（ADR-003 组件约定；未知组件原样放行）
+    if (type === 'ccx.Collider') {
+      for (const key of ['hx', 'hy']) {
+        const v = data?.[key];
+        if (typeof v !== 'number' || !Number.isFinite(v) || v < 0) {
+          throw new Error('Collider.' + key + ' 需要非负数字');
+        }
+      }
+      for (const key of ['layer', 'mask']) {
+        const v = data?.[key];
+        if (typeof v !== 'number' || !Number.isInteger(v) || v < 0 || v > 0x7fffffff) {
+          throw new Error('Collider.' + key + ' 需要 0..2^31-1 的整数');
+        }
+      }
+    }
+    return true;
+  }
+
   execute(cmd) {
     const s = this.scene;
     switch (cmd.op) {
@@ -131,6 +150,7 @@ export class CommandBus {
       case 'add_component': {
         const e = s.entities.get(cmd.id);
         if (!e) throw new Error('实体不存在: ' + cmd.id);
+        this.validateComponentData(cmd.type, cmd.data);  // 写路径校验
         e.components.set(cmd.type, clone(cmd.data ?? {}));
         return;
       }

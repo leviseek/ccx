@@ -53,6 +53,7 @@ async function main() {
     if (args[i] === '--times') flags.times = args[++i];
     if (args[i] === '--delay') flags.delay = args[++i];
     if (args[i] === '--gif') flags.gif = args[++i];
+    if (args[i] === '--highlight') flags.highlight = args[++i];
   }
   const sub = positional[0] ?? 'doctor';
 
@@ -606,7 +607,9 @@ async function main() {
         const ppm = resolve(buildDirName(), 'frame-' + t.replace('.', '_') + '.ppm');
         mkdirSync(dirname(ppm), { recursive: true });
         tmpPpms.push(ppm);
-        const r = spawnSync(dumpExe, [sceneFile, ppm, m[1], m[2], t], { encoding: 'utf8' });
+        const args5 = [sceneFile, ppm, m[1], m[2], t];
+        if (flags.highlight) args5.push(flags.highlight);  // 接触高亮透传
+        const r = spawnSync(dumpExe, args5, { encoding: 'utf8' });
         if (r.status !== 0) return emit({ ok: false, error: ('帧 t=' + t + ' 失败: ' + r.stderr).trim() });
         const { w, h, data } = parsePpm(readFileSync(ppm));
         const pixels = new Uint8Array(w * h * 4);

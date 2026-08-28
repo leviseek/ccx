@@ -300,12 +300,14 @@ test('ccx frame gif：多时间点 -> GIF 动画文件', () => {
     const out = join(dir, 'anim.gif');
     const r = runCli([
       'frame', 'gif', sceneFile, '--times', '0,0.1,0.2', '--out', out,
-      '--size', '64x64', '--delay', '10',
+      '--size', '64x64', '--delay', '10', '--highlight', '1,2',
     ], import.meta.dirname);  // cwd=仓库（dump 相对路径无依赖，但干净）
     assert.equal(r.status, 0, r.err + r.out);
     const parsed = JSON.parse(r.out);
     assert.equal(parsed.ok, true);
     assert.equal(parsed.frames, 3);
+    // 高亮场景：帧像素含白块（接触对叠加）——取 GCE 后第一帧解码太繁，验白块由单帧测试覆盖；
+    // 此处仅断言命令整体成功（透传路径）*/
     const gif = readFileSync(out);
     assert.equal(gif.toString('ascii', 0, 6), 'GIF89a');
     let gce = 0, img = 0;

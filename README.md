@@ -131,6 +131,7 @@
 
 ## 变更记录
 
+- **v0.3.33（2026-08-27）**：M1 写路径校验面——**component 数据校验**（CommandBus.validateComponentData：Collider hx/hy 非负数字、layer/mask 整数范围内；非法即拒，未知组件原样放行，测试 7/7 全过）、**frame gif --highlight 透传**（接触高亮进入多帧动画序列）；ctest 43/43 + node 84/84。
 - **v0.3.32（2026-08-27）**：M1 组件往返面——**Collider 组件 ADR-003 往返**（文件→loadSceneFile→collectBodies→saveSceneFile→重载→物理体字段逐项一致；文件数据驱动接触：移动 hero 后 runCollisionSim 命中 1 对——物理数据完整走场景文件生命周期）；ctest 43/43 + node 83/83。
 - **v0.3.31（2026-08-27）**：M1 接触可视面——**tick_contact 迁移正式碰撞系统**（Scheduler 内调 scene::runCollisionSim（组件体+层窄相），音频触发语义保留）、**frame_dump --highlight**（接触对实体白块叠加：无高亮零白像素、高亮后 >500px 白，一次通过）；ctest 42/42 + node 83/83。
 - **v0.3.30（2026-08-27）**：M1 正式化面——**场景碰撞集成 API**（scene::collectBodies + runCollisionSim 进 ccx_scene（scene 依赖 physics 合规），Collider 测试改用正式接口）、**M2 立项刷新**（m2-kickoff §6：七工作包前置实况表——W1 只差 GPU 上传/绘制，W2 有可消费产物）；ctest 42/42 + node 82/82。

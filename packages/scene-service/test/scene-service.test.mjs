@@ -74,3 +74,31 @@ test('redo 后新命令清空 redo 栈', () => {
   bus.apply({ op: 'set_name', id, name: 'z' });
   assert.equal(bus.redoStack.length, 0, '新命令清空 redo');
 });
+
+test('add_component：Collider 写路径校验', () => {
+  const bus = new CommandBus(new SceneState());
+  bus.apply({ op: 'create_entity', name: 'hero' });
+  // 合法
+  bus.apply({ op: 'add_component', id: 1, type: 'ccx.Collider',
+              data: { hx: 25, hy: 20, layer: 1, mask: 2 } });
+  assert.equal(bus.scene.entities.get(1).components.has('ccx.Collider'), true);
+  // 非法：负尺寸
+  assert.throws(
+    () => bus.apply({ op: 'add_component', id: 1, type: 'ccx.Collider',
+                      data: { hx: -1, hy: 20 } }),
+    /非负数字/);
+  // 非法：非整数层
+  assert.throws(
+    () => bus.apply({ op: 'add_component', id: 1, type: 'ccx.Collider',
+                      data: { hx: 10, hy: 10, layer: 1.5, mask: 2 } }),
+    /整数/);
+  // 非法：超出范围掩码
+  assert.throws(
+    () => bus.apply({ op: 'add_component', id: 1, type: 'ccx.Collider',
+                      data: { hx: 10, hy: 10, layer: 1, mask: 1 << 31 } }),
+    /2\^31/);
+  // 未知组件原样放行
+  bus.apply({ op: 'add_component', id: 1, type: 'game.Custom',
+              data: { anything: { nested: true } } });
+  assert.equal(bus.scene.entities.get(1).components.has('game.Custom'), true);
+});

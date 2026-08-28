@@ -4,7 +4,7 @@
 
 ## 数字（本机实测）
 
-- CTest 62/62；node --test 117/117；引擎构建模块 14；Node 测试文件 32；demo all **18 步**全 ok（含真后端帧/骨骼/帧性能汇总）
+- CTest 62/62；node --test 121/121；引擎构建模块 14；Node 测试文件 32；demo all **18 步**全 ok（含真后端帧/骨骼/帧性能汇总）
 - 守护合计 ≈ 194 项；vendor 包 6（pal/audio/storage/main/quickjs/webgpu-headers）
 - demo 基线：frame.gif 44ms / contact.gif 40ms；总耗 ~90ms
 
@@ -41,7 +41,8 @@
 
 ## W6 设备面（2026-08-28 补充）
 
-- ccx device status/screenshot/push-frame；壳 App 运行（Java 壳）+ 帧循环 + 引擎场景数据面（Scene→光栅→上屏）+ QuickJS 脚本驱动场景（eval=7 OCR 实证）+ 帧统计（计数/耗时，ALN-AL00 模拟器）。
+- ccx device status/screenshot/push-frame；壳 App 运行（Java 壳）+ 帧循环 + 引擎场景数据面（Scene→光栅→上屏）+ QuickJS 脚本驱动场景（eval=7 OCR 实证）+ 帧统计上报（logcat CCX_STATS + ccx device stats，ALN-AL00 模拟器）。
+
 
 
 

@@ -6,7 +6,7 @@
 
 - **首帧仿真（无 GPU 可跑）**：RHI 接口核（gfx::Device）+ FakeDevice + 假 GPU 运行时（GameLoop 每帧上传/清屏/绘制/提交/readback 像素断言）——真后端实现者的契约与黄金对照（v0.3.40 起）\n- 引擎（C++20）：foundation（反射/JSON/metrics/job）、ecs（Archetype/Query 缓存/Stage 调度器/TaskGraph）、scene（树/排序/world 变换/Prefab override/ADR-003 文件装载导出/ECS 桥）、render（RenderGraph 编译器/Pipeline 资产/shader+material 校验/batcher）、gfx（描述校验/句柄池）、animation（曲线/精灵帧/状态机/帧循环合流）
 - 服务（Node）：JSON-RPC 2.0 daemon（真实场景写路径/资产扫描/事件推送/构建 RPC/EOF 优雅退出）、SceneService CommandBus（undo/redo）、EditorShell（命令/快捷键/选择/面板）、BuildService（Builder 注册表/bundle/hooks）、AssetService（watch/队列/uuid/PNG/图集/Cook/压缩器接口）
-- 交付链：CLI 11 个子命令（create/scene new/apply/atlas pack/scene atlas/render plan/cook/build/demo all/service demo/doctor/version）——**从 png 到渲染计划的闭环已单命令打通**
+- 交付链：CLI 27+ 子命令（v0.3.103 实况）（create/scene new/apply/atlas pack/scene atlas/render plan/cook/build/demo all/service demo/doctor/version）——**从 png 到渲染计划的闭环已单命令打通**
 
 ## 2. 剩余硬缺口（环境依赖明细）
 
@@ -29,3 +29,7 @@
 
 > 说明：M1 的"10 万精灵 gate"与"三端出包"等出口依赖 GPU/真机里程碑（§2），M1 阶段以 74 项自动化 + 交付链闭环作为阶段验证。
 
+## 交接终检注记（2026-08-28，v0.3.103）
+
+- 与 m1-completion.md 申报一致：环境缺口（GPU/Actions/真机）两处记录一致；数字以 m1-final-summary 为准（51/109/15）。
+- 本文件为基线交接；后续里程碑增量见 m1-gate-review / m1-final-summary / m2-package-index。

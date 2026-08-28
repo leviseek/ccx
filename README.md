@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.72（2026-08-28）**：M1 收官——**成品快照**（m1-final-summary.json/md：51/99/15/174 实时值 + 能力清单 + 状态）、**文档链数字核对**（m1-gate-review 全同步）；ctest 51/51 + node 99/99。
 - **v0.3.71（2026-08-28）**：M1 链终面——**demo all 十五步**（+script.engine：QuickJS 引擎执行器入交付链，2 命令/2 实体实跑 ok）；summary/doctor 同步 15；ctest 51/51 + node 99/99。
 - **v0.3.70（2026-08-28）**：M1 双路径面——**ccx script run --engine**（CLI 走 QuickJS 引擎执行器（未构建则明确提示回落 daemon）；测试断言 engine=quickjs/2 命令/2 实体）、**终评数字同步**（CTest 51/98/14/172）；ctest 51/51 + node 99/99。
 - **v0.3.69（2026-08-28）**：M1 引擎脚本面——**ccx_script_runner 引擎脚本执行器**（命令文件裸 JSON 行/JS 表达式双模式：QuickJS eval + 真实场景桥 + ADR-003 落盘；Node 冒烟两模式全过；路径 JSON 规整）；终评刷新（97/172/14）；ctest 51/51 + node 98/98。

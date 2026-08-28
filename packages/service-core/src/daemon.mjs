@@ -28,14 +28,14 @@ export function createDaemon(services) {
       });
       for (const fn of pushFns) fn(payload);
     },
-    handle(line) {
+    async handle(line) {
       const parsed = parseMessage(line);
       if (parsed.error) {
         return failure(null, parsed.error.code, parsed.error.message);
       }
       const { msg } = parsed;
       if (msg.id === undefined || msg.id === null) return null;  // 通知
-      const out = dispatch(handlers, msg);
+      const out = await dispatch(handlers, msg);
       if (out.code !== undefined) return failure(msg.id, out.code, out.message);
       return success(msg.id, out.result);
     },
@@ -47,9 +47,9 @@ export function runStdioDaemon(services) {
   // 事件推送通道：subscribe 后 daemon 侧可主动推送（services-spec §3 事件契约）
   daemon.onPush((payload) => process.stdout.write(payload + '\n'));
   const rl = createInterface({ input: process.stdin, crlfDelay: Infinity });
-  rl.on('line', (line) => {
+  rl.on('line', async (line) => {
     if (!line.trim()) return;
-    const out = daemon.handle(line);
+    const out = await daemon.handle(line);
     if (out) process.stdout.write(JSON.stringify(out) + '\n');
   });
   // 就绪通知（客户端等待）

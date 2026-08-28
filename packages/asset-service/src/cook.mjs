@@ -40,3 +40,39 @@ export function cook(intermediate, platformKey) {
     },
   };
 }
+
+// 压缩器插件接口（M2 由原生 worker 实现 astcenc 等）
+const compressors = new Map();  // format -> async fn(intermediate, format) -> {ok, bytes}
+
+export function registerCompressor(format, fn) {
+  compressors.set(format, fn);
+}
+
+export async function compressTexture(intermediate, format) {
+  const fn = compressors.get(format);
+  if (!fn) return { ok: false, error: '无压缩器: ' + format };
+  return fn(intermediate, format);
+}
+
+// Cook + 真实压缩（每个 texture target 调用已注册压缩器；未注册的跳过并记录）
+export async function cookWithCompression(intermediate, platformKey) {
+  const plan = planCook(intermediate, platformKey);
+  const parts = [];
+  for (const t of plan.targets) {
+    if (t.kind === 'texture') {
+      const r = await compressTexture(intermediate, t.format);
+      if (!r.ok) {
+        parts.push({ kind: 'texture', format: t.format, ok: false, error: r.error });
+        continue;
+      }
+      parts.push({ kind: 'texture', format: t.format, ok: true, bytes: r.bytes ?? 0 });
+    } else {
+      parts.push({ kind: t.kind, format: t.format, ok: true });
+    }
+  }
+  return {
+    uuid: intermediate.uuid,
+    platform: platformKey,
+    artifact: { key: plan.uuid + '@' + platformKey, parts },
+  };
+}

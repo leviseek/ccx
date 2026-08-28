@@ -18,6 +18,27 @@ test('planCook：目标矩阵推导', () => {
   assert.throws(() => planCook({ uuid: 'x' }, 'ps5'), /未知平台/);
 });
 
+
+test('compressor 接口：注册 + 调用 + 未注册报错', async () => {
+  const { registerCompressor, compressTexture, cookWithCompression } = await import('../src/cook.mjs');
+  let called = null;
+  registerCompressor('astc4', async (intermediate, format) => {
+    called = { uuid: intermediate.uuid, format };
+    return { ok: true, bytes: 512 };
+  });
+  const r = await compressTexture({ uuid: 't1', sourceFormat: 'png' }, 'astc4');
+  assert.equal(r.ok, true);
+  assert.equal(r.bytes, 512);
+  assert.equal(called.uuid, 't1');
+  const missing = await compressTexture({ uuid: 't1' }, 'bc7');
+  assert.equal(missing.ok, false);
+  assert.ok(missing.error.includes('bc7'));
+  const full = await cookWithCompression({ uuid: 't1', sourceFormat: 'png' }, 'android');
+  const tex = full.artifact.parts.find((x) => x.kind === 'texture');
+  assert.equal(tex.ok, true);
+  assert.equal(tex.bytes, 512);
+});
+
 test('cook：产物记录（真实压缩留 M2 worker）', () => {
   const a = cook({ uuid: 'tex-1', type: 'ccx.Texture', sourceFormat: 'png', sizeBytes: 2048 },
                   'ios');

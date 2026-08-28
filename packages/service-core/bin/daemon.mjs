@@ -9,7 +9,35 @@ import { join } from 'node:path';
 import { createWatcher } from '../../asset-service/src/watch.mjs';
 import { assetUuid } from '../../asset-service/src/queue.mjs';
 import { CommandBus } from '../../scene-service/src/commands.mjs';
+import { createBundleManifest } from '../../build-service/src/bundle.mjs';
+import { getBuilder, listBuilders, registerBuilder } from '../../build-service/src/builder_registry.mjs';
+function listBuildersSafe() {
+  try {
+    return listBuilders();
+  } catch {
+    return [];
+  }
+}
+import { runBuild } from '../../build-service/src/pipeline.mjs';
 import { createDaemon } from '../src/daemon.mjs';
+
+// 平台 Builder 内置注册（contributes.builder 对齐）
+const builtinBuilder = {
+  platform: 'web-desktop',
+  displayName: 'Web Desktop',
+  hooks: {
+    onBeforeInit: () => ({ ok: true }),
+    onAfterInit: () => ({ ok: true }),
+    onBeforeBundle: () => ({ ok: true }),
+    onAfterBundle: () => ({ ok: true }),
+    onAfterBuild: () => ({ ok: true }),
+  },
+};
+try {
+  registerBuilder(builtinBuilder);
+} catch {
+  /* 幂等 */
+}
 
 const watchers = [];
 let scene = null;          // 当前打开的 CommandBus
@@ -43,6 +71,27 @@ const services = {
     }),
     subscribe: null,  // 由下方事件源绑定
     unsubscribe: null,
+  },
+  build: {
+    platforms: () => ({ platforms: listBuildersSafe() }),
+    configure: (params = {}) => {
+      const b = getBuilder(params.platform);
+      if (!b) return { ok: false, error: '未知平台: ' + params.platform };
+      return { ok: true, profile: { platform: params.platform, options: params.options ?? {} } };
+    },
+    async run(params = {}) {
+      const b = getBuilder(params.platform);
+      if (!b) return { ok: false, error: '未知平台: ' + params.platform };
+      return runBuild(b, {
+        makeManifest: () => createBundleManifest({
+          project: params.project ?? 'demo',
+          platform: params.platform,
+          assets: params.assets ?? [],
+          scripts: [],
+          config: params.options ?? {},
+        }),
+      });
+    },
   },
   scene: {
     open: ({ path } = {}) => {
@@ -110,9 +159,9 @@ services.asset.unsubscribe = () => {
 };
 
 const rl = createInterface({ input: process.stdin, crlfDelay: Infinity });
-rl.on('line', (line) => {
+rl.on('line', async (line) => {
   if (!line.trim()) return;
-  const out = daemon.handle(line);
+  const out = await daemon.handle(line);
   if (out) process.stdout.write(JSON.stringify(out) + '\n');
 });
 

@@ -20,8 +20,8 @@ export function failure(id, code, message) {
   return { jsonrpc: '2.0', id, error: { code, message } };
 }
 
-// 分发器：services[ns][method](params) -> result
-export function dispatch(services, msg) {
+// 分发器：services[ns][method](params) -> result（async 方法支持）
+export async function dispatch(services, msg) {
   const parts = msg.method.split('.');
   const ns = parts[0];
   const method = parts.slice(1).join('.');
@@ -31,7 +31,9 @@ export function dispatch(services, msg) {
     return { code: -32601, message: 'Method not found: ' + msg.method };
   }
   try {
-    return { result: fn(msg.params ?? {}) };
+    let result = fn(msg.params ?? {});
+    if (result && typeof result.then === 'function') result = await result;
+    return { result };
   } catch (e) {
     return { code: -32602, message: 'Invalid params: ' + e.message };
   }

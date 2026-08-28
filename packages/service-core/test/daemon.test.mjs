@@ -61,16 +61,57 @@ test('daemon: closed connection rejects requests', async () => {
   await assert.rejects(client.request('asset.scan', {}, 500), /daemon exited|超时/);
 });
 
-test('createDaemon: in-process handle unit (protocol error codes)', () => {
+test('createDaemon: in-process handle unit (protocol error codes)', async () => {
   const d = createDaemon({ asset: { list: () => ({ ok: true }) } });
-  const ok = d.handle(JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'asset.list', params: {} }));
+  const ok = await d.handle(JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'asset.list', params: {} }));
   assert.deepEqual(ok.result, { ok: true });
-  const bad = d.handle(JSON.stringify({ jsonrpc: '2.0', id: 2, method: 'asset.nope' }));
+  const bad = await d.handle(JSON.stringify({ jsonrpc: '2.0', id: 2, method: 'asset.nope' }));
   assert.equal(bad.error.code, -32601);
-  const parse = d.handle('not json');
+  const parse = await d.handle('not json');
   assert.equal(parse.error.code, -32700);
-  const notify = d.handle(JSON.stringify({ jsonrpc: '2.0', method: 'asset.list' }));
+  const notify = await d.handle(JSON.stringify({ jsonrpc: '2.0', method: 'asset.list' }));
   assert.equal(notify, null, 'notification no response');
+});
+
+test('createDaemon: async service methods supported', async () => {
+  const d = createDaemon({
+    build: {
+      async run() {
+        await new Promise((r) => setTimeout(r, 10));
+        return { ok: true, wait: true };
+      },
+    },
+  });
+  const out = await d.handle(JSON.stringify({ jsonrpc: '2.0', id: 7, method: 'build.run' }));
+  assert.deepEqual(out.result, { ok: true, wait: true });
+});
+
+test('daemon: build.configure/platforms/run RPC', async () => {
+  const client = new RpcClient(process.execPath, [daemonEntry]);
+  try {
+    await new Promise((resolve) => {
+      const off = client.onEvent((m) => {
+        if (m.method === 'system.ready') {
+          off();
+          resolve();
+        }
+      });
+      setTimeout(() => resolve(), 2000);
+    });
+    const platforms = await client.request('build.platforms');
+    assert.ok(platforms.platforms.some((p) => p.platform === 'web-desktop'), '内置 builder');
+    const cfg = await client.request('build.configure', { platform: 'web-desktop', options: { split: true } });
+    assert.equal(cfg.ok, true);
+    assert.equal(cfg.profile.options.split, true);
+    const bad = await client.request('build.configure', { platform: 'ps5' });
+    assert.equal(bad.ok, false);
+    const run = await client.request('build.run', { platform: 'web-desktop', project: 'demo' });
+    assert.equal(run.ok, true);
+    assert.ok(run.trace.length >= 10, 'hooks 五阶段 enter+ok');
+    assert.equal(run.trace.filter((t) => t.status === 'error').length, 0, '无 error 项');
+  } finally {
+    client.close();
+  }
 });
 
 

@@ -666,6 +666,28 @@ test('ccx doctor --all --verify：验收总键（W1+首批）', () => {
   assert.equal(out.m2Batch1.ok, true, 'M2 首批 9 票');
 });
 
+test('ccx editor preview --apply --undo：会话回退进预览', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ccx-pvundo-'));
+  try {
+    const sceneFile = join(dir, 's.scene.json');
+    writeFileSync(sceneFile, JSON.stringify({
+      schema: 'ccx.scene/1', meta: {},
+      entities: [{ id: 1, name: 'root', parent: null, components: [] }],
+      systems: [],
+    }));
+    const r = runCli(['editor', 'preview', sceneFile, '--out', join(dir, 'p.html'),
+                      '--apply', JSON.stringify({ op: 'create_entity', name: 'npc' }),
+                      '--undo', '--json'], dir);
+    assert.equal(r.status, 0, r.err + r.out);
+    const out = JSON.parse(r.out);
+    assert.equal(out.ok, true);
+    assert.deepEqual(out.applied, ['create_entity', 'undo'], '流程含 undo');
+    assert.equal(out.entities, 1, 'undo 后实体回退');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('scene apply：非法命令拒绝且不写坏文件', () => {
   const dir = mkdtempSync(join(tmpdir(), 'ccx-apply-bad-'));
   try {

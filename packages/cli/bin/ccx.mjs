@@ -104,6 +104,8 @@ async function main() {
     if (args[i] === '--net') flags.net = true;
     if (args[i] === '--w1') flags.w1 = true;
     if (args[i] === '--verify') flags.verify = true;
+    if (args[i] === '--undo') flags.undo = true;
+    if (args[i] === '--redo') flags.redo = true;
     if (args[i] === '--js') flags.js = true;
   }
   const sub = positional[0] ?? 'doctor';
@@ -316,6 +318,7 @@ async function main() {
 
   // —— editor preview <scene.json> [--out preview.html]：自包含预览页 ——
   if (sub === 'editor' && positional[1] === 'preview') {
+    const applied = [];
     const sceneFile = positional[2];
     if (!sceneFile || !existsSync(sceneFile)) {
       return emit({ ok: false, error: '用法: ccx editor preview <scene.json> [--out <html>]' });
@@ -341,6 +344,15 @@ async function main() {
       } catch (e) {
         return emit({ ok: false, error: '命令执行失败: ' + e.message });
       }
+      applied.push(cmd.op);
+    }
+    if (flags.undo) {
+      bus.undo();
+      applied.push('undo');
+    }
+    if (flags.redo) {
+      bus.redo();
+      applied.push('redo');
     }
     const shell = new EditorShell({ bus });
     shell.addPanel('hierarchy', 'left', 0);
@@ -385,6 +397,7 @@ async function main() {
     const out = flags.out ? resolve(flags.out) : resolve('preview.html');
     writeFileSync(out, html);
     return emit({ ok: true, out, entities: view.scene.entityCount,
+                  applied: applied ?? [],
                   frame: flags.frame && existsSync(flags.frame) ? resolve(flags.frame) : null });
   }
 

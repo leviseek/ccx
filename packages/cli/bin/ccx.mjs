@@ -674,7 +674,25 @@ async function main() {
           });
         }
       }
-      // 12) status.summary：守护规模汇总
+      // 12) profiler.frames：三源帧耗时汇总（仿真/GPU/骨骼）
+      tick('profiler.frames');
+      {
+        const findMs = (n) => {
+          const s = steps.find((x) => x.name === n);
+          return s ? s.ms : 0;
+        };
+        const gifMs = findMs('frame.gif');
+        const wgpuMs = findMs('frame.wgpu');
+        const spineMs = findMs('spine.frame');
+        push('profiler.frames', {
+          frameGifMs: gifMs,
+          frameWgpuMs: wgpuMs,
+          spineMs,
+          totalMs: gifMs + wgpuMs + spineMs,
+          ok: gifMs > 0 && wgpuMs > 0 && spineMs > 0,
+        });
+      }
+      // 13) status.summary：守护规模汇总
       tick('status.summary');
       {
         const root = resolve(join(here, '..', '..', '..'));
@@ -1224,7 +1242,7 @@ async function main() {
         engineModules: mods,
         ctestCount: countAddTestSync(root),
         nodeTestFiles: countTestFilesSync(root),
-        demoSteps: 17,
+        demoSteps: 18,
         generatedAt: new Date().toISOString(),
       },
     });
@@ -1349,10 +1367,10 @@ async function main() {
         engineModules: checksAll['引擎模块计数'],
         ctestCount: checksAll['CTest 数（本地）'],
         nodeTestFiles: checksAll['Node 测试文件数'],
-        demoSteps: 17,
+        demoSteps: 18,
         generatedAt: new Date().toISOString(),
       },
-      demo: { steps: 17, allOk: true,
+      demo: { steps: 18, allOk: true,
               note: '健康+性能见 cxx doctor --demo（两轮计时）' },
       hint: '五合一：环境(checks) + 规模(summary) + 交付链(demo=15 步)',
     });
@@ -1474,6 +1492,7 @@ main().catch((e) => {
   console.error(e);
   process.exit(1);
 });
+
 
 
 

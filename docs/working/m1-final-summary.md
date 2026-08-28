@@ -29,8 +29,8 @@
 
 ## 门禁（2026-08-28 终检）
 
-- layered_imports：76 文件合规（铁律 1/6）
-- vendor_check：5 包合规（ADR-005）
+- layered_imports：**84 文件合规**（铁律 1/6；W7 新增 render→animation 依赖表项，2026-08-29 复跑）
+- vendor_check：**6 包合规**（ADR-005；修复 .cxx 构建产物目录误扫）
 - 双门禁纳入每轮全量验证（此前曾遗漏 layered，已修复并固化）
 
 

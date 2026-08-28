@@ -13,7 +13,7 @@ const ALLOWED = {
   ecs: ['foundation'],
   scene: ['ecs', 'foundation', 'physics'],
   gfx: ['platform', 'foundation'],
-  render: ['scene', 'ecs', 'gfx', 'animation', 'foundation'],
+  render: ['animation', 'scene', 'ecs', 'gfx', 'foundation'],  // W7 骨骼→RenderItem 桥（渲染消费骨骼）
   animation: ['scene', 'ecs', 'foundation'],
   physics: ['scene', 'ecs', 'foundation'],
   audio: ['foundation'],
@@ -38,3 +38,61 @@ function walk(dir, out = []) {
   try {
     entries = fs.readdirSync(dir, { withFileTypes: true });
   } catch {
+    return out;
+  }
+  for (const e of entries) {
+    if (e.name === '.git' || e.name === 'node_modules' || e.name === 'build' ||
+        e.name.startsWith('CMakeFiles') || e.name === 'vendor') {
+      continue;  // vendor（ADR-005）不受依赖方向门禁约束
+    }
+    const p = path.join(dir, e.name);
+    if (e.isDirectory()) {
+      walk(p, out);
+    } else if (SRC_EXT.includes(path.extname(e.name).toLowerCase())) {
+      out.push(p);
+    }
+  }
+  return out;
+}
+
+const includeRe = /#\s*include\s*[<"]([^>"]+)[>"]/g;
+const violations = [];
+let filesChecked = 0;
+
+for (const file of walk(engineRoot)) {
+  const rel = path.relative(engineRoot, file);
+  const moduleName = rel.split(path.sep)[0];
+  if (moduleName === 'tests') continue; // 测试可依赖任意引擎模块
+  const allowed = ALLOWED[moduleName];
+  if (allowed === undefined) {
+    violations.push(rel + ': 未登记模块（请在 ALLOWED 中登记）');
+    continue;
+  }
+  const src = fs.readFileSync(file, 'utf8');
+  includeRe.lastIndex = 0;
+  let m;
+  while ((m = includeRe.exec(src)) !== null) {
+    const inc = m[1];
+    const parts = inc.split(/[\\/]/);
+    if (parts.some((p) => FORBIDDEN.includes(p))) {
+      violations.push(rel + ': 禁止引用 "' + inc + '"（引擎不得依赖 ' + FORBIDDEN.join('/') + '）');
+      continue;
+    }
+    if (inc.startsWith('ccx/')) {
+      const target = parts[1] ?? '';
+      if (target === moduleName) continue;
+      if (allowed !== null && !allowed.includes(target)) {
+        violations.push(rel + ': ' + moduleName + ' -> ' + target +
+          ' 违反依赖方向（允许: ' + (allowed.join(', ') || '无') + '）');
+      }
+    }
+  }
+  ++filesChecked;
+}
+
+if (violations.length > 0) {
+  console.error('[layered_imports] FAIL: ' + violations.length + ' violation(s)');
+  for (const v of violations) console.error('  ' + v);
+  process.exit(1);
+}
+console.log('[layered_imports] OK: ' + filesChecked + ' files，engine 依赖方向合规（铁律 1/6）');

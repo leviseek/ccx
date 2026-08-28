@@ -17,7 +17,9 @@ function findVendorDirs(dir, out = []) {
     return out;
   }
   for (const e of entries) {
-    if (['.git', 'node_modules', 'build'].includes(e.name)) continue;
+    // 跳过 VCS/依赖/构建产物目录（.cxx 为 Android CMake 构建产物，内含 vendor 源路径镜像）
+    if (['.git', 'node_modules', 'build', '.cxx', '.gradle', 'cmake-build-*'].includes(e.name)) continue;
+    if (e.name.startsWith('.') && e.name !== '.') continue;
     const p = path.join(dir, e.name);
     if (e.isDirectory()) {
       if (e.name === 'vendor') out.push(p);

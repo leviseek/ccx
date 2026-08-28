@@ -5,6 +5,15 @@ add_executable(ccx_foundation_tests roundtrip_test.cpp)
 target_link_libraries(ccx_foundation_tests PRIVATE ccx_foundation)
 add_test(NAME foundation.roundtrip COMMAND ccx_foundation_tests)
 
+# M5：cc4-compat 基线（Node façade 驱动 ECS，engine-spec §8 兼容层独立发布）
+if(EXISTS ${CMAKE_SOURCE_DIR}/compat/cc4/cc4_compat_test.cpp)
+  add_executable(ccx_cc4_compat_test ${CMAKE_SOURCE_DIR}/compat/cc4/cc4_compat_test.cpp
+                                              ${CMAKE_SOURCE_DIR}/compat/cc4/cc4_node.cpp)
+  target_include_directories(ccx_cc4_compat_test PRIVATE ${CMAKE_SOURCE_DIR}/compat/cc4)
+  target_link_libraries(ccx_cc4_compat_test PRIVATE ccx_ecs ccx_foundation)
+  add_test(NAME m5.cc4_compat COMMAND ccx_cc4_compat_test)
+endif()
+
 # M1 gate 基准（engine-spec §3.7 / ADR-001 §5）：实体创建/10 万查询/空 tick/精灵帧推进
 add_executable(ccx_ecs_bench_test ecs_bench_test.cpp)
 target_link_libraries(ccx_ecs_bench_test PRIVATE ccx_ecs ccx_render ccx_foundation)

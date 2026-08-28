@@ -4,13 +4,15 @@
 
 ## 数字（本机实测）
 
-- CTest **65/65**（含 ecs.bench_gate + scene.big_roundtrip）；node --test **132/132**（35 文件，含 creator_migrator，2026-08-29 实测复跑）；引擎构建模块 14；demo all **18 步**全 ok（含真后端帧/骨骼/帧性能汇总）
+- CTest **71/71**（含 ecs.bench_gate + scene.big_roundtrip + platform.crash_reporter + network.sync_channel + network.world_sync + assets.stream + m5.cc4_compat）；node --test **132/132**（35 文件，含 creator_migrator + preview_resolution，2026-08-29 实测复跑）；引擎构建模块 14；demo all **18 步**全 ok（含真后端帧/骨骼/帧性能汇总）
 - **M1 性能 gate（engine-spec §3.7，2026-08-29 实测）**：实体创建 8.7M/s（≥1M/s ✅）；10 万 Transform 查询 0.148ms（<2ms ✅）；空世界 tick ~0ms（<0.5ms ✅）；10 万精灵帧推进 0.038ms（桌面 <6ms ✅）；10 万同键精灵 = 1 批 0.028ms（renderer-spec §5 ✅）——RTX 4070 桌面
 - **v1.0 基准1 移动端（roadmap §8.2，2026-08-29 实测，Android 模拟器 ALN-AL00 x86_64）**：10 万实体创建 14.78ms（≈6.8M/s，≥1M/s ✅）；10 万查询 0.150ms（<6ms ✅）；10 万精灵帧推进 0.032ms（移动目标 1.5ms ✅）——logcat CCX_BENCH
 - **v1.0 基准4（roadmap §8.2，2026-08-29 实测）**：10 万实体场景 JSON round-trip 全等——build 17.6ms / save 142.6ms（23.5MB）/ load 120.5ms / save(load(save)) dump 全等 ✅
 - **v1.0 基准6（roadmap §8.2，2026-08-29 实测）**：MCP 自然语言闭环 9 步全过（open→create_entity→Sprite→Health→query→save→帧导出→build.run；verify_mcp_loop.mjs 单 daemon 会话）✅
 - **v1.0 基准3（roadmap §8.2，2026-08-29 实测）**：从零新建项目 → Web+Android 双端出包 **4.1s**（预算 3600s；verify_three_platform.mjs；iOS 待环境）✅
 - **M5 迁移器（engine-spec §237，2026-08-29）**：`ccx migrate <creator.scene>` 核心落地——Creator 2D 数组格式 → ccx.scene/1（Node/Sprite/Label/UITransform 映射 + 变换/父级树），fixture 4 测试全过，**迁移产物被引擎加载渲染**（quads=1）；基准5 待真实项目端到端
+- **M5 cc4-compat 基线（engine-spec §8，2026-08-29）**：`compat/cc4/`——cc.Node façade（name/position/active 驱动 ECS）+ Component 生命周期钩子骨架，8 断言测试；兼容层独立于引擎核心
+- **M4 五项全落地（2026-08-29）**：net sync delta 通道（encode/decode + World A→B 回放）、远端 daemon token 鉴权（CCX_TOKEN）、纹理流送（LOD + 预算逐出）、UI 多分辨率视口（editor preview --resolution）
 - 守护合计 ≈ 194 项；vendor 包 6（pal/audio/storage/main/quickjs/webgpu-headers）
 - demo 基线：frame.gif 44ms / contact.gif 40ms；总耗 ~90ms
 

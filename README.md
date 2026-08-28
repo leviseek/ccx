@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.207（2026-08-29）**：M5 cc4-compat 基线（cc.Node façade 驱动 ECS）；M4 五项全落地（net sync delta + World 回放 + daemon token + 纹理流送 + UI 多分辨率）；M3 toon-2d/崩溃上报；M5 迁移器核心。ctest 71/71、node 132/132、CI 三 job 全绿。
 - **v0.3.203（2026-08-29）**：W6-1 验收：release APK 五验证实证（壳/帧循环/光栅/script-eval 7/统计），壳显示 bug 修复。
 - **v0.3.202（2026-08-29）**：W6 release 签名链闭环——keytool keystore + signingConfig + assembleRelease + apksigner 验证，真机引擎帧正常。
 - **v0.3.201（2026-08-28）**：评审包终检 7→8——六线闭环完成。

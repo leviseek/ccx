@@ -1,0 +1,29 @@
+# M2 评审彩排演练实录（计时实测）
+
+> 日期：2026-08-28 · 目的：验证预演议程"60 分钟内完成"声明；结果远优于预算。
+
+## 逐段计时（本机实跑）
+
+| 段 | 内容 | 实测耗时 |
+| --- | --- | --- |
+| 1 | 交接实况（ccx doctor --all） | <1s |
+| 2 | 架构总览（浏览器打开 m1-architecture.html） | 人工 ~1min |
+| 3 | 范围与批次（m2-proposal 阅读） | 人工 ~5min |
+| 4 | 首批凭据（node ci/verify_m2_batch1.mjs） | 13s |
+| 5 | W1 预备（ccx doctor --w1） | <3s |
+| 6 | 决策点（ccx script run --engine 演示） | <2s |
+| 7 | 自检收口（ci/verify_review_package.mjs） | 16.3s |
+| 8 | 健康性能（ccx doctor --demo 两轮） | 7.7s |
+| Σ 机器段 | — | ≈ 45s |
+
+## 结论
+
+- 机器段全部 <1 分钟；人工段（阅读/讨论）预算 10-15 分钟——**全程可在 20 分钟内完成**，远优于 60 分钟声明。
+- 评审当天的额外风险仅剩：环境依赖项讨论（GPU/Actions/真机）与结论填写。
+
+## 现场检查表（评审人）
+
+1. [ ] ccx doctor --all --verify（≈15s）全绿
+2. [ ] ccx demo all（≈3s）15 步全 ok
+3. [ ] 材料 10/10（verify_review_package）
+4. [ ] 结论三择 + 批次决议 + 签名

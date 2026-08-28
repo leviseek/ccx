@@ -15,6 +15,11 @@ add_executable(ccx_scene_big_roundtrip_test scene_big_roundtrip_test.cpp)
 target_link_libraries(ccx_scene_big_roundtrip_test PRIVATE ccx_scene ccx_foundation)
 add_test(NAME scene.big_roundtrip COMMAND ccx_scene_big_roundtrip_test)
 
+# M3：崩溃上报（roadmap 工作包；--crash 子进程模式验证 SEH/信号捕获）
+add_executable(ccx_crash_reporter_test crash_reporter_test.cpp)
+target_link_libraries(ccx_crash_reporter_test PRIVATE ccx_foundation)
+add_test(NAME platform.crash_reporter COMMAND ccx_crash_reporter_test)
+
 # 灯塔任务 D：SpriteBatch 合批模型（renderer-spec §5，逻辑在 render::batcher）
 add_executable(ccx_batch_prototype_test batch_prototype_test.cpp)
 target_link_libraries(ccx_batch_prototype_test PRIVATE ccx_render)

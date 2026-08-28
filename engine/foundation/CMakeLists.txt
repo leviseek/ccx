@@ -6,6 +6,7 @@ add_library(ccx_foundation STATIC
   src/serialization/serializer.cpp
   src/job/task_graph.cpp
   src/metrics.cpp
+  src/crash_reporter.cpp
 )
 
 target_include_directories(ccx_foundation PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)

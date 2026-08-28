@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.147（2026-08-28）**：W6 显示面——**设备显示链路验证**（push-frame 后 am start VIEW → 设备弹出文件打开菜单（screencap OCR 实证）——引擎帧被 Android 系统识别；真实 app 渲染属发布链后续）；ctest 62/62 + node 119/119。
 - **v0.3.146（2026-08-28）**：push 终核——**清单终核记录**（树 0 entries/171 commits/vendor 纪律保持/全量绿——push 就绪；仅 Actions 真跑待 push 后确认）；ctest 62/62 + node 119/119。
 - **v0.3.145（2026-08-28）**：W6 材料面——**设备链入评审**（就绪页/发起声明：status/screenshot/push-frame 三命令；doctor --env device 段列交互面）；ctest 62/62 + node 119/119。
 - **v0.3.144（2026-08-28）**：W6 传输面——**ccx device push-frame**（引擎帧 PPM→BMP→adb push→设备侧校验（/sdcard/ccx-frame.bmp，12342 字节实跑）——exit4 输入面传输链打通；修复 parsePpm Buffer 传参与 tmpdir 路径）；ctest 62/62 + node 119/119。

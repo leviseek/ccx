@@ -29,3 +29,8 @@
 
 
 
+## 设备显示验证（2026-08-28，v0.3.146）
+
+- ccx device push-frame（PPM→BMP→adb push /sdcard/ccx-frame.bmp）→ am start VIEW intent。
+- 设备侧验证：screencap 截图 OCR 显示系统弹出文件打开菜单（MT管理器/微信等选项）——推送的引擎帧被 Android 系统识别并可进入打开流程。
+- 结论：引擎帧 → 设备文件 → 系统识别链路全通（exit4 输入面显示验证）；真实 app 渲染（自研 viewer/游戏壳）属 W6 发布链后续。

@@ -513,6 +513,10 @@ async function main() {
       'vendor/ 纪律': existsSync(join(cwd, 'engine', 'platform', 'vendor', 'pal', 'UPSTREAM.md')),
       '构建产物（本地）': existsSync(join(cwd, 'build', 'local', 'engine', 'tests',
                                             'ccx_foundation_tests.exe')),
+      '粒子模块': existsSync(join(cwd, 'engine', 'particle', 'include')),
+      '输入模块': existsSync(join(cwd, 'engine', 'input', 'include')),
+      '帧循环模块': existsSync(join(cwd, 'engine', 'game', 'include')),
+      '资产注册表模块': existsSync(join(cwd, 'engine', 'assets', 'include')),
     };
     const failed = Object.entries(checks).filter(([, v]) => v === false || v === 'missing');
     return emit({

@@ -131,7 +131,8 @@
 
 ## 变更记录
 
-- **v0.3.15（2026-08-27）**：M1 渲染提交与宿主面——**Sprite 渲染提交打包**（engine/render packer：RenderItem→批+顶点+索引，UV/旋转/缩放/染色字节化；断言两次修数学笔误后 4 组全绿）、**GameLoop 帧循环宿主**（engine/game：固定步长累积/多帧/螺旋保护 maxSubSteps，3 组一次通过）；引擎模块增至 12 个；ctest 28/28 + node 64/64。
+- **v0.3.16（2026-08-27）**：M1 渲染帧与资产面——**渲染帧全链测试**（GameLoop 固定步 20fps→Scheduler 推进→渲染项收集（含动画 UV）→packer 缓冲→metrics 如实映射 batches/drawCalls/allocBytes，2 精灵 8 顶点 1 draw）、**runtime 资产注册表**（engine/assets：句柄池、槽位复用+版本失效、load 状态、池满拒绝，4 组一次通过）、**doctor 增至 15 项检查**（+粒子/输入/帧循环/资产注册表模块）；引擎模块增至 **13 个**；ctest 29/29 + node 64/64。
+- **v0.3.15（2026-08-27）**：M1 渲染提交与宿主面——**Sprite 渲染提交打包**（engine/render packer：RenderItem→批+顶点+索引，UV/旋转/缩放/染色字节化）、**GameLoop 帧循环宿主**（engine/game：固定步长累积/多帧/螺旋保护 maxSubSteps）；引擎模块增至 12 个；ctest 28/28 + node 64/64。
 - **v0.3.14（2026-08-27）**：M1 全帧链路——**完整帧循环集成测试**（一帧全接：InputState 按住 W 移动 3 帧→+15px、动画状态机摆动、粒子稳态计数写场景组件、SceneBridge 同步、FrameMetrics 记录；途中揪出忘记 release 导致持续移动的语义坑）、**`ccx editor preview --apply`**（命令回路：--apply 序列在预览生成前应用，7→8 实体入视图）；ctest 26/26 + node 64/64。
 - **v0.3.13（2026-08-27）**：M1 内容与交互面——**2D 粒子数据面**（engine/particle：确定性 LCG、固定池、发射/重力/拖拽/淡出、稳态 rate×life）、**输入归一化模型**（engine/input：边沿 pressed/released、多键独立、指针按下/拖拽/抬起；Vec2 补 operator*=）、**`ccx editor preview`**（自包含预览页：buildView→HTML+内联场景+点击交互 JS；修理 preview_page 语法崩坏导致 CLI 全停的问题）；ctest 25/25 + node 63/63。
 - **v0.3.12（2026-08-27）**：M1 编辑器渲染与运维面——**最小 HTML 渲染器**（renderViewHtml：buildView→HTML 字符串产物，实体/组件/选中/命令/转义，M2 实 DOM 起点）、**M2 立项材料**（docs/working/m2-kickoff.md：7 工作包/5 exit 标准/依赖风险/Owner）、**`ccx service start/status/stop` 常驻模式**（detached+pid 文件+日志流；阶段复现并修复三个真问题：worker fork 不支持 stdio 路径、detached 下 stdin 为 ignore 事件循环空、常驻需心跳保持）；ctest 23/23 + node 62/62。

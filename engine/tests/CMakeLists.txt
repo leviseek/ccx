@@ -145,6 +145,17 @@ add_executable(ccx_game_loop_test game_loop_test.cpp)
 target_link_libraries(ccx_game_loop_test PRIVATE ccx_game)
 add_test(NAME game.loop COMMAND ccx_game_loop_test)
 
+# M1：渲染帧全链（GameLoop -> Scheduler -> 渲染项收集 -> packer -> metrics）
+add_executable(ccx_render_frame_test render_frame_test.cpp)
+target_link_libraries(ccx_render_frame_test PRIVATE
+  ccx_game ccx_ecs ccx_scene ccx_render ccx_animation ccx_foundation)
+add_test(NAME e2e.render_frame COMMAND ccx_render_frame_test)
+
+# M1：runtime 资产注册表（句柄/复用/失效）
+add_executable(ccx_asset_registry_test asset_registry_test.cpp)
+target_link_libraries(ccx_asset_registry_test PRIVATE ccx_assets)
+add_test(NAME assets.registry COMMAND ccx_asset_registry_test)
+
 # M1：动画整合（状态机选 clip -> 精灵帧采样 -> 帧循环）
 add_executable(ccx_integrated_animation_test integrated_animation_test.cpp)
 target_link_libraries(ccx_integrated_animation_test PRIVATE ccx_animation ccx_ecs ccx_scene)

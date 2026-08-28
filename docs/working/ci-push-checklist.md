@@ -27,3 +27,12 @@
 - 真机/渠道（W6）：账号与设备待配置。
 `n`n## 4b. W6 真机预备（2026-08-28）`n`n- adb 工具：**已安装**（经代理手动下载 platform-tools 37.0.1 → %USERPROFILE%\Android\platform-tools；doctor --env 可探测）。`n- doctor --env device 段已可探测 adb 路径与设备数。`n
 
+
+
+## 终核记录（2026-08-28，v0.3.145）
+
+- 本地全量：ctest 62/62 + node 119/119 + 双门禁（持续绿）。
+- 仓库卫生：工作树 0 entries；171 commits；vendor 近 4 commit 0 改动（纪律保持）。
+- 环境：GPU ✅ + 设备 ✅ + vendor 6 包；仅 Actions CI 真跑待 push。
+- 结论：**push 就绪**——push 后按 §3 确认 Actions 三任务。
+

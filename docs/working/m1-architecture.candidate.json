@@ -1,0 +1,327 @@
+{
+  "schema_version": 1,
+  "diagram_type": "architecture",
+  "meta": {
+    "title": "CCX 2D Game Runtime Platform — M1 实况",
+    "subtitle": "CLI · 服务 · 引擎 · 消费四层（97 commits / 175 守护）",
+    "output": "m1-architecture.html",
+    "quality_profile": "showcase",
+    "views": [
+      {
+        "id": "main-path",
+        "label": "主路径：命令到帧",
+        "focus": [
+          "cli",
+          "daemon",
+          "scene",
+          "engine",
+          "render",
+          "web"
+        ],
+        "note": "从一条 ccx 命令到可发布 Web 帧的完整交付。"
+      },
+      {
+        "id": "script-path",
+        "label": "脚本驱动面",
+        "focus": [
+          "engine",
+          "script",
+          "scene",
+          "demo"
+        ],
+        "note": "QuickJS 宿主、事件桥与命令桥如何把脚本变成场景变更。"
+      },
+      {
+        "id": "tool-faces",
+        "label": "外部接口",
+        "focus": [
+          "mcp",
+          "cli",
+          "demo",
+          "web"
+        ],
+        "note": "AI 工具面、CLI 命令面与交付链三者独立可核。"
+      }
+    ]
+  },
+  "components": [
+    {
+      "id": "cli",
+      "type": "frontend",
+      "label": "ccx CLI",
+      "sublabel": "命令面 25+ 子命令",
+      "pos": [
+        60,
+        250
+      ],
+      "size": [
+        150,
+        64
+      ]
+    },
+    {
+      "id": "daemon",
+      "type": "backend",
+      "label": "服务守护 daemon",
+      "sublabel": "JSON-RPC stdio · MCP 16 工具",
+      "pos": [
+        320,
+        250
+      ],
+      "size": [
+        160,
+        64
+      ]
+    },
+    {
+      "id": "scene",
+      "type": "backend",
+      "label": "Scene 服务",
+      "sublabel": "命令总线 · 会话 undo/redo · session.save",
+      "pos": [
+        590,
+        150
+      ],
+      "size": [
+        160,
+        64
+      ]
+    },
+    {
+      "id": "assets",
+      "type": "backend",
+      "label": "资产服务",
+      "sublabel": "cook · atlas · 外部压缩器",
+      "pos": [
+        590,
+        250
+      ],
+      "size": [
+        160,
+        64
+      ]
+    },
+    {
+      "id": "profiler",
+      "type": "backend",
+      "label": "性能服务",
+      "sublabel": "帧统计 · 脚本耗时",
+      "pos": [
+        590,
+        350
+      ],
+      "size": [
+        160,
+        64
+      ]
+    },
+    {
+      "id": "engine",
+      "type": "backend",
+      "label": "CCX 引擎",
+      "sublabel": "13 模块 2D 运行时 · ECS",
+      "pos": [
+        880,
+        250
+      ],
+      "size": [
+        170,
+        64
+      ]
+    },
+    {
+      "id": "script",
+      "type": "backend",
+      "label": "QuickJS 宿主",
+      "sublabel": "eval · 事件桥 · 预算",
+      "pos": [
+        880,
+        110
+      ],
+      "size": [
+        170,
+        64
+      ]
+    },
+    {
+      "id": "gfx",
+      "type": "backend",
+      "label": "RHI 抽象",
+      "sublabel": "FakeDevice 仿真 + 契约",
+      "pos": [
+        880,
+        390
+      ],
+      "size": [
+        170,
+        64
+      ]
+    },
+    {
+      "id": "render",
+      "type": "backend",
+      "label": "软件光栅",
+      "sublabel": "packer · camera · PPM/GIF",
+      "pos": [
+        1180,
+        250
+      ],
+      "size": [
+        170,
+        64
+      ]
+    },
+    {
+      "id": "web",
+      "type": "frontend",
+      "label": "Web 目标",
+      "sublabel": "index.html · 资产索引",
+      "pos": [
+        1460,
+        250
+      ],
+      "size": [
+        160,
+        64
+      ]
+    },
+    {
+      "id": "mcp",
+      "type": "external",
+      "label": "MCP 工具面",
+      "sublabel": "LLM/AI 接入",
+      "pos": [
+        320,
+        470
+      ],
+      "size": [
+        160,
+        64
+      ]
+    },
+    {
+      "id": "demo",
+      "type": "external",
+      "label": "交付链 demo all",
+      "sublabel": "15 步 · 一键复验",
+      "pos": [
+        60,
+        470
+      ],
+      "size": [
+        150,
+        64
+      ]
+    }
+  ],
+  "boundaries": [
+    {
+      "kind": "region",
+      "label": "CLI + 服务面",
+      "wraps": [
+        "cli",
+        "daemon",
+        "scene",
+        "assets",
+        "profiler",
+        "mcp"
+      ]
+    },
+    {
+      "kind": "region",
+      "label": "引擎面",
+      "wraps": [
+        "engine",
+        "script",
+        "gfx"
+      ]
+    },
+    {
+      "kind": "region",
+      "label": "消费面",
+      "wraps": [
+        "render",
+        "web"
+      ]
+    }
+  ],
+  "connections": [
+    {
+      "id": "cli-daemon",
+      "from": "cli",
+      "to": "daemon",
+      "label": "RPC",
+      "variant": "emphasis"
+    },
+    {
+      "id": "cli-demo",
+      "from": "cli",
+      "to": "demo",
+      "label": "编排",
+      "variant": "dashed",
+      "labelDy": 24
+    },
+    {
+      "id": "daemon-scene",
+      "from": "daemon",
+      "to": "scene",
+      "label": "命令/会话"
+    },
+    {
+      "id": "daemon-assets",
+      "from": "daemon",
+      "to": "assets",
+      "labelDy": 22
+    },
+    {
+      "id": "daemon-profiler",
+      "from": "daemon",
+      "to": "profiler",
+      "label": "记录/快照"
+    },
+    {
+      "id": "mcp-daemon",
+      "from": "mcp",
+      "to": "daemon",
+      "label": "callTool",
+      "variant": "dashed"
+    },
+    {
+      "id": "scene-engine",
+      "from": "scene",
+      "to": "engine",
+      "label": "场景数据",
+      "variant": "emphasis"
+    },
+    {
+      "id": "engine-script",
+      "from": "script",
+      "to": "engine",
+      "label": "命令桥/事件桥",
+      "fromSide": "bottom",
+      "toSide": "top",
+      "labelDy": 26,
+      "labelDx": -40
+    },
+    {
+      "id": "engine-gfx",
+      "from": "engine",
+      "to": "gfx",
+      "label": "上传/绘制",
+      "labelDy": 24
+    },
+    {
+      "id": "engine-render",
+      "from": "engine",
+      "to": "render",
+      "label": "渲染项",
+      "variant": "emphasis"
+    },
+    {
+      "id": "render-web",
+      "from": "render",
+      "to": "web",
+      "label": "帧/动画产物"
+    }
+  ]
+}

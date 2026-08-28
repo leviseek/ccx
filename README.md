@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.132（2026-08-28）**：M2 终检面——**评审包终检**（tickets 验收记录 13 张 ✅ + 复核路径更新（batch 9/9 + W1 10/10 + spine 3）；自检 READY 复核）；ctest 62/62 + node 115/115。
 - **v0.3.131（2026-08-28）**：M1 收口终版——**全链终核一次过**（62 CTest / 115 node / 双门禁）+ **申报页数字固化**（17 步/13 张 ✅/双后端 10/10）；ctest 62/62 + node 115/115。
 - **v0.3.130（2026-08-28）**：W7 贴图面——**附件 atlas 接入渲染消费**（useSlotAtlas：骨骼名→插槽名匹配 → item.atlas 用附件 atlas；测试扩展 3 项（root 默认/body/head 附件 atlas）——Spine 贴图采样面闭环）；ctest 62/62 + node 115/115。
 - **v0.3.129（2026-08-28）**：W7 深化——**插槽/附件数据面**（spine_loader 解析 slots + skins.default 附件 → SlotAttachment（附件名 + atlas 哈希占位）；w7.spine_slots 测试 4 组（双插槽/附件名/atlas 区分）——贴图采样面的前置）；ctest 62/62 + node 115/115。

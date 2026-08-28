@@ -13,6 +13,7 @@
 - **M5 迁移器（engine-spec §237，2026-08-29）**：`ccx migrate <creator.scene>` 核心落地——Creator 2D 数组格式 → ccx.scene/1（Node/Sprite/Label/UITransform 映射 + 变换/父级树），fixture 4 测试全过，**迁移产物被引擎加载渲染**（quads=1）；基准5 待真实项目端到端
 - **M5 cc4-compat 基线（engine-spec §8，2026-08-29）**：`compat/cc4/`——cc.Node façade（name/position/active 驱动 ECS）+ Component 生命周期钩子骨架，8 断言测试；兼容层独立于引擎核心
 - **M4 五项全落地（2026-08-29）**：net sync delta 通道（encode/decode + World A→B 回放）、远端 daemon token 鉴权（CCX_TOKEN）、纹理流送（LOD + 预算逐出）、UI 多分辨率视口（editor preview --resolution）
+- **M3 移动 pipeline 资产（asset-spec §86，2026-08-29）**：平台矩阵（android astc4/ios astc4/minigame etc2/windows bc7 + audio）+ **etc2 保底降级**（astc4 压缩失败自动重试 etc2，fallback 标记）——cook 6 测试全过
 - 守护合计 ≈ 194 项；vendor 包 6（pal/audio/storage/main/quickjs/webgpu-headers）
 - demo 基线：frame.gif 44ms / contact.gif 40ms；总耗 ~90ms
 

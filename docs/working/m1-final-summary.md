@@ -4,7 +4,7 @@
 
 ## 数字（本机实测）
 
-- CTest **71/71**（含 ecs.bench_gate + scene.big_roundtrip + platform.crash_reporter + network.sync_channel + network.world_sync + assets.stream + m5.cc4_compat）；node --test **132/132**（35 文件，含 creator_migrator + preview_resolution，2026-08-29 实测复跑）；引擎构建模块 14；demo all **18 步**全 ok（含真后端帧/骨骼/帧性能汇总）
+- CTest **72/72**（含 ecs.bench_gate + scene.big_roundtrip + crash_reporter + sync_channel + world_sync + asset_stream + m5.cc4_compat + render.caps）；node --test **137/137**（37 文件，含 creator_migrator + preview_resolution + cook 保底 + plugin market，2026-08-29 实测）；引擎构建模块 15（含 network）；demo all **19 步**全 ok（含 plugin.market 步，真后端帧/骨骼/帧性能汇总）
 - **M1 性能 gate（engine-spec §3.7，2026-08-29 实测）**：实体创建 8.7M/s（≥1M/s ✅）；10 万 Transform 查询 0.148ms（<2ms ✅）；空世界 tick ~0ms（<0.5ms ✅）；10 万精灵帧推进 0.038ms（桌面 <6ms ✅）；10 万同键精灵 = 1 批 0.028ms（renderer-spec §5 ✅）——RTX 4070 桌面
 - **v1.0 基准1 移动端（roadmap §8.2，2026-08-29 实测，Android 模拟器 ALN-AL00 x86_64）**：10 万实体创建 14.78ms（≈6.8M/s，≥1M/s ✅）；10 万查询 0.150ms（<6ms ✅）；10 万精灵帧推进 0.032ms（移动目标 1.5ms ✅）——logcat CCX_BENCH
 - **v1.0 基准4（roadmap §8.2，2026-08-29 实测）**：10 万实体场景 JSON round-trip 全等——build 17.6ms / save 142.6ms（23.5MB）/ load 120.5ms / save(load(save)) dump 全等 ✅

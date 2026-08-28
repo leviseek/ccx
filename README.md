@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.38（2026-08-27）**：M1 健康面——**ccx doctor --demo 一键 e2e 健康**（自跑 demo all：8 步全绿/总耗时/最慢步；嵌套 spawn 输出经临时文件规避 stdout 怪癖后稳定），CLI 18/18；ctest 43/43 + node 87/87。
 - **v0.3.37（2026-08-27）**：M1 预演与可观测面——**M2 gate 预演清单**（docs/working/m2-gate-rehearsal.md：五条 exit ← M1 已承接 ← 承接工作 ← 验收动作 + 执行顺序建议）、**demo all 步耗时**（每步 ms 输出：open 1 / apply 0 / save 1 / build 1 / profiler 0 / frame.gif 44 / contact.gif 40 / cook 1）；ctest 43/43 + node 86/86。
 - **v0.3.36（2026-08-27）**：M1 文档与自检面——**六模块 README**（particle/input/game/assets/audio/physics：用途/API/语义/测试/依赖/M2 接入点）、**doctor 测试计数自检**（引擎模块 13 / Node 测试文件 23 / CTest 43，一键可见守护规模）；ctest 43/43 + node 86/86。
 - **v0.3.35（2026-08-27）**：M1 叙事与透传面——**demo all 八步**（+contact.gif：碰撞时序动画（--contacts 自动高亮）八步全 ok）、**CLI 校验错误透传**（scene apply --cmd Collider 非法数据 → 服务端校验错误原样上浮，CLI 17/17）；ctest 43/43 + node 86/86。

@@ -1,0 +1,56 @@
+{
+  "ok": true,
+  "steps": [
+    {
+      "name": "scene.open",
+      "entities": 7,
+      "ok": true,
+      "ms": 1
+    },
+    {
+      "name": "scene.apply",
+      "entities": 8,
+      "ok": true,
+      "ms": 1
+    },
+    {
+      "name": "scene.save",
+      "entities": 8,
+      "ok": true,
+      "ms": 0
+    },
+    {
+      "name": "build.run",
+      "trace": 5,
+      "ok": true,
+      "ms": 1
+    },
+    {
+      "name": "profiler.snapshot",
+      "schema": "ccx.profile/1",
+      "frames": 1,
+      "ok": true,
+      "ms": 0
+    },
+    {
+      "name": "frame.gif",
+      "frames": 3,
+      "ok": true,
+      "ms": 44
+    },
+    {
+      "name": "contact.gif",
+      "frames": 3,
+      "ok": true,
+      "ms": 40
+    },
+    {
+      "name": "cook",
+      "scanned": 2,
+      "cookOk": 0,
+      "ok": true,
+      "ms": 1
+    }
+  ],
+  "note": "demo-all 端到端串起 open/apply/save/build/cook"
+}

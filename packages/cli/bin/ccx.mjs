@@ -3,7 +3,7 @@
 // 约定：--json 机器可读；--no-interactive 适配 CI。
 import { spawn, spawnSync } from 'node:child_process';
 import { createWriteStream } from 'node:fs';
-import { cpSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { closeSync, cpSync, existsSync, mkdirSync, openSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { buildAtlasFromDir } from '../../asset-service/src/atlas_builder.mjs';
 import { cookWithCompression } from '../../asset-service/src/cook.mjs';
 import { createBundleManifest } from '../../build-service/src/bundle.mjs';
@@ -83,6 +83,7 @@ async function main() {
     if (args[i] === '--delay') flags.delay = args[++i];
     if (args[i] === '--gif') flags.gif = args[++i];
     if (args[i] === '--highlight') flags.highlight = args[++i];
+    if (args[i] === '--demo') flags.demo = true;
   }
   const sub = positional[0] ?? 'doctor';
 
@@ -766,6 +767,43 @@ async function main() {
 
   // —— doctor / version ——
   if (sub === 'version') return emit({ ok: true, name: '@ccx/cli', version: '0.1.0', milestone: 'M1' });
+  if (sub === 'doctor' && flags.demo) {
+    // 一键 e2e 健康：自跑 demo all 并汇总（输出经临时文件，规避嵌套 stdout 怪癖）
+    const selfPath = resolve(join(here, '..', 'bin', 'ccx.mjs'));
+    const tmpOut = join(buildDirName(), 'doctor-demo.json');
+    mkdirSync(dirname(tmpOut), { recursive: true });
+    const fd = openSync(tmpOut, 'w');
+    const r = spawnSync(process.execPath, [selfPath, 'demo', 'all', '--json'],
+                        { stdio: ['ignore', fd, 'ignore'] });
+    closeSync(fd);
+    if (r.status !== 0 || r.error) {
+      return emit({ ok: false, error: 'demo all 失败: ' +
+                    (r.error ? String(r.error) : 'exit ' + r.status) });
+    }
+    if (r.status !== 0 || r.error) {
+      return emit({ ok: false, error: 'demo all 失败: ' +
+                    (r.error ? String(r.error) : (r.stderr || '').slice(0, 300)) });
+    }
+    let demo = null;
+    try {
+      demo = JSON.parse(readFileSync(tmpOut, 'utf8'));
+    } catch (e) {
+      return emit({ ok: false, error: 'demo all 输出解析失败: ' + e.message });
+    }
+    const totalMs = demo.steps.reduce((a, s) => a + (s.ms ?? 0), 0);
+    return emit({
+      ok: demo.ok === true,
+      tool: 'ccx doctor',
+      cwd: process.cwd(),
+      demo: {
+        steps: demo.steps.length,
+        allOk: demo.ok === true,
+        totalMs,
+        slowest: demo.steps.reduce((a, s) => ((s.ms ?? 0) > (a.ms ?? 0) ? s : a), { ms: 0 }).name ?? null,
+      },
+      hint: demo.ok === true ? '交付链 8 步全绿（e2e 健康）' : '交付链有步骤失败，见 demo all 输出',
+    });
+  }
   if (sub === 'doctor') {
     const cwd = process.cwd();
     const git = spawnSync('git', ['--version'], { encoding: 'utf8' });

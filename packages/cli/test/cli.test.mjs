@@ -371,6 +371,17 @@ test('scene apply：Collider 校验错误透传 CLI', () => {
   }
 });
 
+test('ccx doctor --demo：一键 e2e 健康', () => {
+  const r = runCli(['doctor', '--demo', '--json'], join(import.meta.dirname, '..'));
+  assert.equal(r.status, 0, r.err + r.out);
+  const out = JSON.parse(r.out);
+  assert.equal(out.ok, true);
+  assert.equal(out.demo.steps, 8);
+  assert.equal(out.demo.allOk, true);
+  assert.ok(out.demo.totalMs > 0, '总耗时已测');
+  assert.ok(out.demo.slowest.length > 0, '最慢步已标注');
+});
+
 test('scene apply：非法命令拒绝且不写坏文件', () => {
   const dir = mkdtempSync(join(tmpdir(), 'ccx-apply-bad-'));
   try {

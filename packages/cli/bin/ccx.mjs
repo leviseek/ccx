@@ -106,6 +106,7 @@ async function main() {
     if (args[i] === '--verify') flags.verify = true;
     if (args[i] === '--undo') flags.undo = true;
     if (args[i] === '--env') flags.env = true;
+    if (args[i] === '--device') flags.device = args[i + 1];
     if (args[i] === '--redo') flags.redo = true;
     if (args[i] === '--js') flags.js = true;
   }
@@ -930,8 +931,9 @@ async function main() {
     if (!existsSync(dumpExe)) {
       return emit({ ok: false, error: '未构建 ccx_frame_dump（先 cmake --build build/local）' });
     }
-    const r = spawnSync(dumpExe, [sceneFile, out, m[1], m[2], String(flags.time ?? 0)],
-                        { encoding: 'utf8' });
+    const argsDump = [sceneFile, out, m[1], m[2], String(flags.time ?? 0)];
+    if (flags.device === 'wgpu') argsDump.push('1', 'wgpu');
+    const r = spawnSync(dumpExe, argsDump, { encoding: 'utf8' });
     if (r.status !== 0) return emit({ ok: false, error: (r.stderr || 'frame dump 失败').trim() });
     let meta = {};
     try {

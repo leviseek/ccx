@@ -752,6 +752,25 @@ test('ccx doctor --env：环境就绪探测（结构断言）', () => {
   }
 });
 
+test('ccx frame dump --device wgpu：真后端帧导出', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'ccx-fwgpu-'));
+  try {
+    const sceneFile = join(import.meta.dirname, '..', '..', '..', 'examples', 'scenes', 'sample.scene.json');
+    const out = join(dir, 'f.ppm');
+    const r = runCli(['frame', 'dump', sceneFile, '--out', out, '--size', '64x64',
+                      '--device', 'wgpu', '--json'], dir);
+    assert.equal(r.status, 0, r.err + r.out);
+    const parsed = JSON.parse(r.out);
+    assert.equal(parsed.ok, true);
+    assert.equal(parsed.width, 64);
+    assert.ok(readFileSync(out).length > 1000, 'PPM 落盘');
+    const head = readFileSync(out, 'utf8').slice(0, 2);
+    assert.equal(head, 'P6', 'P6 头');
+  } finally {
+    rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('scene apply：非法命令拒绝且不写坏文件', () => {
   const dir = mkdtempSync(join(tmpdir(), 'ccx-apply-bad-'));
   try {

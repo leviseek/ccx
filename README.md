@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.116（2026-08-28）**：W1 导出面——**ccx frame dump --device wgpu**（真后端帧导出：黄金帧 → GPU 上传/读回 → PPM 落盘；CLI 测试 P6 头+尺寸；frame_dump 条件编译 CCX_WGPU_BACKEND）；ctest 56/56 + node 113/113。
 - **v0.3.115（2026-08-28）**：W1 合流面——**黄金对照合流**（w1.wgpu_golden：引擎 RasterTarget 渲染面 ↔ GPU 数据面全量像素一致）+ **T-W1-1/2 ✅ 已验收**（m2-tickets 凭据复核通过；gpu-plan 五级达成注记）；ctest 56/56 + node 112/112。
 - **v0.3.114（2026-08-28）**：W1 验收双后端——**verify_w1 10/10**（5 仿真 + 5 wgpu 真后端段；gpuPassed/backends 标记）；ccx doctor --w1 同步；ctest 55/55 + node 112/112。
 - **v0.3.113（2026-08-28）★★ W1 五级里程碑 5/5 真后端全达成 ★★**——**L4 全场景帧**（3 精灵场景帧经 GPU 数据面像素一致）+ **L5 帧统计**（frames/uploads/bytesUploaded 入 profiler 面）；真后端全链：L1 设备缓冲 / L2 清屏 / L3 黄金对照 / L4 场景帧 / L5 统计（RTX 4070 各 0.5s）——**exit1（首帧像素对照）真后端侧全部达成**；ctest 55/55 + node 111/111。

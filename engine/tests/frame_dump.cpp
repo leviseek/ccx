@@ -150,8 +150,10 @@ int main(int argc, char** argv) {
     OrthoCamera cam{-static_cast<float>(W) / 2.0f, static_cast<float>(W) / 2.0f,
                     -static_cast<float>(H) / 2.0f, static_cast<float>(H) / 2.0f};
     const bool deviceMode = argc >= 9 && std::string(argv[8]) == "1";
-    if (deviceMode) {
-        // 设备路径：缓冲上传 -> 清屏 -> 绘制提交 -> 读回（真后端替换点）
+    const bool wgpuMode = argc >= 10 && std::string(argv[9]) == "wgpu";
+    rasterizeQuads(pk, target, cam);
+    if (deviceMode && !wgpuMode) {
+        // 设备路径：缓冲上传 -> 清屏 -> 绘制提交 -> 读回（仿真后端）
         gfx::FakeDevice device;
         const gfx::Handle vb = device.createBuffer(
             {gfx::BufferDesc::Vertex, pk.vertexCount() * 24, true});
@@ -163,7 +165,6 @@ int main(int argc, char** argv) {
             {gfx::TextureDesc::Rgba8, static_cast<uint32_t>(W), static_cast<uint32_t>(H)});
         device.beginFrame();
         device.clear(tex, 0x2020E8FFu);
-        rasterizeQuads(pk, target, cam);
         for (int y = 0; y < H; ++y) {
             for (int x = 0; x < W; ++x) {
                 device.putPixel(tex, x, y, target.get(x, y));
@@ -173,8 +174,22 @@ int main(int argc, char** argv) {
         std::vector<uint32_t> px(static_cast<size_t>(W) * H, 0);
         if (!device.readback(tex, px.data(), px.size() * 4)) return 1;
         std::copy(px.begin(), px.end(), target.pixels.begin());
-    } else {
-        rasterizeQuads(pk, target, cam);
+    } else if (wgpuMode) {
+#ifdef CCX_WGPU_BACKEND
+        // 真后端（W1）：黄金帧整帧上传 GPU -> 读回（真实 GPU 数据面承载帧）
+        gfx::WgpuDevice device;
+        const gfx::Handle tex = device.createTexture(
+            {gfx::TextureDesc::Rgba8, static_cast<uint32_t>(W), static_cast<uint32_t>(H)});
+        device.beginFrame();
+        if (!device.uploadTexture(tex, target.pixels.data(), target.pixels.size() * 4)) return 1;
+        device.submit();
+        std::vector<uint32_t> px(static_cast<size_t>(W) * H, 0);
+        if (!device.readback(tex, px.data(), px.size() * 4)) return 1;
+        std::copy(px.begin(), px.end(), target.pixels.begin());
+#else
+        std::fprintf(stderr, "wgpu 后端未构建（无 CCX_WGPU_BACKEND）\n");
+        return 1;
+#endif
     }
     if (!writePpm(target, argv[2])) {
         std::fprintf(stderr, "write failed: %s\n", argv[2]);

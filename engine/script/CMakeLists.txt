@@ -6,6 +6,7 @@ set(QUICKJS_DIR ${CMAKE_SOURCE_DIR}/engine/platform/vendor/quickjs)
 
 add_library(ccx_script STATIC
   src/host.cpp
+  src/scene_bridge.cpp
   ${QUICKJS_DIR}/quickjs.c
   ${QUICKJS_DIR}/cutils.c
   ${QUICKJS_DIR}/libregexp.c
@@ -23,7 +24,7 @@ set_source_files_properties(
 
 target_include_directories(ccx_script PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 target_include_directories(ccx_script PRIVATE ${QUICKJS_DIR})
-target_link_libraries(ccx_script PUBLIC ccx_foundation)
+target_link_libraries(ccx_script PUBLIC ccx_foundation ccx_scene)
 target_compile_features(ccx_script PUBLIC cxx_std_20)
 
 # 严格标志只作用于自有源码；vendor C 源豁免（上游风格差异）+ CONFIG_VERSION 兜底
@@ -37,3 +38,4 @@ set_source_files_properties(
   ${QUICKJS_DIR}/dtoa.c
   PROPERTIES COMPILE_OPTIONS "-w;-DCONFIG_VERSION=\"1.0.0\""
 )
+

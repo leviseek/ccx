@@ -24,6 +24,7 @@ const MATERIALS = [
   'ci-push-checklist.md', 'm1-architecture.html',
   // 索引
   'm2-package-index.md',
+  'w6-release-chain.md',
 ];
 
 const materials = MATERIALS.map((f) => ({ file: f, exists: existsSync(join(docs, f)) }));

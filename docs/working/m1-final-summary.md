@@ -4,8 +4,8 @@
 
 ## 数字（本机实测）
 
-- CTest 51/51；node --test 99/99；引擎构建模块 13；Node 测试文件 25；demo all **15 步**全 ok
-- 守护合计 ≈ 174 项；vendor 包 5（pal/audio/storage/main/quickjs）
+- CTest 51/51；node --test 100/100；引擎构建模块 14；Node 测试文件 27；demo all **15 步**全 ok
+- 守护合计 ≈ 175 项；vendor 包 5（pal/audio/storage/main/quickjs）
 - demo 基线：frame.gif 44ms / contact.gif 40ms；总耗 ~90ms
 
 ## 能力清单（一条命令可验证）
@@ -24,3 +24,4 @@
 
 - M0 ✅ 关闭；M1 里程碑评审材料齐备（m1-gate-review / m1-handoff / m1-final-summary）
 - M2 首批（W3 会话 / W4 外部压缩 / W5 脚本三环）已在 M1 内实现主干；剩余工作包依赖环境（GPU/渠道/Actions）如实记录
+

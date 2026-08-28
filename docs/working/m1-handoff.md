@@ -29,7 +29,9 @@
 
 > 说明：M1 的"10 万精灵 gate"与"三端出包"等出口依赖 GPU/真机里程碑（§2），M1 阶段以 74 项自动化 + 交付链闭环作为阶段验证。
 
-## 交接终检注记（2026-08-28，v0.3.103）
+## 工具安装规则（2026-08-28 起）`n`n- 网络下载优先**本地代理 127.0.0.1:7897**（HTTP_PROXY/HTTPS_PROXY）；scoop 下载失败时先走代理。`n`n- Windows 环境**优先 scoop** 安装工具（llvm/astcenc 等）；winget 仅后备。`n`n## 交接终检注记（2026-08-28，v0.3.103）
 
 - 与 m1-completion.md 申报一致：环境缺口（GPU/Actions/真机）两处记录一致；数字以 m1-final-summary 为准（51/109/15）。
 - 本文件为基线交接；后续里程碑增量见 m1-gate-review / m1-final-summary / m2-package-index。
+
+

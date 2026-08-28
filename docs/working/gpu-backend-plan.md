@@ -79,3 +79,11 @@
 - 浅克隆成功（52 文件）；release 构建后台进行中。
 - 构建完成后：webgpu.h + wgpu-native dll + 真 GPU → 五级验收真后端段启动条件齐备。
 
+
+
+## wgpu-native 构建成功（2026-08-28）
+
+- **wgpu_native.dll 8.7MB + import lib 构建完成**（cargo 18.5s，release）。
+- 环境全链：真 GPU（RTX 4070）+ webgpu.h（vendor）+ wgpu_native.dll。
+- 下一步：gfx 真后端（wgpuDevice）实现 → 五级验收真后端段。
+

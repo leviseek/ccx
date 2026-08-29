@@ -82,6 +82,89 @@ export const SOLVERS: Record<string, PlanStep[]> = {
     { dir: 'right', jump: true, ticks: 30 },   // 弹跳过箱（越顶吃 c1，至箱右侧）
     { dir: 'right', ticks: 90 },               // 地面直行到 finish
   ],
+  '1-4 双影双门': [
+    { dir: 'right', ticks: 51 },                   // sw1 (9.5)
+    { act: 'recordStart' }, { dir: null, ticks: 65 }, { act: 'recordStop' },
+    { dir: 'right', ticks: 26 },                   // 卡 g1 门前 (11.4)
+    { act: 'summon' }, { dir: null, ticks: 70 },   // e1 站桩 -> g1 latch 开
+    { dir: 'right', ticks: 18 },                   // 站 sw2 (14.4)
+    { act: 'recordStart', slot: 'e2' }, { dir: null, ticks: 65 }, { act: 'recordStop', slot: 'e2' },
+    { act: 'summon', slot: 'e2' }, { dir: null, ticks: 70 },  // e2 站桩 -> g2 latch 开
+    { dir: 'right', ticks: 68 },                   // 过 g2 -> finish
+  ],
+  '1-5 瞬窗之下': [
+    { dir: 'right', ticks: 73 },                   // sw1 (13.17)
+    { act: 'recordStart' }, { dir: null, ticks: 70 }, { act: 'recordStop' },
+    { dir: 'right', ticks: 8 },                    // 门 g1 前 (14.4)
+    { act: 'summon' }, { dir: 'right', ticks: 55 },  // 窗开穿门 -> c1 -> finish
+  ],
+  '1-6 时序接力': [
+    { dir: 'right', ticks: 51 },                   // sw1 (9.5)
+    { act: 'recordStart' }, { dir: null, ticks: 65 }, { act: 'recordStop' },
+    { dir: 'right', ticks: 26 },
+    { act: 'summon' }, { dir: null, ticks: 70 },   // e1 锁 g1
+    { dir: 'right', ticks: 13 },                   // sw2 (15.97，sw2 16..17.1)
+    { act: 'recordStart', slot: 'e2' }, { dir: null, ticks: 40 }, { act: 'recordStop', slot: 'e2' },
+    { dir: 'right', ticks: 21 },                   // g2 门前 (19.4)
+    { act: 'summon', slot: 'e2' }, { dir: 'right', ticks: 42 },  // 窗开穿 g2 -> finish
+  ],
+  '1-7 残影守桥': [
+    { dir: 'right', ticks: 52 },                   // 坑边 (9.67)
+    { dir: 'right', jump: true, ticks: 14 },       // 跳越桥上桥 (12.4)
+    { dir: 'right', ticks: 24 },                   // 桥面到 sw1 (16.4)
+    { act: 'recordStart' }, { dir: null, ticks: 70 }, { act: 'recordStop' },
+    { act: 'summon' }, { dir: 'right', ticks: 55 },  // 窗开穿 g1 -> finish
+  ],
+  '1-9 错拍双窗': [
+    { dir: 'right', ticks: 61 },                   // sw2 (11.17)
+    { act: 'recordStart' }, { dir: null, ticks: 65 }, { act: 'recordStop' },
+    { dir: 'right', ticks: 8 },                    // g1 门前 (12.4)
+    { act: 'summon' }, { dir: 'right', ticks: 18 },  // 窗开穿 g1 -> sw1 (15.07)
+    { act: 'recordStart', slot: 'e2' }, { dir: null, ticks: 65 }, { act: 'recordStop', slot: 'e2' },
+    { dir: 'right', ticks: 26 },                   // g2 门前 (19.4)
+    { act: 'summon', slot: 'e2' }, { dir: 'right', ticks: 50 },  // 窗开穿 g2 -> finish
+  ],
+  '1-10 时间回廊': [
+    { dir: 'right', ticks: 26 },                   // sw1 (5.33)
+    { dir: null, ticks: 32 },                      // hold 20 -> g1 开
+    { dir: 'right', ticks: 40 },                   // 过 g1 -> 梯 1 前 (11.4)
+    { dir: 'right', jump: true, ticks: 20 },       // 跳上梯 1（12.8, 7.9）
+    { dir: 'right', jump: true, ticks: 20 },       // -> 梯 2（16.1, 6.7）
+    { dir: 'right', jump: true, ticks: 20 },       // -> 梯 3（19.4, 5.5）
+    { dir: 'right', jump: true, ticks: 20 },       // -> 梯 4（22.7, 4.3）
+    { dir: 'right', jump: true, ticks: 20 },       // 跳下梯 4 -> 地面 (26, 9.1)
+    { dir: 'right', ticks: 12 },                   // -> finish (27+)
+  ],
+  '1-11 三锁连环': [
+    { dir: 'right', ticks: 43 },                   // sw1 (8.17)
+    { act: 'recordStart' }, { dir: null, ticks: 65 }, { act: 'recordStop' },
+    { dir: 'right', ticks: 20 },                   // g1 门前 (10.4)
+    { act: 'summon' }, { dir: null, ticks: 70 },   // e1 锁 g1
+    { dir: 'right', ticks: 21 },                   // sw2 (15.0，sw2 14..15.1)
+    { act: 'recordStart', slot: 'e2' }, { dir: null, ticks: 40 }, { act: 'recordStop', slot: 'e2' },
+    { dir: 'right', ticks: 16 },                   // g2 门前 (16.4)
+    { act: 'summon', slot: 'e2' }, { dir: 'right', ticks: 21 },  // 窗穿 g2 -> sw3 (19.9)
+    { dir: null, ticks: 70 },                      // hold 60 -> g3 开
+    { dir: 'right', ticks: 62 },                   // 过 g3 -> finish
+  ],
+  '1-12 时间监工': [
+    { dir: 'right', ticks: 49 },                   // sw1 (9.17)
+    { act: 'recordStart' }, { dir: null, ticks: 65 }, { act: 'recordStop' },
+    { dir: 'right', ticks: 20 },                   // g1 门前 (11.4)
+    { act: 'summon' }, { dir: null, ticks: 70 },   // e1 锁 g1
+    { dir: 'right', ticks: 15 },                   // sw2 (13.9，sw2 14..15.1)
+    { act: 'recordStart', slot: 'e2' }, { dir: null, ticks: 90 }, { act: 'recordStop', slot: 'e2' },
+    { dir: 'right', ticks: 17 },                   // g2 门前 (16.4)
+    { act: 'summon', slot: 'e2' }, { dir: 'right', ticks: 5 },   // 窗穿 g2
+    { dir: 'right', jump: true, ticks: 20 },       // 越中枢台 -> 落右侧地面 (20.5)
+    { dir: 'right', ticks: 3 },                    // sw3 区 (20.9)
+    { dir: null, ticks: 95 },                      // hold 90 -> g3 开
+    { dir: 'right', ticks: 16 },                   // 高台前 (23.4)
+    { dir: 'right', jump: true, ticks: 18 },       // 跳越高台上 (24, 7.65)
+    { dir: null, jump: true, ticks: 12 },          // 吃 c1
+    { dir: 'right', jump: true, ticks: 12 },       // 跳下高台 -> 过 g3
+    { dir: 'right', ticks: 40 },                   // -> finish
+  ],
   '1-8 双段天梯': [
     { dir: null, ticks: 40 },                  // 落地
     { dir: 'right', ticks: 30 },               // x=6（板 0 左）

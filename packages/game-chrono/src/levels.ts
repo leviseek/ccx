@@ -93,9 +93,9 @@ export const CHAPTERS: { id: string; title: string; intro: string; levels: Level
           { id: 'sw1', x: 9, y: 8.3, w: 1.1, h: 0.7, mode: 'latch', holdTicks: 60, target: 'g1' },
           { id: 'sw2', x: 16, y: 8.3, w: 1.1, h: 0.7, mode: 'window', holdTicks: 1, target: 'g2' },
         ],
-        echoes: [{ id: 'e1', uses: 2 }],
+        echoes: [{ id: 'e1', uses: 1 }, { id: 'e2', uses: 1 }],
         collectibles: [{ id: 'c1', x: 22, y: 8.2, w: 0.8, h: 0.8 }],
-        hint: '第一扇门"锁死"、第二扇门"看窗"——让残影先锁门，再回来补窗。',
+        hint: '第一扇门"锁死"、第二扇门"看窗"——残影 1 锁门，残影 2 补窗。',
       },
       {
         schema: 'ccx.chrono/1', name: '1-7 残影守桥', width: 28, height: 11,
@@ -143,29 +143,30 @@ export const CHAPTERS: { id: string; title: string; intro: string; levels: Level
           { id: 'sw1', x: 15, y: 8.3, w: 1.1, h: 0.7, mode: 'window', holdTicks: 1, target: 'g2' },
           { id: 'sw2', x: 11, y: 8.3, w: 1.1, h: 0.7, mode: 'window', holdTicks: 1, target: 'g1' },
         ],
-        echoes: [{ id: 'e1', uses: 2 }],
+        echoes: [{ id: 'e1', uses: 1 }, { id: 'e2', uses: 1 }],
         collectibles: [{ id: 'c1', x: 22, y: 8.2, w: 0.8, h: 0.8 }],
-        hint: '窗压反向：压 1 开 2，压 2 开 1。让残影和自己各踩一边。',
+        hint: '窗压反向：压 1 开 2，压 2 开 1。残影 1 压右窗，残影 2 压左窗。',
       },
       {
         schema: 'ccx.chrono/1', name: '1-10 时间回廊', width: 30, height: 12,
         spawn: { x: 1, y: 7 },
         solids: [
           { x: 0, y: 10, w: 30, h: 2 },
-          { x: 12, y: 7, w: 2, h: 3 },                      // 墙 1（高不可跳，绕行缺口 8..12）
-          { x: 20, y: 5.5, w: 2, h: 4.5 },                  // 墙 2（需走墙 1 后平台）
-          { x: 16, y: 6.6, w: 2.4, h: 0.8 },                // 中台
+          { x: 12, y: 8.8, w: 1.6, h: 1.2 },                  // 梯 1（跳上）
+          { x: 15, y: 7.6, w: 1.6, h: 1.2 },                  // 梯 2
+          { x: 18.5, y: 6.4, w: 1.6, h: 1.2 },                // 梯 3
+          { x: 22, y: 5.2, w: 1.6, h: 1.2 },                  // 梯 4（回廊顶）
         ],
         finish: { x: 27, y: 8.9, w: 1.3, h: 1.1 },
-        doors: [{ id: 'g1', x: 8, y: 8.8, w: 0.9, h: 1.2 }],
-        switches: [{ id: 'sw1', x: 5, y: 9.3, w: 1.1, h: 0.7, mode: 'latch', holdTicks: 60, target: 'g1' }],
-        echoes: [{ id: 'e1', uses: 2 }],
+        doors: [{ id: 'g1', x: 8, y: 7.6, w: 0.9, h: 2.4 }],
+        switches: [{ id: 'sw1', x: 5, y: 9.4, w: 1.1, h: 0.6, mode: 'latch', holdTicks: 20, target: 'g1' }],
+        echoes: [{ id: 'e1', uses: 1 }],
         collectibles: [
-          { id: 'c1', x: 17, y: 4.8, w: 0.8, h: 0.8 },
-          { id: 'c2', x: 21, y: 3.6, w: 0.8, h: 0.8 },
-          { id: 'c3', x: 25, y: 9.1, w: 0.8, h: 0.8 },
+          { id: 'c1', x: 13.4, y: 7.0, w: 0.8, h: 0.8 },
+          { id: 'c2', x: 16.4, y: 5.8, w: 0.8, h: 0.8 },
+          { id: 'c3', x: 20.1, y: 4.6, w: 0.8, h: 0.8 },
         ],
-        hint: '门在墙的缺口上。墙 1 背后有平台——残影先探路，交换进出。',
+        hint: '开门后逐级跳上时间回廊——最高处回望来路，碎片在每一级。',
       },
       {
         schema: 'ccx.chrono/1', name: '1-11 三锁连环', width: 32, height: 12,
@@ -182,10 +183,10 @@ export const CHAPTERS: { id: string; title: string; intro: string; levels: Level
           { id: 'sw2', x: 14, y: 9.3, w: 1.1, h: 0.7, mode: 'window', holdTicks: 1, target: 'g2' },
           { id: 'sw3', x: 20, y: 9.3, w: 1.1, h: 0.7, mode: 'latch', holdTicks: 60, target: 'g3' },
         ],
-        echoes: [{ id: 'e1', uses: 2 }, { id: 'e2', uses: 1 }],
+        echoes: [{ id: 'e1', uses: 1 }, { id: 'e2', uses: 1 }],
         collectibles: [
-          { id: 'c1', x: 13, y: 9.1, w: 0.8, h: 0.8 },
-          { id: 'c2', x: 21, y: 9.1, w: 0.8, h: 0.8 },
+          { id: 'c1', x: 13, y: 8.5, w: 0.8, h: 0.8 },
+          { id: 'c2', x: 21, y: 8.5, w: 0.8, h: 0.8 },
         ],
         hint: '锁、窗、锁——三扇门各司其职。规划好谁的残影站在哪个压板上。',
       },
@@ -194,14 +195,14 @@ export const CHAPTERS: { id: string; title: string; intro: string; levels: Level
         spawn: { x: 1, y: 7 },
         solids: [
           { x: 0, y: 10, w: 34, h: 2 },
-          { x: 18, y: 6.5, w: 2, h: 3.5 },                  // 中枢（Boss 域）
-          { x: 24, y: 7.2, w: 1.4, h: 2.8 },                // 高台
+          { x: 18, y: 8.7, w: 2, h: 1.3 },                  // 中枢（Boss 域，跳越台）
+          { x: 24, y: 8.55, w: 1.4, h: 1.45 },              // 高台（跳越收集台）
         ],
         finish: { x: 31, y: 8.9, w: 1.3, h: 1.1 },
         doors: [
           { id: 'g1', x: 12, y: 8.8, w: 0.9, h: 1.2 },
           { id: 'g2', x: 17, y: 8.8, w: 0.9, h: 1.2 },
-          { id: 'g3', x: 25, y: 8.8, w: 0.9, h: 1.2 },
+          { id: 'g3', x: 25, y: 7.6, w: 0.9, h: 2.4 },       // Boss 门加高（防跳越）
         ],
         switches: [
           { id: 'sw1', x: 9, y: 9.3, w: 1.1, h: 0.7, mode: 'latch', holdTicks: 45, target: 'g1' },
@@ -210,9 +211,9 @@ export const CHAPTERS: { id: string; title: string; intro: string; levels: Level
         ],
         echoes: [{ id: 'e1', uses: 2 }, { id: 'e2', uses: 2 }],
         collectibles: [
-          { id: 'c1', x: 25.2, y: 5.4, w: 0.8, h: 0.8 },
-          { id: 'c2', x: 28, y: 9.1, w: 0.8, h: 0.8 },
-          { id: 'c3', x: 30, y: 9.1, w: 0.8, h: 0.8 },
+          { id: 'c1', x: 24.6, y: 6.8, w: 0.8, h: 0.8 },
+          { id: 'c2', x: 28, y: 8.5, w: 0.8, h: 0.8 },
+          { id: 'c3', x: 30.5, y: 8.5, w: 0.8, h: 0.8 },
         ],
         hint: '监工头也不回。双槽、三锁、一窗——把每个时间点都安排上。',
       },

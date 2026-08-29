@@ -139,6 +139,8 @@
 
 ## 变更记录
 
+- **v0.3.215（2026-08-29）**：仓库内 CLI 便捷入口 `node ccx.mjs <cmd>`（转调 packages/cli/bin/ccx.mjs，任意 cwd/退出码透传）；无全局安装依赖。
+- **v0.3.214（2026-08-29）**：`ccx serve` 静态站点预览（build/chrono-site 一键 + --watch 热重载 + MIME/越界防护）。
 - **v0.3.213（2026-08-29）**：实时预览工具链——**ccx preview**（Web 双平台实时预览 + --watch SSE 热刷新）+ **preview_native.exe**（Windows 原生窗口预览器：engine/platform/win32 DisplayAdapter 实现 bridge.h 契约首个原生落地；headless 单帧验证 960×540 PPM）；文档 docs/working/preview-tooling.md。
 - **v0.3.212（2026-08-29）**：时之三重奏 G3/G4/G5——星级评级（metrics 纯逻辑 5/5）+ 暂停 P + 事件驱动程序化音效（WebAudio 合成 7 音）+ 渠道适配层（wx/tt/web 检测，channel-sdk 语义）+ 发布文档（docs/working/chrono-echo-launch.md：玩法/关卡表/GitHub Pages 指引）——全链验证器升级（10 模块运行时 + 4 测试文件）ALL PASSED。
 - **v0.3.211（2026-08-29）**：时之三重奏全员 TypeScript（ADR-001 对齐）——game-chrono 全部 .ts（引擎/精灵数据/12 关数据/解法库/运行时四件套/测试/verify），Node 24 原生跑（type stripping）+ 站点经 Node stripTypeScriptTypes 转译 ESM；**G1 运行时完成**（canvas 像素渲染/HUD/键盘输入/30Hz 固定步循环/选关/胜利面板），第一章 12 关数据+解法回放+**全链验证器 ci/verify_chrono.ts 全绿**（机制 19/19 + 4 关解法 + 站点产物 ESM）——tsc 6 emit CJS 实测异常遂弃用，Node 内置转译胜出。

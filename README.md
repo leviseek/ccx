@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.211（2026-08-29）**：时之三重奏全员 TypeScript（ADR-001 对齐）——game-chrono 全部 .ts（引擎/精灵数据/12 关数据/解法库/运行时四件套/测试/verify），Node 24 原生跑（type stripping）+ 站点经 Node stripTypeScriptTypes 转译 ESM；**G1 运行时完成**（canvas 像素渲染/HUD/键盘输入/30Hz 固定步循环/选关/胜利面板），第一章 12 关数据+解法回放+**全链验证器 ci/verify_chrono.ts 全绿**（机制 19/19 + 4 关解法 + 站点产物 ESM）——tsc 6 emit CJS 实测异常遂弃用，Node 内置转译胜出。
 - **v0.3.210（2026-08-29）**：游戏示例「时之三重奏」开工——PNG 编码器（asset-service png_writer，IDAT roundtrip 3/3）+ 纯逻辑时轴引擎（chrono_engine：残影录制/重放/换位守恒/latch+window 时序机关/事件日志，9/9）——资产管线写入侧对称补齐。
 - **v0.3.209（2026-08-29）**：vendor 纪律闭环——vendor_check 许可检测覆盖 LICENSE/LICENSE.txt/LICENSE.md（quickjs LICENSE.txt 不再误报）+ webgpu-headers 补上游 BSD-3-Clause LICENSE（1,533B 无 BOM）——6 vendor 包零 WARN 全绿。
 - **v0.3.208（2026-08-29）**：M0–M5 终检收口——daemon RPC 回归修复（stdio 补 `\n`）+ 插件 builder 平台冲突修复（demo 19 步全绿）+ node 全套 150/150（41 文件）+ CI 全绿。

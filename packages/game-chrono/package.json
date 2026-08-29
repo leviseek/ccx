@@ -1,0 +1,6 @@
+{
+  "name": "@ccx/game-chrono",
+  "private": true,
+  "type": "module",
+  "description": "时之三重奏 Chrono Echo（2D 时间解谜示例；TS 业务 + mjs 工具）"
+}

@@ -1,6 +1,7 @@
 // 时之三重奏 · 纯逻辑时轴引擎（ccx.chrono/1）
 // 确定性：同一输入序列 -> 同一世界状态（无随机；测试可直接断言）
 // 模块无 DOM/定时器依赖：Node 测全机制，浏览器运行时仅为渲染壳
+// TypeScript（ADR-001 双语言：脚本/服务 TS）；erasable syntax（Node 原生跑）
 
 export const SCHEMA = 'ccx.chrono/1';
 export const DT = 1 / 30;          // 固定步 30 Hz
@@ -9,18 +10,73 @@ export const RUN_SPEED = 5.0;      // tile/s
 export const JUMP_V = -10.0;       // tile/s（向下为正，负 = 起跳）
 export const MAX_WINDOW_TICKS = 900; // 录制上界 30s
 
-function rectHit(a, b) {
+// —— 数据契约（ccx.chrono/1 可 diff JSON） ——
+                                                                    
+                                                                            
+                                                                                                                   
+                                                                        
+                                                     
+                                                           
+                           
+                                                              
+                                  
+                                                          
+                                                    
+                
+ 
+
+                                                                              
+                              
+                                                                            
+ 
+
+                                                                                             
+                                                                 
+                                                                                                   
+                                                                       
+                            
+               
+                                                                     
+                                                                                       
+ 
+                            
+               
+                 
+                      
+                     
+                         
+                                     
+               
+                   
+                       
+ 
+
+                
+                                                                                      
+                                                                      
+ 
+                       
+                  
+                
+                   
+                      
+                    
+                     
+                                     
+ 
+
+function rectHit(a      , b      )          {
   return a.x < b.x + b.w && a.x + a.w > b.x &&
          a.y < b.y + b.h && a.y + a.h > b.y;
 }
 
 /** 关卡校验（数据即文档：ccx.chrono/1 可 diff JSON） */
-export function validateLevel(data) {
-  const errs = [];
+export function validateLevel(data          )                                    {
+  const errs           = [];
   if (!data || data.schema !== SCHEMA) errs.push('schema 需 ' + SCHEMA);
   if (!data.name) errs.push('缺 name');
   if (!Number.isFinite(data.width) || !Number.isFinite(data.height)) errs.push('缺 width/height');
-  const rect = (v, tag) => {
+  const rect = (v      , tag        ) => {
     if (!v || !Number.isFinite(v.x) || !Number.isFinite(v.y) ||
         !Number.isFinite(v.w) || !Number.isFinite(v.h)) errs.push(tag + ' 需 {x,y,w,h} 数字');
   };
@@ -31,19 +87,17 @@ export function validateLevel(data) {
   } else errs.push('缺 spawn');
   rect(data.finish, 'finish');
   for (const s of data.solids ?? []) rect(s, 'solid');
-  const switchIds = new Set();
-  const slotIds = new Set();
   const doorIds = new Set((data.doors ?? []).map((d) => d.id));
   for (const d of data.doors ?? []) rect(d, 'door ' + d.id);
   for (const s of data.switches ?? []) {
-    if (!s.id) errs.push('switch 缺 id'); else switchIds.add(s.id);
+    if (!s.id) errs.push('switch 缺 id');
     rect(s, 'switch ' + s.id);
     if (s.mode !== 'latch' && s.mode !== 'window') errs.push('switch ' + s.id + ' mode 需 latch|window');
     if (!(s.holdTicks > 0)) errs.push('switch ' + s.id + ' holdTicks 需 >0');
     if (!doorIds.has(s.target)) errs.push('switch ' + s.id + ' target 门不存在: ' + s.target);
   }
   for (const e of data.echoes ?? []) {
-    if (!e.id) errs.push('echo 缺 id'); else slotIds.add(e.id);
+    if (!e.id) errs.push('echo 缺 id');
     if (!(e.uses >= 1)) errs.push('echo ' + e.id + ' uses 需 >=1');
   }
   for (const c of data.collectibles ?? []) {
@@ -55,7 +109,7 @@ export function validateLevel(data) {
 }
 
 /** 创建一局（关卡数据 -> 可变游戏状态句柄） */
-export function createGame(level, opts = {}) {
+export function createGame(level          )       {
   const v = validateLevel(level);
   if (!v.ok) throw new Error('关卡校验失败: ' + v.errors.join('; '));
   const game = {
@@ -64,11 +118,10 @@ export function createGame(level, opts = {}) {
       id: e.id, uses: e.uses, blueprint: null, recActive: false, samples: [],
       echo: null,            // { t } 回放指针；echo.pos 由 tick 写入
     })),
-    state: null,
+    state: null ,
     events: [],
     tickCount: 0,
-    _win: false,
-  };
+  }        ;
   game.reset = () => {
     const L = level;
     game.state = {
@@ -76,9 +129,9 @@ export function createGame(level, opts = {}) {
       player: { x: L.spawn.x, y: L.spawn.y, w: L.spawn.w ?? 0.6, h: L.spawn.h ?? 0.9,
                 vx: 0, vy: 0, onGround: false },
       echoes: game.slots.map((s) => ({ id: s.id, active: false, t: 0,
-        x: 0, y: 0, w: L.spawn.w ?? 0.6, h: L.spawn.h ?? 0.9, vx: 0, vy: 0, done: false })),
+        x: 0, y: 0, w: L.spawn.w ?? 0.6, h: L.spawn.h ?? 0.9, vx: 0, vy: 0, onGround: false, done: false })),
       doors: L.doors.map((d) => ({ id: d.id, open: d.openHint ?? false, rect: { ...d } })),
-      collected: new Set(),
+      collected: new Set        (),
       switchHold: {},
       won: false,
       log: [],           // 事件累积日志（铁律 12 审计精神；运行时 HUD/音效消费）
@@ -87,18 +140,17 @@ export function createGame(level, opts = {}) {
     for (const s of game.slots) { s.blueprint = null; s.samples = []; s.recActive = false; s.echo = null; }
     game.events = [];
     game.tickCount = 0;
-    game._win = false;
     return game.state;
   };
-  game.tick = (input = {}) => {
+  game.tick = (input            = {}) => {
     const st = game.state;
     st.tick += 1;
     if (st.won) return st; // 通关后冻结：事件保持 win tick 内容
-    const ev = [];
+    const ev              = [];
     game.events = ev;
 
     // 1) 录制状态推进（每槽独立：recStart 后逐 tick 记录 player 快照）
-    game.slots.forEach((slot, i) => {
+    game.slots.forEach((slot) => {
       if (slot.recActive) {
         slot.samples.push(snapshot(st.player));
         if (slot.samples.length >= MAX_WINDOW_TICKS) {
@@ -113,7 +165,7 @@ export function createGame(level, opts = {}) {
     game.slots.forEach((slot, i) => {
       const e = st.echoes[i];
       if (!e.active || !slot.echo) return;
-      const bp = slot.blueprint;
+      const bp = slot.blueprint ;
       const idx = slot.echo.t;
       if (idx < bp.length) {
         const s = bp.samples[idx];
@@ -133,9 +185,10 @@ export function createGame(level, opts = {}) {
     // 残影不参与物理（严格按记录轨迹行走）
 
     // 4) 机关：实体集 = player + 活跃 echoes
-    const bodies = [
+    const bodies                               = [
       { id: 'player', rect: p },
-      ...game.slots.map((_, i) => ({ id: st.echoes[i].id, rect: st.echoes[i] })).filter((e, i) => st.echoes[i].active),
+      ...game.slots.map((_, i) => ({ id: st.echoes[i].id, rect: st.echoes[i]         }))
+        .filter((_, i) => st.echoes[i].active),
     ];
     for (const sw of level.switches ?? []) {
       const on = bodies.filter((b) => rectHit(b.rect, sw)).length > 0;
@@ -168,7 +221,7 @@ export function createGame(level, opts = {}) {
 
     // 6) 到达终点
     if (!st.won && rectHit(p, level.finish)) {
-      st.won = true; game._win = true;
+      st.won = true;
       ev.push({ type: 'win' });
     }
     st.log.push(...ev);
@@ -179,11 +232,11 @@ export function createGame(level, opts = {}) {
   return game;
 }
 
-function snapshot(ent) {
+function snapshot(ent        )           {
   return { x: ent.x, y: ent.y, vx: ent.vx, vy: ent.vy, onGround: ent.onGround };
 }
 
-function _playerPhysics(p, solidRects, solids, input) {
+function _playerPhysics(p        , solidRects        , solids        , input           ) {
   const platforms = [...solidRects, ...solids];
   p.vx = input.left ? -RUN_SPEED : input.right ? RUN_SPEED : 0;
   p.vy += GRAVITY * DT;
@@ -210,8 +263,8 @@ function _playerPhysics(p, solidRects, solids, input) {
 }
 
 /** 操作层：录制/重放/换位（输入事件的语义化入口；返回事件数组） */
-export function actions(game, input) {
-  const ev = [];
+export function actions(game      , input             )              {
+  const ev              = [];
   const st = game.state;
   game.slots.forEach((slot, i) => {
     if (input.recordStart === slot.id && !slot.recActive && !slot.blueprint) {

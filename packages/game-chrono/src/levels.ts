@@ -1,7 +1,12 @@
 // 时之三重奏 · 第一章「遗迹采掘」关卡数据（ccx.chrono/1 可 diff JSON）
 // 设计规则：地面 y=9（高 2 封底）；玩家 0.6x0.9、跳跃高≈1.5t、水平≈3.3t；
 // 门挡走廊（y 7.8..9）；机关距门留解谜步幅；碎片/终点标注目标点。
-export const CHAPTERS = [
+import type { LevelDef } from './chrono_engine.ts';
+
+// 时之三重奏 · 第一章「遗迹采掘」关卡数据（ccx.chrono/1 可 diff JSON）
+// 设计规则：地面 y=9（高 2 封底）；玩家 0.6x0.9、跳跃高≈1.5t、水平≈3.3t；
+// 门挡走廊（y 7.8..9）；机关距门留解谜步幅；碎片/终点标注目标点。
+export const CHAPTERS: { id: string; title: string; intro: string; levels: LevelDef[] }[] = [
   {
     id: 'ch1', title: '第一章 · 遗迹采掘',
     intro: '这里是"时间采掘公司"最古老的矿区——时间在这里留下了残影。',
@@ -10,19 +15,17 @@ export const CHAPTERS = [
         schema: 'ccx.chrono/1', name: '1-1 初涉矿区', width: 24, height: 11,
         spawn: { x: 1, y: 6 },
         solids: [
-          { x: 0, y: 9, w: 7, h: 2 },                       // 地面左段
-          { x: 9, y: 9, w: 15, h: 2 },                       // 地面右段（缺口 7..9，深坑）
-          { x: 7, y: 11, w: 2, h: 0.5 },                     // 坑底（视觉兜底，可跳回）
-          { x: 12, y: 7.6, w: 3, h: 0.7 },                   // 空中平台（跳上取碎片）
+          { x: 0, y: 9, w: 24, h: 2 },                       // 地面
+          { x: 11, y: 8.5, w: 2, h: 0.6 },                   // 高台（挡路需跳越；顶面 8.5）
         ],
         finish: { x: 21.5, y: 7.9, w: 1.3, h: 1.1 },
         doors: [], switches: [],
         echoes: [{ id: 'e1', uses: 1 }],
         collectibles: [
-          { id: 'c1', x: 13.1, y: 5.9, w: 0.8, h: 0.8 },     // 平台上方（跳取）
-          { id: 'c2', x: 18, y: 7.6, w: 0.8, h: 0.8 },       // 地面跳到
+          { id: 'c1', x: 11.8, y: 7.7, w: 0.8, h: 0.8 },     // 高台顶（站台即得）
+          { id: 'c2', x: 18, y: 8.2, w: 0.8, h: 0.8 },       // 地面跳跃吃到
         ],
-        hint: '←→ 移动 · 空格 跳跃 · 跳上平台拿碎片 · 到石碑处完成',
+        hint: '←→ 移动 · 空格 跳跃 · 跳上高台拿碎片 · 到石碑处完成',
       },
       {
         schema: 'ccx.chrono/1', name: '1-2 残影替我', width: 24, height: 11,
@@ -217,7 +220,7 @@ export const CHAPTERS = [
   },
 ];
 
-export function levelById(id) {
+export function levelById(id: string): LevelDef | null {
   for (const ch of CHAPTERS) {
     const lv = ch.levels.find((l) => l.name === id);
     if (lv) return lv;

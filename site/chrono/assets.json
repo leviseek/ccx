@@ -1,0 +1,38 @@
+{
+  "schema": "ccx.assets.index/1",
+  "platform": "web-desktop",
+  "assets": [
+    {
+      "uuid": "sprite-player",
+      "path": "assets/player.png"
+    },
+    {
+      "uuid": "sprite-echo",
+      "path": "assets/echo.png"
+    },
+    {
+      "uuid": "sprite-tile",
+      "path": "assets/tile.png"
+    },
+    {
+      "uuid": "sprite-switch",
+      "path": "assets/switch.png"
+    },
+    {
+      "uuid": "sprite-door",
+      "path": "assets/door.png"
+    },
+    {
+      "uuid": "sprite-collectible",
+      "path": "assets/collectible.png"
+    },
+    {
+      "uuid": "sprite-finish",
+      "path": "assets/finish.png"
+    },
+    {
+      "uuid": "sprite-lamp",
+      "path": "assets/lamp.png"
+    }
+  ]
+}

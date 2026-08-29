@@ -1,9 +1,9 @@
 // 时之三重奏 · 资产与关卡数据测试
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { artPixels, buildSprites, PALETTE, SPRITE_NAMES } from '../src/sprites.mjs';
-import { CHAPTERS, levelById } from '../src/levels.mjs';
-import { validateLevel } from '../src/chrono_engine.mjs';
+import { artPixels, buildSprites, PALETTE, SPRITE_NAMES } from '../src/sprites.ts';
+import { CHAPTERS, levelById } from '../src/levels.ts';
+import { validateLevel } from '../src/chrono_engine.ts';
 
 test('sprites: 全部精灵 16x16 + 像素采样', () => {
   for (const name of SPRITE_NAMES) {
@@ -12,14 +12,11 @@ test('sprites: 全部精灵 16x16 + 像素采样', () => {
     assert.equal(h, 16, name + ' 高');
     assert.equal(pixels.length, 16 * 16 * 4);
   }
-  // player 中心不透明（身体蓝）
   const p = artPixels('player');
   const i = (8 * 16 + 8) * 4;
   assert.equal(p.pixels[i + 3], 255, 'player 中心不透明');
-  assert.deepEqual([p.pixels[i], p.pixels[i + 1], p.pixels[i + 2]], PALETTE.b.slice(0, 3));
-  // 角落透明
-  const c = artPixels('player');
-  assert.equal(c.pixels[3], 0, '角落透明');
+  assert.deepEqual([p.pixels[i], p.pixels[i + 1], p.pixels[i + 2]], PALETTE.b!.slice(0, 3));
+  assert.equal(artPixels('player').pixels[3], 0, '角落透明');
 });
 
 test('sprites: buildSprites 全 PNG 合法头部', () => {
@@ -45,17 +42,13 @@ test('levels: 12 关全部通过 ccx.chrono/1 校验（结构+引用完整性）
 
 test('levels: 机制要素分布（教程梯度）', () => {
   const ls = CHAPTERS[0].levels;
-  const withEcho = ls.filter((l) => l.echoes.length > 0).length;
-  assert.equal(withEcho, 12, '全 12 关配备残影槽');
-  const withDoor = ls.filter((l) => l.doors.length > 0).length;
-  assert.ok(withDoor >= 6, '≥6 关有门+机关（latch/window 学习）');
-  const withCollect = ls.filter((l) => l.collectibles.length > 0).length;
-  assert.equal(withCollect, 12, '全 12 关有碎片收集');
-  // 教学梯度：前 4 关 hint 含操作教学
-  for (const lv of ls.slice(0, 4)) assert.ok(lv.hint.length > 8, lv.name + ' 有提示');
+  assert.equal(ls.filter((l) => l.echoes.length > 0).length, 12, '全 12 关配备残影槽');
+  assert.ok(ls.filter((l) => l.doors.length > 0).length >= 6, '≥6 关有门+机关');
+  assert.equal(ls.filter((l) => l.collectibles.length > 0).length, 12, '全 12 关有碎片收集');
+  for (const lv of ls.slice(0, 4)) assert.ok(lv.hint!.length > 8, lv.name + ' 有提示');
 });
 
 test('levels: levelById 查询', () => {
-  assert.equal(levelById('1-5 瞬窗之下').name, '1-5 瞬窗之下');
+  assert.equal(levelById('1-5 瞬窗之下')!.name, '1-5 瞬窗之下');
   assert.equal(levelById('9-9 不存在'), null);
 });

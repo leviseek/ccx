@@ -29,6 +29,7 @@ import { buildGif } from '../../editor-shell/src/gif.mjs';
 import { parsePpm, ppmToBmp } from '../../editor-shell/src/ppm_to_bmp.mjs';
 import { renderPreviewPage } from '../../editor-shell/src/preview_page.mjs';
 import { startPreviewServer } from '../../editor-shell/src/preview_server.mjs';
+import { startStaticServer } from '../../editor-shell/src/static_server.mjs';
 import { CommandBus } from '../../scene-service/src/commands.mjs';
 import { diffScenes } from '../../scene-service/src/diff.mjs';
 import { renderPlan } from '../../scene-service/src/render_plan.mjs';
@@ -439,6 +440,33 @@ async function main() {
       return emit({ ok: true, url: srv.url });
     } catch (e) {
       return emit({ ok: false, error: '预览服务失败: ' + e.message });
+    }
+  }
+
+  // ---- serve [dir]：静态站点本地预览（构建产物 build/chrono-site 等；--watch 热重载）----
+  if (sub === 'serve') {
+    const defDir = resolve(join('build', 'chrono-site'));
+    const dir = positional[1] ? resolve(positional[1]) : defDir;
+    if (!existsSync(dir)) {
+      return emit({ ok: false, error: '目录不存在: ' + dir + '（先构建：node examples/games/chrono-echo/scripts/build_site.mjs）' });
+    }
+    const port = Number(flags.port) || 8321;
+    try {
+      const srv = await startStaticServer({ root: dir, port, watch: !!flags.watch });
+      console.log('[ccx serve] ' + srv.url + (flags.watch ? '（--watch：产物更新即刷新）' : ''));
+      console.log('[ccx serve] Ctrl+C 结束');
+      if (flags.open) {
+        const opener = process.platform === 'win32' ? 'start' : 'open';
+        spawnSync(opener, [srv.url], { shell: true, stdio: 'ignore' });
+      }
+      if (jsonMode) {
+        await srv.close();
+        return emit({ ok: true, url: srv.url, port: srv.port, watch: !!flags.watch, root: dir });
+      }
+      await new Promise((res) => srv.server.on('close', res));
+      return emit({ ok: true, url: srv.url });
+    } catch (e) {
+      return emit({ ok: false, error: '静态服务失败: ' + e.message });
     }
   }
 

@@ -28,6 +28,7 @@ import { parseAssetsIndex } from '../../build-service/src/assets_index.mjs';
 import { buildGif } from '../../editor-shell/src/gif.mjs';
 import { parsePpm, ppmToBmp } from '../../editor-shell/src/ppm_to_bmp.mjs';
 import { renderPreviewPage } from '../../editor-shell/src/preview_page.mjs';
+import { startPreviewServer } from '../../editor-shell/src/preview_server.mjs';
 import { CommandBus } from '../../scene-service/src/commands.mjs';
 import { diffScenes } from '../../scene-service/src/diff.mjs';
 import { renderPlan } from '../../scene-service/src/render_plan.mjs';
@@ -412,6 +413,33 @@ async function main() {
     return emit({ ok: true, out, entities: view.scene.entityCount,
                   applied: applied ?? [],
                   frame: flags.frame && existsSync(flags.frame) ? resolve(flags.frame) : null });
+  }
+
+  // —— preview <scene>：实时预览服务（Web 双平台通用；--watch 保存即刷新）——
+  if (sub === 'preview') {
+    const sceneFile = positional[1] ? resolve(positional[1]) : null;
+    if (!sceneFile || !existsSync(sceneFile)) {
+      return emit({ ok: false, error: '用法: ccx preview <scene.json> [--port N] [--watch] [--open]' });
+    }
+    const port = Number(flags.port) || 8321;
+    try {
+      const srv = await startPreviewServer({ root: process.cwd(), scenePath: sceneFile, port, watch: !!flags.watch });
+      console.log('[ccx preview] ' + srv.url + (flags.watch ? '（--watch：保存场景即刷新）' : ''));
+      console.log('[ccx preview] Ctrl+C 结束');
+      if (flags.open) {
+        const opener = process.platform === 'win32' ? 'start' : 'open';
+        spawnSync(opener, [srv.url], { shell: true, stdio: 'ignore' });
+      }
+      // 保持服务（直到信号）；json 模式下输出端口并关闭（机器消费场景）
+      if (jsonMode) {
+        await srv.close();
+        return emit({ ok: true, url: srv.url, port: srv.port, watch: !!flags.watch });
+      }
+      await new Promise((resolve) => srv.server.on('close', resolve));
+      return emit({ ok: true, url: srv.url });
+    } catch (e) {
+      return emit({ ok: false, error: '预览服务失败: ' + e.message });
+    }
   }
 
   // —— demo all：端到端编排（open -> apply -> save -> build -> cook）——

@@ -57,8 +57,10 @@ for (const dir of vendors) {
       violations.push(path.relative(root, pkg) +
         ': UPSTREAM.md 声明本地改动但缺 patches/（改动必须走 patch 文件，ADR-005 §7）');
     }
-    if (!fs.existsSync(path.join(pkg, 'LICENSE'))) {
-      warnings.push(path.relative(root, pkg) + ': 缺少 LICENSE（MIT 合规要求，ADR-005 §4）');
+    const licenseFile = ['LICENSE', 'LICENSE.txt', 'LICENSE.md']
+      .find((n) => fs.existsSync(path.join(pkg, n)));
+    if (!licenseFile) {
+      warnings.push(path.relative(root, pkg) + ': 缺少 LICENSE（MIT/BSD 合规要求，ADR-005 §4）');
     }
   }
 }

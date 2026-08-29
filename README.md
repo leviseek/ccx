@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.209（2026-08-29）**：vendor 纪律闭环——vendor_check 许可检测覆盖 LICENSE/LICENSE.txt/LICENSE.md（quickjs LICENSE.txt 不再误报）+ webgpu-headers 补上游 BSD-3-Clause LICENSE（1,533B 无 BOM）——6 vendor 包零 WARN 全绿。
 - **v0.3.208（2026-08-29）**：M0–M5 终检收口——daemon RPC 回归修复（stdio 补 `\n`）+ 插件 builder 平台冲突修复（demo 19 步全绿）+ node 全套 150/150（41 文件）+ CI 全绿。
 - **v0.3.207（2026-08-29）**：M5 cc4-compat 基线（cc.Node façade 驱动 ECS）；M4 五项全落地（net sync delta + World 回放 + daemon token + 纹理流送 + UI 多分辨率）；M3 toon-2d/崩溃上报；M5 迁移器核心。ctest 71/71、node 132/132、CI 三 job 全绿。
 - **v0.3.203（2026-08-29）**：W6-1 验收：release APK 五验证实证（壳/帧循环/光栅/script-eval 7/统计），壳显示 bug 修复。

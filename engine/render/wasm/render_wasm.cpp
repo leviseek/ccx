@@ -1,5 +1,5 @@
-// 时之三重奏 · 引擎渲染接入（wasm）：CCX 引擎软件光栅管线（RenderItem -> packer -> OrthoCamera -> RasterTarget）
-// 导出 C 接口供 Web 运行时调用；引擎核心能力（rendering）在浏览器侧真实执行
+// CCX render wasm 入口：引擎软件光栅管线导出（RenderItem -> packer -> OrthoCamera -> RasterTarget）
+// C 接口导出（ccx_render_frame）：供 Web/桌面宿主调用；引擎渲染能力跨平台复用
 #include <cstdint>
 #include <cstring>
 #include <vector>

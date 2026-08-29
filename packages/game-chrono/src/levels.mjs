@@ -1,0 +1,226 @@
+// 时之三重奏 · 第一章「遗迹采掘」关卡数据（ccx.chrono/1 可 diff JSON）
+// 设计规则：地面 y=9（高 2 封底）；玩家 0.6x0.9、跳跃高≈1.5t、水平≈3.3t；
+// 门挡走廊（y 7.8..9）；机关距门留解谜步幅；碎片/终点标注目标点。
+export const CHAPTERS = [
+  {
+    id: 'ch1', title: '第一章 · 遗迹采掘',
+    intro: '这里是"时间采掘公司"最古老的矿区——时间在这里留下了残影。',
+    levels: [
+      {
+        schema: 'ccx.chrono/1', name: '1-1 初涉矿区', width: 24, height: 11,
+        spawn: { x: 1, y: 6 },
+        solids: [
+          { x: 0, y: 9, w: 7, h: 2 },                       // 地面左段
+          { x: 9, y: 9, w: 15, h: 2 },                       // 地面右段（缺口 7..9，深坑）
+          { x: 7, y: 11, w: 2, h: 0.5 },                     // 坑底（视觉兜底，可跳回）
+          { x: 12, y: 7.6, w: 3, h: 0.7 },                   // 空中平台（跳上取碎片）
+        ],
+        finish: { x: 21.5, y: 7.9, w: 1.3, h: 1.1 },
+        doors: [], switches: [],
+        echoes: [{ id: 'e1', uses: 1 }],
+        collectibles: [
+          { id: 'c1', x: 13.1, y: 5.9, w: 0.8, h: 0.8 },     // 平台上方（跳取）
+          { id: 'c2', x: 18, y: 7.6, w: 0.8, h: 0.8 },       // 地面跳到
+        ],
+        hint: '←→ 移动 · 空格 跳跃 · 跳上平台拿碎片 · 到石碑处完成',
+      },
+      {
+        schema: 'ccx.chrono/1', name: '1-2 残影替我', width: 24, height: 11,
+        spawn: { x: 1, y: 6 },
+        solids: [{ x: 0, y: 9, w: 24, h: 2 }],
+        finish: { x: 21.5, y: 7.9, w: 1.3, h: 1.1 },
+        doors: [{ id: 'g1', x: 14, y: 7.8, w: 0.9, h: 1.2 }],
+        switches: [{ id: 'sw1', x: 9.5, y: 8.3, w: 1.1, h: 0.7, mode: 'latch', holdTicks: 45, target: 'g1' }],
+        echoes: [{ id: 'e1', uses: 1 }],
+        collectibles: [{ id: 'c1', x: 16, y: 8.2, w: 0.8, h: 0.8 }],
+        hint: '按住压板前按 R 录制（再按 R 结束）；到门前按 E 召唤残影替你压板——时间是你的。',
+      },
+      {
+        schema: 'ccx.chrono/1', name: '1-3 换位拾空', width: 26, height: 11,
+        spawn: { x: 1, y: 6 },
+        solids: [
+          { x: 0, y: 9, w: 26, h: 2 },
+          { x: 14, y: 7.6, w: 1.5, h: 1.4 },                 // 低台（跳上）
+        ],
+        finish: { x: 23, y: 7.9, w: 1.3, h: 1.1 },
+        doors: [{ id: 'g1', x: 12, y: 7.8, w: 0.9, h: 1.2 }],
+        switches: [{ id: 'sw1', x: 9.5, y: 8.3, w: 1.1, h: 0.7, mode: 'latch', holdTicks: 45, target: 'g1' }],
+        echoes: [{ id: 'e1', uses: 2 }],
+        collectibles: [{ id: 'c1', x: 14.6, y: 4.8, w: 0.8, h: 0.8 }],  // 空中高处（跳跃顶点不可达）
+        hint: '在台上录一段"跳起"，召唤残影；当残影跳到最高处时按 Q 换位——在半空拾取碎片。',
+      },
+      {
+        schema: 'ccx.chrono/1', name: '1-4 双影双门', width: 28, height: 11,
+        spawn: { x: 1, y: 6 },
+        solids: [{ x: 0, y: 9, w: 28, h: 2 }],
+        finish: { x: 25.5, y: 7.9, w: 1.3, h: 1.1 },
+        doors: [
+          { id: 'g1', x: 12, y: 7.8, w: 0.9, h: 1.2 },
+          { id: 'g2', x: 16, y: 7.8, w: 0.9, h: 1.2 },
+        ],
+        switches: [
+          { id: 'sw1', x: 9, y: 8.3, w: 1.1, h: 0.7, mode: 'latch', holdTicks: 60, target: 'g1' },
+          { id: 'sw2', x: 14, y: 8.3, w: 1.1, h: 0.7, mode: 'latch', holdTicks: 60, target: 'g2' },
+        ],
+        echoes: [{ id: 'e1', uses: 1 }, { id: 'e2', uses: 1 }],
+        collectibles: [{ id: 'c1', x: 19, y: 8.2, w: 0.8, h: 0.8 }],
+        hint: '两个压板、两扇门——你只有一个本体。双槽残影齐上阵（R 录制 x2，E 召唤 x2）。',
+      },
+      {
+        schema: 'ccx.chrono/1', name: '1-5 瞬窗之下', width: 26, height: 11,
+        spawn: { x: 1, y: 6 },
+        solids: [{ x: 0, y: 9, w: 26, h: 2 }],
+        finish: { x: 23, y: 7.9, w: 1.3, h: 1.1 },
+        doors: [{ id: 'g1', x: 15, y: 7.8, w: 0.9, h: 1.2 }],
+        switches: [{ id: 'sw1', x: 13, y: 8.3, w: 1.1, h: 0.7, mode: 'window', holdTicks: 1, target: 'g1' }],
+        echoes: [{ id: 'e1', uses: 1 }],
+        collectibles: [{ id: 'c1', x: 17, y: 8.2, w: 0.8, h: 0.8 }],
+        hint: '这是一个"窗门"：被压住才开。让残影一直压着，你穿过那一瞬。',
+      },
+      {
+        schema: 'ccx.chrono/1', name: '1-6 时序接力', width: 28, height: 11,
+        spawn: { x: 1, y: 6 },
+        solids: [{ x: 0, y: 9, w: 28, h: 2 }],
+        finish: { x: 25.5, y: 7.9, w: 1.3, h: 1.1 },
+        doors: [
+          { id: 'g1', x: 12, y: 7.8, w: 0.9, h: 1.2 },
+          { id: 'g2', x: 20, y: 7.8, w: 0.9, h: 1.2 },
+        ],
+        switches: [
+          { id: 'sw1', x: 9, y: 8.3, w: 1.1, h: 0.7, mode: 'latch', holdTicks: 60, target: 'g1' },
+          { id: 'sw2', x: 16, y: 8.3, w: 1.1, h: 0.7, mode: 'window', holdTicks: 1, target: 'g2' },
+        ],
+        echoes: [{ id: 'e1', uses: 2 }],
+        collectibles: [{ id: 'c1', x: 22, y: 8.2, w: 0.8, h: 0.8 }],
+        hint: '第一扇门"锁死"、第二扇门"看窗"——让残影先锁门，再回来补窗。',
+      },
+      {
+        schema: 'ccx.chrono/1', name: '1-7 残影守桥', width: 28, height: 11,
+        spawn: { x: 1, y: 6 },
+        solids: [
+          { x: 0, y: 9, w: 12, h: 2 },
+          { x: 17, y: 9, w: 11, h: 2 },
+          { x: 12, y: 8.3, w: 5, h: 0.7 },                   // 窄桥（5t 缺口上）
+        ],
+        finish: { x: 25.5, y: 7.9, w: 1.3, h: 1.1 },
+        doors: [{ id: 'g1', x: 19, y: 7.8, w: 0.9, h: 1.2 }],
+        switches: [{ id: 'sw1', x: 16.3, y: 7.5, w: 1.1, h: 0.7, mode: 'window', holdTicks: 1, target: 'g1' }],
+        echoes: [{ id: 'e1', uses: 1 }],
+        collectibles: [{ id: 'c1', x: 13.8, y: 6.6, w: 0.8, h: 0.8 }],   // 桥正上方（跳取）
+        hint: '窄桥尽头是一扇"窗"。让残影站在桥上压板，你穿过窗口。',
+      },
+      {
+        schema: 'ccx.chrono/1', name: '1-8 双段天梯', width: 28, height: 12,
+        spawn: { x: 1, y: 6 },
+        solids: [
+          { x: 0, y: 10, w: 28, h: 2 },
+          { x: 6, y: 8.4, w: 1.4, h: 1.6 },                 // 板 0（可跳上）
+          { x: 9.2, y: 6.4, w: 1.4, h: 2 },                 // 板 1（高，换位才可站）
+        ],
+        finish: { x: 25, y: 8.9, w: 1.3, h: 1.1 },
+        doors: [],
+        switches: [],
+        echoes: [{ id: 'e1', uses: 2 }],
+        collectibles: [
+          { id: 'c1', x: 9.9, y: 4.7, w: 0.8, h: 0.8 },     // 板 1 顶（跳取）
+          { id: 'c2', x: 21, y: 9.1, w: 0.8, h: 0.8 },
+        ],
+        hint: '残影是你自己的"前一步"：在近板上录跳、召唤、等残影到最高点、换位——你落上远板。',
+      },
+      {
+        schema: 'ccx.chrono/1', name: '1-9 错拍双窗', width: 30, height: 11,
+        spawn: { x: 1, y: 6 },
+        solids: [{ x: 0, y: 9, w: 30, h: 2 }],
+        finish: { x: 27.5, y: 7.9, w: 1.3, h: 1.1 },
+        doors: [
+          { id: 'g1', x: 13, y: 7.8, w: 0.9, h: 1.2 },
+          { id: 'g2', x: 20, y: 7.8, w: 0.9, h: 1.2 },
+        ],
+        switches: [
+          { id: 'sw1', x: 15, y: 8.3, w: 1.1, h: 0.7, mode: 'window', holdTicks: 1, target: 'g2' },
+          { id: 'sw2', x: 11, y: 8.3, w: 1.1, h: 0.7, mode: 'window', holdTicks: 1, target: 'g1' },
+        ],
+        echoes: [{ id: 'e1', uses: 2 }],
+        collectibles: [{ id: 'c1', x: 22, y: 8.2, w: 0.8, h: 0.8 }],
+        hint: '窗压反向：压 1 开 2，压 2 开 1。让残影和自己各踩一边。',
+      },
+      {
+        schema: 'ccx.chrono/1', name: '1-10 时间回廊', width: 30, height: 12,
+        spawn: { x: 1, y: 7 },
+        solids: [
+          { x: 0, y: 10, w: 30, h: 2 },
+          { x: 12, y: 7, w: 2, h: 3 },                      // 墙 1（高不可跳，绕行缺口 8..12）
+          { x: 20, y: 5.5, w: 2, h: 4.5 },                  // 墙 2（需走墙 1 后平台）
+          { x: 16, y: 6.6, w: 2.4, h: 0.8 },                // 中台
+        ],
+        finish: { x: 27, y: 8.9, w: 1.3, h: 1.1 },
+        doors: [{ id: 'g1', x: 8, y: 8.8, w: 0.9, h: 1.2 }],
+        switches: [{ id: 'sw1', x: 5, y: 9.3, w: 1.1, h: 0.7, mode: 'latch', holdTicks: 60, target: 'g1' }],
+        echoes: [{ id: 'e1', uses: 2 }],
+        collectibles: [
+          { id: 'c1', x: 17, y: 4.8, w: 0.8, h: 0.8 },
+          { id: 'c2', x: 21, y: 3.6, w: 0.8, h: 0.8 },
+          { id: 'c3', x: 25, y: 9.1, w: 0.8, h: 0.8 },
+        ],
+        hint: '门在墙的缺口上。墙 1 背后有平台——残影先探路，交换进出。',
+      },
+      {
+        schema: 'ccx.chrono/1', name: '1-11 三锁连环', width: 32, height: 12,
+        spawn: { x: 1, y: 7 },
+        solids: [{ x: 0, y: 10, w: 32, h: 2 }],
+        finish: { x: 29, y: 8.9, w: 1.3, h: 1.1 },
+        doors: [
+          { id: 'g1', x: 11, y: 8.8, w: 0.9, h: 1.2 },
+          { id: 'g2', x: 17, y: 8.8, w: 0.9, h: 1.2 },
+          { id: 'g3', x: 23, y: 8.8, w: 0.9, h: 1.2 },
+        ],
+        switches: [
+          { id: 'sw1', x: 8, y: 9.3, w: 1.1, h: 0.7, mode: 'latch', holdTicks: 45, target: 'g1' },
+          { id: 'sw2', x: 14, y: 9.3, w: 1.1, h: 0.7, mode: 'window', holdTicks: 1, target: 'g2' },
+          { id: 'sw3', x: 20, y: 9.3, w: 1.1, h: 0.7, mode: 'latch', holdTicks: 60, target: 'g3' },
+        ],
+        echoes: [{ id: 'e1', uses: 2 }, { id: 'e2', uses: 1 }],
+        collectibles: [
+          { id: 'c1', x: 13, y: 9.1, w: 0.8, h: 0.8 },
+          { id: 'c2', x: 21, y: 9.1, w: 0.8, h: 0.8 },
+        ],
+        hint: '锁、窗、锁——三扇门各司其职。规划好谁的残影站在哪个压板上。',
+      },
+      {
+        schema: 'ccx.chrono/1', name: '1-12 时间监工', width: 34, height: 12,
+        spawn: { x: 1, y: 7 },
+        solids: [
+          { x: 0, y: 10, w: 34, h: 2 },
+          { x: 18, y: 6.5, w: 2, h: 3.5 },                  // 中枢（Boss 域）
+          { x: 24, y: 7.2, w: 1.4, h: 2.8 },                // 高台
+        ],
+        finish: { x: 31, y: 8.9, w: 1.3, h: 1.1 },
+        doors: [
+          { id: 'g1', x: 12, y: 8.8, w: 0.9, h: 1.2 },
+          { id: 'g2', x: 17, y: 8.8, w: 0.9, h: 1.2 },
+          { id: 'g3', x: 25, y: 8.8, w: 0.9, h: 1.2 },
+        ],
+        switches: [
+          { id: 'sw1', x: 9, y: 9.3, w: 1.1, h: 0.7, mode: 'latch', holdTicks: 45, target: 'g1' },
+          { id: 'sw2', x: 14, y: 9.3, w: 1.1, h: 0.7, mode: 'window', holdTicks: 1, target: 'g2' },
+          { id: 'sw3', x: 21, y: 9.3, w: 1.1, h: 0.7, mode: 'latch', holdTicks: 90, target: 'g3' },
+        ],
+        echoes: [{ id: 'e1', uses: 2 }, { id: 'e2', uses: 2 }],
+        collectibles: [
+          { id: 'c1', x: 25.2, y: 5.4, w: 0.8, h: 0.8 },
+          { id: 'c2', x: 28, y: 9.1, w: 0.8, h: 0.8 },
+          { id: 'c3', x: 30, y: 9.1, w: 0.8, h: 0.8 },
+        ],
+        hint: '监工头也不回。双槽、三锁、一窗——把每个时间点都安排上。',
+      },
+    ],
+  },
+];
+
+export function levelById(id) {
+  for (const ch of CHAPTERS) {
+    const lv = ch.levels.find((l) => l.name === id);
+    if (lv) return lv;
+  }
+  return null;
+}

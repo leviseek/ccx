@@ -24,7 +24,11 @@ export function validateLevel(data) {
     if (!v || !Number.isFinite(v.x) || !Number.isFinite(v.y) ||
         !Number.isFinite(v.w) || !Number.isFinite(v.h)) errs.push(tag + ' 需 {x,y,w,h} 数字');
   };
-  if (data.spawn) rect(data.spawn, 'spawn'); else errs.push('缺 spawn');
+  if (data.spawn) {
+    if (!Number.isFinite(data.spawn.x) || !Number.isFinite(data.spawn.y)) errs.push('spawn 需 {x,y} 数字');
+    if (data.spawn.w !== undefined && !Number.isFinite(data.spawn.w)) errs.push('spawn.w 需数字');
+    if (data.spawn.h !== undefined && !Number.isFinite(data.spawn.h)) errs.push('spawn.h 需数字');
+  } else errs.push('缺 spawn');
   rect(data.finish, 'finish');
   for (const s of data.solids ?? []) rect(s, 'solid');
   const switchIds = new Set();

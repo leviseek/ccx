@@ -4,7 +4,7 @@ import { existsSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { dirname, fileURLToPath } from 'node:url';
 
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
+const root = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..');
 const outDir = resolve(process.argv[2] ?? join(root, 'build', 'chrono-wasm'));
 const cpp = join(root, 'engine', 'render', 'wasm', 'render_wasm.cpp');
 const incs = ['foundation', 'render'].map((m) => '-I' + join(root, 'engine', m, 'include')).join(' ');

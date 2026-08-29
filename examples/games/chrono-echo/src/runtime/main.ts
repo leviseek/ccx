@@ -6,7 +6,7 @@ import { sceneDrawLists, hudData } from './scene_draw.ts';
 import { createRenderer } from './renderer.ts';
 import { createInput } from './input.ts';
 import { createAudio } from './audio.ts';
-import { createWebBridge } from '../../platform-web/src/web_bridge.ts';
+import { createWebBridge } from '../../../../packages/platform-web/src/web_bridge.ts';
 import { createEngineRenderer } from './wasm_render.ts';
 import { starRating, runResultOf } from '../metrics.ts';
 

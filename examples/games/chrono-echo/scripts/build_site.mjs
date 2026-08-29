@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { buildSprites } from '../src/sprites.ts';
 import { CHAPTERS } from '../src/levels.ts';
 
-const root = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..', '..');
+const root = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..');
 const site = resolve(process.argv[2] ?? join(root, 'site', 'chrono'));
 
 rmSync(site, { recursive: true, force: true });
@@ -37,12 +37,12 @@ const runtimeFiles = [
   { root: 'packages/platform-web', rel: 'viewport.ts' },
   { root: 'packages/platform-web', rel: 'web_bridge.ts' },
   // 引擎 wasm（渐进增强；产物存在才携带）
-  { root: 'packages/game-chrono', rel: 'build/chrono-wasm/chrono_game.wasm' },
+  { root: 'examples/games/chrono-echo', rel: 'build/chrono-wasm/chrono_game.wasm' },
 ];
 function transpileToJs(entry) {
   const rel = typeof entry === 'string' ? entry : entry.rel;
   const srcRoot = typeof entry === 'string'
-    ? join(root, 'packages', 'game-chrono', 'src')
+    ? join(root, 'examples', 'games', 'chrono-echo', 'src')
     : join(root, entry.root, 'src');
   const srcPath = join(srcRoot, rel);
   const isWasm = rel.endsWith('.wasm');

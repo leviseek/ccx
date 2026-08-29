@@ -6,7 +6,7 @@ import { sceneDrawLists, hudData } from './scene_draw.js';
 import { createRenderer } from './renderer.js';
 import { createInput } from './input.js';
 import { createAudio } from './audio.js';
-import { createWebBridge } from '../../platform-web/src/web_bridge.js';
+import { createWebBridge } from '../../../../packages/platform-web/src/web_bridge.js';
 import { createEngineRenderer } from './wasm_render.js';
 import { starRating, runResultOf } from '../metrics.js';
 

@@ -1,5 +1,5 @@
 // 时之三重奏 · 游戏输入归一化（消费平台桥事件流；游戏不直接接触 DOM）
-import type { PlatformBridge, BridgeInputEvent } from '../../platform-web/src/web_bridge.ts';
+import type { PlatformBridge, BridgeInputEvent } from '../../../../packages/platform-web/src/web_bridge.ts';
 import type { TickInput } from '../chrono_engine.ts';
 
 export interface InputSample { input: TickInput; acts: { action: string; slot: string | undefined }[] }

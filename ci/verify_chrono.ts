@@ -4,9 +4,9 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync, existsSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { validateLevel } from '../packages/game-chrono/src/chrono_engine.ts';
-import { CHAPTERS, levelById } from '../packages/game-chrono/src/levels.ts';
-import { runPlan, SOLVERS } from '../packages/game-chrono/src/solvers.ts';
+import { validateLevel } from '../examples/games/chrono-echo/src/chrono_engine.ts';
+import { CHAPTERS, levelById } from '../examples/games/chrono-echo/src/levels.ts';
+import { runPlan, SOLVERS } from '../examples/games/chrono-echo/src/solvers.ts';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const jsonMode = process.argv.includes('--json');
@@ -21,10 +21,10 @@ function run(label: string, fn: () => string | boolean): void {
 run('node 机制测试', () => {
   execFileSync(process.execPath, [
     '--test', '--test-timeout=20000', '--test-force-exit',
-    'packages/game-chrono/test/chrono_engine.test.ts',
-    'packages/game-chrono/test/sprites_levels.test.ts',
-    'packages/game-chrono/test/runtime.test.ts',
-    'packages/game-chrono/test/metrics.test.ts',
+    'examples/games/chrono-echo/test/chrono_engine.test.ts',
+    'examples/games/chrono-echo/test/sprites_levels.test.ts',
+    'examples/games/chrono-echo/test/runtime.test.ts',
+    'examples/games/chrono-echo/test/metrics.test.ts',
   ], { cwd: root, stdio: 'pipe' });
   return true;
 });
@@ -54,7 +54,7 @@ run('解法回放（1-1/1-2/1-3/1-8）', () => {
 
 // 4) 站点构建 + 产物校验
 run('Web 站点构建', () => {
-  execFileSync(process.execPath, ['packages/game-chrono/scripts/build_site.mjs'], { cwd: root, stdio: 'pipe' });
+  execFileSync(process.execPath, ['examples/games/chrono-echo/scripts/build_site.mjs'], { cwd: root, stdio: 'pipe' });
   return true;
 });
 run('站点产物（assets/levels/index/运行时 ESM）', () => {

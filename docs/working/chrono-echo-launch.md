@@ -48,7 +48,7 @@
 ## 4. 工程结构（TypeScript，ADR-001 双语言）
 
 ```
-packages/game-chrono/
+examples/games/chrono-echo/
   src/
     chrono_engine.ts      # 纯逻辑时轴引擎（残影/换位/机关/物理；确定性强可测）
     metrics.ts            # 星级评级（纯逻辑）
@@ -65,16 +65,16 @@ ci/verify_chrono.ts       # 全链验证器（CI 入口）
 
 ## 5. 运行时/构建
 
-- **Node 24 原生跑 TS**（type stripping 默认开启）：`node --test packages/game-chrono/test/*.test.ts`
+- **Node 24 原生跑 TS**（type stripping 默认开启）：`node --test examples/games/chrono-echo/test/*.test.ts`
 - **TS -> 浏览器 ESM**：Node 内置 `stripTypeScriptTypes` 转译（保留 import/export；.ts 导入改写为 .js）。
   注意：tsc 6.0.3 在 ES2022/NodeNext/Preserve + "type":"module" 下实测仍 emit CommonJS，故弃用（记录于 2026-08-29）。
-- **站点构建**：`node packages/game-chrono/scripts/build_site.mjs` → `site/chrono/`
+- **站点构建**：`node examples/games/chrono-echo/scripts/build_site.mjs` → `site/chrono/`
   （index.html + game.js + ESM 运行时 10 模块 + assets/*.png 8 张 + levels.json + assets.json）
 
 ## 6. 发布（GitHub Pages）
 
 ```bash
-node packages/game-chrono/scripts/build_site.mjs
+node examples/games/chrono-echo/scripts/build_site.mjs
 # 产物 site/chrono/ 推到 gh-pages 分支或仓库 Pages 目录（Settings -> Pages -> Deploy from branch）
 # 访问 https://<user>.github.io/<repo>/chrono/
 ```

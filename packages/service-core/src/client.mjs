@@ -35,7 +35,7 @@ export class RpcClient {
 
   _write(line) {
     if (this.socket) this.socket.write(line + '\n');
-    else this.proc.stdin.write(line);
+    else this.proc.stdin.write(line + '\n');
   }
 
   onLine(line) {

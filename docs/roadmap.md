@@ -24,7 +24,7 @@
 | M1 | 首帧/RHI/RenderGraph/批处理/脚本宿主/导入/模板 | ✅ | demo 19 步；ecs.bench_gate；verify_w1 双后端 10/10 |
 | M2 | 编辑器壳/面板/动画/预制体/MCP/移动端 | ✅ | 14 票；verify_editor_game（出口①）；verify_mcp_loop（出口③）；W6-1（出口② Android） |
 | M3 | 渠道插件/移动资产/GLES3 降级/pixel-art/toon/构建农场/崩溃上报/插件市场 | ✅ | channel_sdk 3 测试；cook 保底；render.caps；pixel_art/toon；crash_reporter |
-| M4 | net sync/UI 深度/远端 daemon/纹理流送/插件市场 | ✅ | sync_channel+world_sync；preview_resolution；plugin RPC；asset_stream |
+| M4 | net sync/UI 深度/远端 daemon/纹理流送/插件市场 | ✅（三出口全闭合） | ① 16 人同屏：network.16p_sync；② 插件市场安装 builder：plugin 4 测试；③ 云构建 TLS+token：remote_daemon 测试（RpcClient.tls + 自签证书） |
 | M5 | 迁移器/cc4-compat/DAM 评审 | ✅ | creator_migrator 4 测试；m5.cc4_compat；review 3 测试 |
 | 环境缺口 | iOS 真机/渠道真机发布/真实 Creator 项目/QuickJS MSVC eval 上游限制 | ⏳ | 非本地代码可闭环（macOS/渠道账号/素材） |
 

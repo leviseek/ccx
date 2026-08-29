@@ -6,7 +6,8 @@ import { sceneDrawLists, hudData } from './scene_draw.ts';
 import { createRenderer } from './renderer.ts';
 import { createInput } from './input.ts';
 import { createAudio } from './audio.ts';
-import { detectChannel } from './channel.ts';
+import { createWebBridge } from '../../platform-web/src/web_bridge.ts';
+import { createEngineRenderer } from './wasm_render.ts';
 import { starRating, runResultOf } from '../metrics.ts';
 
 const levels = CHAPTERS[0].levels;
@@ -18,9 +19,20 @@ const canvas = document.getElementById('ccx-canvas') as HTMLCanvasElement;
 const overlay = document.getElementById('ccx-overlay') as HTMLDivElement;
 const statsEl = document.getElementById('ccx-stats') as HTMLDivElement;
 const renderer = createRenderer(canvas);
-const input = createInput(window);
+// 平台桥（platform-spec §2：显示/输入/渠道 统一由桥接层提供；游戏不直接触碰 DOM/window 适配细节）
+const bridge = createWebBridge({ canvas, target: window, baseW: VIEW_TILES_X * TILE, baseH: VIEW_TILES_Y * TILE });
+const input = createInput(bridge);
+const channel = bridge.channel;
+// 引擎渲染（wasm 软件光栅，渐进增强：加载失败回退 JS 精灵渲染）
+void createEngineRenderer().then((engine) => { if (engine.ready) renderer.setEngine(engine); });
+
+// 屏幕适配（桥接层策略）：游戏只请求视口应用；DPR/整数倍缩放由 platform-web 实现
+function fitToView(): void {
+  const vp = bridge.display.applyViewport();
+  renderer.setView(vp.logicalW, vp.logicalH, bridge.display.dpr);
+}
+bridge.display.onResize(fitToView);
 const audio = createAudio();
-const channel = detectChannel();
 let paused = false;
 let lastLogLen = 0;
 let pendingJumpSound = 0;
@@ -124,5 +136,6 @@ function frame(now: number): void {
 
 document.addEventListener('DOMContentLoaded', () => {
   load(levelIndex);
+  fitToView();
   requestAnimationFrame((t) => { last = t; requestAnimationFrame(frame); });
 });

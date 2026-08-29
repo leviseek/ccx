@@ -70,10 +70,13 @@ run('站点产物（assets/levels/index/运行时 ESM）', () => {
   const engine = readFileSync(join(site, 'chrono_engine.js'), 'utf8');
   if (!/export /.test(engine)) throw new Error('engine 非 ESM');
   if (!existsSync(join(site, 'assets', 'player.png'))) throw new Error('精灵 PNG 缺失');
-  for (const f of ['runtime/audio.js', 'runtime/channel.js', 'metrics.js']) {
+  for (const f of ['runtime/audio.js', 'runtime/wasm_render.js', 'metrics.js']) {
     if (!existsSync(join(site, f))) throw new Error('缺少运行时文件: ' + f);
   }
-  return '8 PNG + 12 关 + ESM 运行时(10 模块)';
+  for (const f of ['platform-web/src/web_bridge.js', 'platform-web/src/viewport.js']) {
+    if (!existsSync(join(site, f))) throw new Error('缺少平台桥: ' + f);
+  }
+  return '8 PNG + 12 关 + ESM 运行时 + 平台桥';
 });
 
 const allPassed = checks.every((c) => c.ok);

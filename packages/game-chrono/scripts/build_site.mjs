@@ -32,19 +32,41 @@ import { stripTypeScriptTypes } from 'node:module';
 const runtimeFiles = [
   'chrono_engine.ts', 'levels.ts', 'sprite_data.ts', 'metrics.ts',
   'runtime/scene_draw.ts', 'runtime/renderer.ts', 'runtime/input.ts', 'runtime/main.ts',
-  'runtime/audio.ts', 'runtime/channel.ts',
+  'runtime/audio.ts', 'runtime/wasm_render.ts',
+  // 平台桥（platform-web）：显示/输入/渠道适配器（与运行时同链进站点镜像）
+  { root: 'packages/platform-web', rel: 'viewport.ts' },
+  { root: 'packages/platform-web', rel: 'web_bridge.ts' },
+  // 引擎 wasm（渐进增强；产物存在才携带）
+  { root: 'packages/game-chrono', rel: 'build/chrono-wasm/chrono_game.wasm' },
 ];
-function transpileToJs(rel) {
-  const srcPath = join(root, 'packages', 'game-chrono', 'src', rel);
-  if (!existsSync(srcPath)) throw new Error('缺失运行时源: ' + rel);
+function transpileToJs(entry) {
+  const rel = typeof entry === 'string' ? entry : entry.rel;
+  const srcRoot = typeof entry === 'string'
+    ? join(root, 'packages', 'game-chrono', 'src')
+    : join(root, entry.root, 'src');
+  const srcPath = join(srcRoot, rel);
+  const isWasm = rel.endsWith('.wasm');
+  if (!existsSync(srcPath)) {
+    if (typeof entry !== 'string' && isWasm) return rel;   // 可选产物：缺失跳过（渐进增强）
+    throw new Error('缺失运行时源: ' + rel);
+  }
+  const outRel = (typeof entry === 'string')
+    ? rel.replace(/\.ts$/, '.js')                                     // game-chrono -> site/<rel>（保持相对链）
+    : (isWasm ? 'chrono_game.wasm'                                     // 引擎 wasm -> 站点根（fetch 相对 index.html）
+              : 'platform-web/src/' + rel.replace(/\.ts$/, '.js'));  // 跨包 -> site/platform-web/src/（main 相对导入 ../../platform-web/src/ 命中）
+  if (isWasm) {
+    const outPath = join(site, outRel);
+    mkdirSync(dirname(outPath), { recursive: true });
+    writeFileSync(outPath, readFileSync(srcPath));
+    return outRel;
+  }
   let code = readFileSync(srcPath, 'utf8');
-  // .ts 导入 -> .js（stripTypeScriptTypes 不改写路径）
   code = code.replace(/(from\s+['"])([^'"]+)\.ts(['"])/g, (m, a, b, c) => a + b + '.js' + c);
   code = stripTypeScriptTypes(code);
-  const outPath = join(site, rel.replace(/\.ts$/, '.js'));
+  const outPath = join(site, outRel);
   mkdirSync(dirname(outPath), { recursive: true });
   writeFileSync(outPath, code);
-  return rel;
+  return outRel;
 }
 const runtimeBuilt = runtimeFiles.map(transpileToJs);
 
@@ -57,7 +79,7 @@ writeFileSync(join(site, 'index.html'), [
   'body{margin:0;background:#0b0c1a;color:#e8e8ff;font:14px monospace;display:flex;flex-direction:column;align-items:center;}',
   '#ccx-title{margin:14px 0 4px;font-size:20px;letter-spacing:2px;}',
   '#ccx-sub{color:#7f88b8;font-size:12px;margin-bottom:12px;}',
-  '#ccx-canvas{border:1px solid #33365a;border-radius:6px;box-shadow:0 0 24px rgba(76,191,168,.25);}',
+  '#ccx-canvas{border:1px solid #33365a;border-radius:6px;box-shadow:0 0 24px rgba(76,191,168,.25);display:block;margin:0 auto;}',
   '#ccx-controls{margin:12px 0;color:#9fe2d0;font-size:12px;}',
   '#ccx-overlay{position:absolute;inset:0;display:flex;flex-direction:column;gap:12px;align-items:center;justify-content:center;background:rgba(11,12,26,.82);}',
   '#ccx-overlay.hidden{display:none;}',
@@ -65,6 +87,9 @@ writeFileSync(join(site, 'index.html'), [
   '.ccx-win-stats{font-size:14px;color:#e8e8ff;}',
   '#ccx-overlay button{font:14px monospace;padding:8px 18px;border:1px solid #4cbfa8;background:#13223a;color:#9fe2d0;border-radius:4px;cursor:pointer;}',
   '#ccx-overlay button:hover{background:#1d3a52;}',
+  '#ccx-touch-buttons{display:flex;gap:10px;justify-content:center;margin-top:10px;flex-wrap:wrap;}',
+  '#ccx-touch-buttons button{font:20px monospace;padding:10px 22px;border:1px solid #4cbfa8;background:#13223a;color:#9fe2d0;border-radius:8px;cursor:pointer;touch-action:none;user-select:none;}',
+  '#ccx-touch-buttons button:active{background:#1d3a52;}',
   '</style></head><body>',
   '<div id="ccx-title">时之三重奏 · Chrono Echo</div>',
   '<div id="ccx-sub">时间采掘公司第一章 · 遗迹采掘（残影 = 过去的你）</div>',
@@ -79,6 +104,11 @@ writeFileSync(join(site, 'index.html'), [
   '</div></div>',
   '<div id="ccx-controls">←→/AD 移动 · 空格/W/↑ 跳跃 · R 录制/停止 · E 召唤残影 · Q 与残影换位 · P 暂停 · 选关 ?level=1-N</div>',
   '<div id="ccx-pause-hint" style="color:#4cbfa8;height:16px;margin-bottom:8px;"></div>',
+  '<div id="ccx-touch-buttons">',
+  '<button id="ccx-btn-left">◀</button> <button id="ccx-btn-right">▶</button>',
+  '<button id="ccx-btn-jump">跳</button> <button id="ccx-btn-rec">R</button>',
+  '<button id="ccx-btn-sum">E</button> <button id="ccx-btn-swap">Q</button>',
+  '</div>',
   '<script type="module" src="game.js"></script></body></html>', '',
 ].join('\n'));
 

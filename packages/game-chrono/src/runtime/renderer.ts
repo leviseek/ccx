@@ -10,14 +10,53 @@ export const VIEW_TILES_Y = 12;      // 视口高（tiles）
 export interface Renderer {
   canvas: HTMLCanvasElement;
   ctx: CanvasRenderingContext2D;
+  /** 视口适配：逻辑尺寸（CSS px）+ DPR；整数倍像素缩放由 main 计算 */
+  setView(logicalW: number, logicalH: number, dpr: number): void;
+  /** 引擎渲染（wasm 软件光栅）；未设置/不可用时回退 JS 精灵渲染 */
+  setEngine(engine: { renderFrame(rects: EngineRect[], cx: number, cy: number, vw: number, vh: number, out: Uint8Array): boolean }): void;
   draw(drawLists: DrawLists, hud: HudData): void;
 }
 
+export interface EngineRect { x: number; y: number; w: number; h: number; color: number }
+
 export function createRenderer(canvas: HTMLCanvasElement): Renderer {
   const ctx = canvas.getContext('2d')!;
-  canvas.width = VIEW_TILES_X * TILE;
-  canvas.height = VIEW_TILES_Y * TILE;
+  let viewW = VIEW_TILES_X * TILE;
+  let viewH = VIEW_TILES_Y * TILE;
+  let dpr = 1;
+  canvas.width = viewW;
+  canvas.height = viewH;
   ctx.imageSmoothingEnabled = false;
+
+  function setView(logicalW: number, logicalH: number, deviceRatio: number): void {
+    viewW = Math.max(1, Math.round(logicalW));
+    viewH = Math.max(1, Math.round(logicalH));
+    dpr = Math.max(1, deviceRatio || 1);
+    canvas.style.width = viewW + 'px';
+    canvas.style.height = viewH + 'px';
+    canvas.width = Math.round(viewW * dpr);
+    canvas.height = Math.round(viewH * dpr);
+  }
+
+  let engine: Renderer['engine'] = null;
+  let engineCanvas: HTMLCanvasElement | null = null;
+  let engineCtx: CanvasRenderingContext2D | null = null;
+  let enginePixels: Uint8Array | null = null;
+
+  /** 世界 -> 引擎光栅矩形（主题色；残影半透明） */
+  function worldRects(L: DrawLists): EngineRect[] {
+    const C = (r: number, g: number, b: number, a = 255) => ((a << 24) | (r << 16) | (g << 8) | b) >>> 0;
+    const rects: EngineRect[] = [];
+    const push = (x: number, y: number, w: number, h: number, color: number) => rects.push({ x, y, w, h, color });
+    for (const s of L.solids) push(s.x, s.y, s.w, s.h, C(59, 61, 92));       // 暗砖
+    for (const sw of L.switches) push(sw.x, sw.y, sw.w, sw.h, sw.on ? C(224, 82, 82) : C(107, 111, 143));
+    for (const d of L.doors) if (!d.open) push(d.x, d.y, d.w, d.h, C(138, 95, 216));
+    for (const c of L.collectibles) push(c.x, c.y, c.w, c.h, C(255, 215, 94));
+    push(L.finish.x, L.finish.y, L.finish.w, L.finish.h, C(76, 191, 168));
+    for (const e of L.echoes) push(e.x, e.y, e.w, e.h, C(76, 191, 168, 110));
+    { const p = L.player; push(p.x, p.y, p.w, p.h, C(78, 107, 216)); }
+    return rects;
+  }
 
   const tex: Record<string, HTMLCanvasElement> = {};
   function texFor(name: string): HTMLCanvasElement {
@@ -36,7 +75,27 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer {
 
   function draw(L: DrawLists, hud: HudData): void {
     const levelW = L.levelW * TILE, levelH = L.levelH * TILE;
-    const viewW = canvas.width, viewH = canvas.height;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);   // 物理像素 -> 逻辑坐标
+    // 引擎渲染路径（wasm 软件光栅）：真引擎管线出帧
+    if (engine) {
+      const camX = Math.max(0, Math.min(L.player.x * TILE - viewW / 2, levelW - viewW));
+      const camY = Math.max(0, Math.min(L.player.y * TILE - viewH / 2, levelH - viewH));
+      if (!engineCanvas) {
+        engineCanvas = document.createElement('canvas');
+        engineCtx = engineCanvas.getContext('2d')!;
+      }
+      engineCanvas.width = viewW; engineCanvas.height = viewH;
+      if (!enginePixels || enginePixels.length !== viewW * viewH * 4) enginePixels = new Uint8Array(viewW * viewH * 4);
+      if (engine.renderFrame(worldRects(L), camX, camY, viewW, viewH, enginePixels)) {
+        const img = engineCtx!.createImageData(viewW, viewH);
+        img.data.set(enginePixels);
+        engineCtx!.putImageData(img, 0, 0);
+        ctx.imageSmoothingEnabled = false;
+        ctx.drawImage(engineCanvas, 0, 0, viewW, viewH);
+        drawHud(hud);
+        return;
+      }
+    }
     const camX = Math.max(0, Math.min(L.player.x * TILE - viewW / 2, levelW - viewW));
     const camY = Math.max(0, Math.min(L.player.y * TILE - viewH / 2, levelH - viewH));
     const at = (wx: number, wy: number): [number, number] => [wx * TILE - camX, wy * TILE - camY];
@@ -125,5 +184,5 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer {
       ctx.globalAlpha = 1;
     }
   }
-  return { canvas, ctx, draw };
+  return { canvas, ctx, setView, draw };
 }

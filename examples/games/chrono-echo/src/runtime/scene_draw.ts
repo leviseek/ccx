@@ -13,6 +13,12 @@ export interface DrawLists {
   levelW: number; levelH: number;
 }
 
+export function computeCam(playerX: number, levelW: number, viewW: number): number {
+  const span = levelW - viewW;
+  if (span <= 0) return (levelW - viewW) / 2;
+  return Math.max(0, Math.min(playerX - viewW / 2, span));
+}
+
 /** 世界状态 -> 渲染意图（确定性；同状态同输出） */
 export function sceneDrawLists(state: GameState, level: LevelDef): DrawLists {
   const solids: DrawRect[] = (level.solids ?? []).map((s) => ({ x: s.x, y: s.y, w: s.w, h: s.h }));

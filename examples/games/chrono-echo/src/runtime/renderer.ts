@@ -2,6 +2,7 @@
 // 精灵纹理：sprite_data 像素 -> offscreen canvas（imageSmoothing=false 保像素感）
 import { artPixels } from '../sprite_data.ts';
 import type { DrawLists, HudData } from './scene_draw.ts';
+import { computeCam } from './scene_draw.ts';
 
 export const TILE = 32;              // 渲染像素/tile
 export const VIEW_TILES_X = 24;      // 视口宽（tiles）
@@ -78,7 +79,7 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer {
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);   // 物理像素 -> 逻辑坐标
     // 引擎渲染路径（wasm 软件光栅）：真引擎管线出帧
     if (engine) {
-      const camX = Math.max(0, Math.min(L.player.x * TILE - viewW / 2, levelW - viewW));
+      const camX = computeCam(L.player.x * TILE, levelW, viewW);
       const camY = Math.max(0, Math.min(L.player.y * TILE - viewH / 2, levelH - viewH));
       if (!engineCanvas) {
         engineCanvas = document.createElement('canvas');
@@ -96,8 +97,8 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer {
         return;
       }
     }
-    const camX = Math.max(0, Math.min(L.player.x * TILE - viewW / 2, levelW - viewW));
-    const camY = Math.max(0, Math.min(L.player.y * TILE - viewH / 2, levelH - viewH));
+    const camX = computeCam(L.player.x * TILE, levelW, viewW);
+    const camY = computeCam(L.player.y * TILE, levelH, viewH);
     const at = (wx: number, wy: number): [number, number] => [wx * TILE - camX, wy * TILE - camY];
     const onScreen = (sx: number, sw: number) => sx < viewW && sx + sw > 0;
 
@@ -169,10 +170,10 @@ export function createRenderer(canvas: HTMLCanvasElement): Renderer {
     ctx.fillText(hud.levelName, 10, 23);
     ctx.font = '12px monospace';
     ctx.fillStyle = '#ffd75e';
-    ctx.fillText('碎片 ' + hud.collected + '/' + hud.totalCollectibles, 320, 23);
+    ctx.fillText('碎片 ' + hud.collected + '/' + hud.totalCollectibles, Math.round(viewW * 0.42), 23);
     const slotTxt = hud.echoSlots.map((s) => s.id + ':' + (s.hasBlueprint ? '已录' : '未录') + (s.uses + 'x')).join('  ');
     ctx.fillStyle = '#9fe2d0';
-    ctx.fillText('残影 ' + slotTxt, 480, 23);
+    ctx.fillText('残影 ' + slotTxt, Math.round(viewW * 0.62), 23);
     if (hud.hint && !hud.won) {
       ctx.globalAlpha = 0.9;
       ctx.fillStyle = 'rgba(12,14,26,0.7)';

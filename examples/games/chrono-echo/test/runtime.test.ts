@@ -1,10 +1,20 @@
 // 时之三重奏 · 运行时绘制指令 + 解法回放测试（纯逻辑层）
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { sceneDrawLists, hudData } from '../src/runtime/scene_draw.ts';
+import { sceneDrawLists, hudData, computeCam } from '../src/runtime/scene_draw.ts';
 import { CHAPTERS, levelById } from '../src/levels.ts';
 import { createGame, actions } from '../src/chrono_engine.ts';
 import { runPlan, SOLVERS } from '../src/solvers.ts';
+
+test('computeCam: 视口大于关卡 -> 居中（负相机曾把世界推出屏外）', () => {
+  const cam = computeCam(100, 768, 2560);
+  assert.equal(cam, (768 - 2560) / 2, '视口超出即居中');
+});
+
+test('computeCam: 正常视口钳制 [0, span]', () => {
+  assert.equal(computeCam(100, 768, 512), 0);
+  assert.equal(computeCam(700, 768, 512), 256);
+});
 
 test('sceneDrawLists: 1-1 世界 -> 渲染意图（结构黄金）', () => {
   const level = levelById('1-1 初涉矿区')!;

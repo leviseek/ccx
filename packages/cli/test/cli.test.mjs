@@ -152,7 +152,7 @@ test('ccx demo all：端到端编排（open/apply/save/build/cook）', () => {
     ['scene.open', 'scene.apply', 'scene.save', 'build.run',
      'profiler.snapshot', 'frame.gif', 'frame.wgpu', 'spine.frame', 'contact.gif',
      'mcp.tools', 'mcp.call', 'session.demo', 'script.run', 'script.engine',
-     'profiler.frames', 'status.summary', 'build.web', 'cook']);
+     'profiler.frames', 'status.summary', 'build.web', 'cook', 'plugin.market']);
   assert.ok(out.steps.every((s) => s.ok), '每步 ok');
   assert.ok(out.steps[3].trace >= 5, 'hooks 走完');
   assert.equal(out.steps[4].frames, 1, 'profiler 帧快照');
@@ -512,7 +512,7 @@ test('ccx doctor --demo：一键 e2e 健康', () => {
   assert.equal(r.status, 0, r.err + r.out);
   const out = JSON.parse(r.out);
   assert.equal(out.ok, true);
-  assert.equal(out.demo.steps, 18);
+  assert.equal(out.demo.steps, 19);
   assert.equal(out.demo.allOk, true);
   assert.ok(out.demo.totalMs > 0, '总耗时已测');
   assert.ok(out.demo.slowest.length > 0, '最慢步已标注');
@@ -577,7 +577,7 @@ test('ccx doctor --summary：状态汇总（机器可消费）', () => {
   assert.ok(out.summary.engineModules >= 13, '引擎模块数');
   assert.ok(out.summary.ctestCount >= 46, 'CTest 计数');
   assert.ok(out.summary.nodeTestFiles >= 23, 'Node 测试文件数');
-  assert.equal(out.summary.demoSteps, 18);
+  assert.equal(out.summary.demoSteps, 19);
   assert.ok(out.summary.generatedAt.length > 0, '时间戳');
 });
 
@@ -713,7 +713,7 @@ test('ccx doctor --all：五合一总页', () => {
   assert.ok('checks' in out && 'summary' in out && 'demo' in out, '三键齐备');
   assert.ok(out.checks['脚本宿主模块（QuickJS）'], '脚本检查');
   assert.ok(out.summary.ctestCount >= 51, 'CTest 数');
-  assert.equal(out.demo.steps, 18);
+  assert.equal(out.demo.steps, 19);
 });
 
 test('ccx doctor --net：W1 网络探测（结构断言）', () => {

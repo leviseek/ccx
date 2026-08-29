@@ -404,7 +404,7 @@ test('daemon: plugin 市场 RPC（install/list/get，M4 插件市场上线）', 
     const bad = await client.request('plugin.install', { dir });
     assert.equal(bad.ok, false);
     // 写清单 -> 安装成功
-    writeFileSync(join(dir, 'ccx-plugin.json'), JSON.stringify({ name: 'webgl-shadow', version: '1.2.0', type: 'builder', platform: 'web-desktop' }));
+    writeFileSync(join(dir, 'ccx-plugin.json'), JSON.stringify({ name: 'webgl-shadow', version: '1.2.0', type: 'builder', platform: 'web-shadow' }));
     const inst = await client.request('plugin.install', { dir });
     assert.equal(inst.ok, true);
     const list = await client.request('plugin.list');

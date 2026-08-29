@@ -758,7 +758,7 @@ async function main() {
       const plugDir = resolve(join(here, '..', '..', '..', 'build', 'local', 'demo-plugin'));
       mkdirSync(plugDir, { recursive: true });
       writeFileSync(join(plugDir, 'ccx-plugin.json'),
-        JSON.stringify({ name: 'demo-toon', version: '1.0.0', type: 'builder', platform: 'web-desktop' }));
+        JSON.stringify({ name: 'demo-toon', version: '1.0.0', type: 'builder', platform: 'web-shadow' }));
       const plugInst = await client.request('plugin.install', { dir: plugDir });
       const plugList = await client.request('plugin.list');
       const plugOk = plugInst.ok === true &&
@@ -1368,7 +1368,7 @@ async function main() {
         engineModules: mods,
         ctestCount: countAddTestSync(root),
         nodeTestFiles: countTestFilesSync(root),
-        demoSteps: 18,
+        demoSteps: 19,
         generatedAt: new Date().toISOString(),
       },
     });
@@ -1515,10 +1515,10 @@ async function main() {
         engineModules: checksAll['引擎模块计数'],
         ctestCount: checksAll['CTest 数（本地）'],
         nodeTestFiles: checksAll['Node 测试文件数'],
-        demoSteps: 18,
+        demoSteps: 19,
         generatedAt: new Date().toISOString(),
       },
-      demo: { steps: 18, allOk: true,
+      demo: { steps: 19, allOk: true,
               note: '健康+性能见 cxx doctor --demo（两轮计时）' },
       hint: '五合一：环境(checks) + 规模(summary) + 交付链(demo=15 步)',
     });

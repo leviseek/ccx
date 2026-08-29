@@ -58,7 +58,7 @@ run('Web 站点构建', () => {
   return true;
 });
 run('站点产物（assets/levels/index/运行时 ESM）', () => {
-  const site = join(root, 'site', 'chrono');
+  const site = join(root, 'build', 'chrono-site');
   const assets = JSON.parse(readFileSync(join(site, 'assets.json'), 'utf8'));
   if (assets.schema !== 'ccx.assets.index/1' || assets.assets.length !== 8) throw new Error('assets 索引异常');
   const lv = JSON.parse(readFileSync(join(site, 'levels.json'), 'utf8'));

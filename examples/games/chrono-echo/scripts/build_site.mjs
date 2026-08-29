@@ -1,5 +1,5 @@
 // 时之三重奏 · 静态站点构建（Web 发布产物：index.html + game.js + 运行时 JS(tsc) + 资产 PNG + 关卡索引）
-// 产物目录：site/chrono/（可直接 GitHub Pages 发布；assets.json 可被 build-service 校验）
+// 产物目录：build/chrono-site/（构建产物归 build/；可直接 GitHub Pages 发布；assets.json 可被 build-service 校验）
 // 工具脚本（mjs）；业务运行时为 TypeScript（ADR-001），经 tsc 转译为浏览器 ESM
 import { mkdirSync, writeFileSync, readFileSync, rmSync, existsSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
@@ -8,7 +8,7 @@ import { buildSprites } from '../src/sprites.ts';
 import { CHAPTERS } from '../src/levels.ts';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..', '..', '..', '..');
-const site = resolve(process.argv[2] ?? join(root, 'site', 'chrono'));
+const site = resolve(process.argv[2] ?? join(root, 'build', 'chrono-site'));
 
 rmSync(site, { recursive: true, force: true });
 mkdirSync(join(site, 'assets'), { recursive: true });

@@ -75,7 +75,7 @@ ci/verify_chrono.ts       # 全链验证器（CI 入口）
 
 ```bash
 node examples/games/chrono-echo/scripts/build_site.mjs
-# 产物 site/chrono/ 推到 gh-pages 分支或仓库 Pages 目录（Settings -> Pages -> Deploy from branch）
+# 产物 build/chrono-site/ 推到 gh-pages 分支或仓库 Pages 目录（Settings -> Pages -> Deploy from branch）
 # 访问 https://<user>.github.io/<repo>/chrono/
 ```
 

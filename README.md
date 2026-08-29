@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.216（2026-08-29）**：时之三重奏真浏览器修复——statsEl null 崩溃（启动即抛错致画布空白/未适配/无引导）→ DOM 防御 + 开始界面（选关/开始按钮/操作说明/音频手势解锁）+ 错误可见化 + file:// 引导提示。
 - **v0.3.215（2026-08-29）**：仓库内 CLI 便捷入口 `node ccx.mjs <cmd>`（转调 packages/cli/bin/ccx.mjs，任意 cwd/退出码透传）；无全局安装依赖。
 - **v0.3.214（2026-08-29）**：`ccx serve` 静态站点预览（build/chrono-site 一键 + --watch 热重载 + MIME/越界防护）。
 - **v0.3.213（2026-08-29）**：实时预览工具链——**ccx preview**（Web 双平台实时预览 + --watch SSE 热刷新）+ **preview_native.exe**（Windows 原生窗口预览器：engine/platform/win32 DisplayAdapter 实现 bridge.h 契约首个原生落地；headless 单帧验证 960×540 PPM）；文档 docs/working/preview-tooling.md。

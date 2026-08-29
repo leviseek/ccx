@@ -16,7 +16,7 @@ const keymap: Record<string, string> = {
   ArrowRight: 'right', KeyD: 'right',
   ArrowUp: 'jump', Space: 'jump', KeyW: 'jump',
   KeyR: 'recordA', KeyT: 'recordB',
-  KeyE: 'summon', KeyQ: 'swap',
+  KeyE: 'summon', KeyQ: 'swap', KeyP: 'pause',
 };
 
 /** 键盘采样（浏览器事件绑定；触屏按钮一并支持） */
@@ -48,6 +48,7 @@ export function createInput(target: Window = window): Input {
       if (p === 'recordB') acts.push({ action: 'record', slot: level.echoes[1]?.id });
       if (p === 'summon') acts.push({ action: 'summon', slot: level.echoes[0]?.id });
       if (p === 'swap') acts.push({ action: 'swap', slot: level.echoes[0]?.id });
+      if (p === 'pause') acts.push({ action: 'pause', slot: undefined });
     }
     return { input, acts };
   }

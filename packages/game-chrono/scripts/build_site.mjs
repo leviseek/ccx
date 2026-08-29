@@ -30,8 +30,9 @@ writeFileSync(join(site, 'levels.json'), JSON.stringify(levelsDoc, null, 1));
 //    镜像 src 结构到 site/（相对导入链 ../chrono_engine.js 保持有效）
 import { stripTypeScriptTypes } from 'node:module';
 const runtimeFiles = [
-  'chrono_engine.ts', 'levels.ts', 'sprite_data.ts',
+  'chrono_engine.ts', 'levels.ts', 'sprite_data.ts', 'metrics.ts',
   'runtime/scene_draw.ts', 'runtime/renderer.ts', 'runtime/input.ts', 'runtime/main.ts',
+  'runtime/audio.ts', 'runtime/channel.ts',
 ];
 function transpileToJs(rel) {
   const srcPath = join(root, 'packages', 'game-chrono', 'src', rel);
@@ -71,11 +72,13 @@ writeFileSync(join(site, 'index.html'), [
   '<canvas id="ccx-canvas"></canvas>',
   '<div id="ccx-overlay" class="hidden">',
   '<div class="ccx-win-title"></div><div class="ccx-win-stats"></div>',
-  '<div><button id="ccx-retry">重玩本关 (R)</button> ',
+  '<div><button id="ccx-retry">重玩本关</button> ',
   '<button id="ccx-prev">上一关</button> ',
-  '<button id="ccx-next">下一关</button></div>',
+  '<button id="ccx-next">下一关</button> ',
+  '<button id="ccx-share" style="display:none">分享</button></div>',
   '</div></div>',
-  '<div id="ccx-controls">←→/AD 移动 · 空格/W/↑ 跳跃 · R 录制/停止 · E 召唤残影 · Q 与残影换位 · 选关 ?level=1-N</div>',
+  '<div id="ccx-controls">←→/AD 移动 · 空格/W/↑ 跳跃 · R 录制/停止 · E 召唤残影 · Q 与残影换位 · P 暂停 · 选关 ?level=1-N</div>',
+  '<div id="ccx-pause-hint" style="color:#4cbfa8;height:16px;margin-bottom:8px;"></div>',
   '<script type="module" src="game.js"></script></body></html>', '',
 ].join('\n'));
 

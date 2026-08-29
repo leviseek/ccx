@@ -24,6 +24,7 @@ run('node 机制测试', () => {
     'packages/game-chrono/test/chrono_engine.test.ts',
     'packages/game-chrono/test/sprites_levels.test.ts',
     'packages/game-chrono/test/runtime.test.ts',
+    'packages/game-chrono/test/metrics.test.ts',
   ], { cwd: root, stdio: 'pipe' });
   return true;
 });
@@ -69,7 +70,10 @@ run('站点产物（assets/levels/index/运行时 ESM）', () => {
   const engine = readFileSync(join(site, 'chrono_engine.js'), 'utf8');
   if (!/export /.test(engine)) throw new Error('engine 非 ESM');
   if (!existsSync(join(site, 'assets', 'player.png'))) throw new Error('精灵 PNG 缺失');
-  return '8 PNG + 12 关 + ESM 运行时';
+  for (const f of ['runtime/audio.js', 'runtime/channel.js', 'metrics.js']) {
+    if (!existsSync(join(site, f))) throw new Error('缺少运行时文件: ' + f);
+  }
+  return '8 PNG + 12 关 + ESM 运行时(10 模块)';
 });
 
 const allPassed = checks.every((c) => c.ok);

@@ -139,6 +139,7 @@
 
 ## 变更记录
 
+- **v0.3.210（2026-08-29）**：游戏示例「时之三重奏」开工——PNG 编码器（asset-service png_writer，IDAT roundtrip 3/3）+ 纯逻辑时轴引擎（chrono_engine：残影录制/重放/换位守恒/latch+window 时序机关/事件日志，9/9）——资产管线写入侧对称补齐。
 - **v0.3.209（2026-08-29）**：vendor 纪律闭环——vendor_check 许可检测覆盖 LICENSE/LICENSE.txt/LICENSE.md（quickjs LICENSE.txt 不再误报）+ webgpu-headers 补上游 BSD-3-Clause LICENSE（1,533B 无 BOM）——6 vendor 包零 WARN 全绿。
 - **v0.3.208（2026-08-29）**：M0–M5 终检收口——daemon RPC 回归修复（stdio 补 `\n`）+ 插件 builder 平台冲突修复（demo 19 步全绿）+ node 全套 150/150（41 文件）+ CI 全绿。
 - **v0.3.207（2026-08-29）**：M5 cc4-compat 基线（cc.Node façade 驱动 ECS）；M4 五项全落地（net sync delta + World 回放 + daemon token + 纹理流送 + UI 多分辨率）；M3 toon-2d/崩溃上报；M5 迁移器核心。ctest 71/71、node 132/132、CI 三 job 全绿。
